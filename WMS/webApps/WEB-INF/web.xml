@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+
+	<display-name>WMS</display-name>
+	
+	<servlet>
+		<servlet-name>FrontControler</servlet-name>
+		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>/WEB-INF/struts-config.xml</param-value>
+		</init-param>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>FrontControler</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	
+	<welcome-file-list>
+		<welcome-file>/v3/util/login.jsp</welcome-file>
+		<welcome-file>/ElRey/login.jsp</welcome-file>
+	</welcome-file-list>
+	
+    <!-- 
+    <error-page>
+        <error-code>404</error-code>
+        <location>/v3/error404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/v3/error500.jsp</location>
+    </error-page>
+	 -->
+	 <servlet>
+	    <description>JAX-RS Tools Generated - Do not modify</description>
+	    <servlet-name>JAX-RS Servlet</servlet-name>
+	    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+	    <load-on-startup>2</load-on-startup>
+	  </servlet>
+	  <servlet-mapping>
+	    <servlet-name>JAX-RS Servlet</servlet-name>
+	    <url-pattern>/jaxrs/*</url-pattern>
+	  </servlet-mapping>
+	  <servlet>
+	    <servlet-name>JerseyService</servlet-name>
+	    <servlet-class>
+	       com.sun.jersey.spi.container.servlet.ServletContainer
+	    </servlet-class>
+	    <load-on-startup>1</load-on-startup>
+	  </servlet>
+	  <servlet-mapping>
+	    <servlet-name>JerseyService</servlet-name>
+	    <url-pattern>/rest/*</url-pattern>
+	  </servlet-mapping>
+	 <jsp-config> 
+        <taglib> 
+	    	<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+	    	<taglib-location>/WEB-INF/c.tld</taglib-location>
+  		</taglib>
+  	</jsp-config>
+</web-app>

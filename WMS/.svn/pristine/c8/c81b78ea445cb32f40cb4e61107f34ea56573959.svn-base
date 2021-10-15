@@ -1,0 +1,144 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false"%>
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<c:choose>
+  <c:when test="${css=='IE'}">
+    <link rel="stylesheet" href="<%=basePath%>v3/assets/handheld/buscador.css" media="screen" />
+  </c:when>
+  <c:otherwise>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="<%=basePath%>v3/assets/css/responsiveForms.css" type="text/css">
+  </c:otherwise>
+</c:choose>
+
+<link rel="stylesheet" href="../assets/css/EstiloScroll.css" />
+
+<script type="text/javascript">
+	function confirmar(){
+		var texto = document.getElementById("nuevoOjo").value;
+		if (texto.length > 0 ){
+			if(confirm("Estas seguro??")){
+				alert("hacer logica");
+			}
+		} else {
+			var valores = document.getElementsByName("nombre");
+			var checkeado = false;
+			for(var i=0 ; i<valores.length; i++){
+				if(valores[i].checked){
+					checkeado = true;
+					break;
+				}
+			}
+			if(checkeado){
+				if(confirm("Estas seguro??")){
+					alert("hacer logica");
+				}
+			}else{
+				alert("Seleccione alguna posicion posible");
+			} 
+			
+			}		
+		}
+	
+</script>
+
+</head>
+<body>
+
+<c:if test="${uLogeado!=null}">
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+
+</head>
+<body id="dt_example" style="border-left: 0;">
+
+
+	<form id="formulario" action="<%=basePath%>/gonzaa.do" method="post">
+		<c:if test="${uLogeado!=null}">
+			<c:forEach var="d" items="${uLogeado.seguridadUI}">
+				<c:if test="${d=='box_cant_picking'}">
+					<c:set var="puede" scope="page" value="1" />
+				</c:if>
+			</c:forEach>
+			<div class="products-main" align="center" style="float: left;">
+				<div class="container" style="float: left;">
+					<div align="center">
+						<p>
+							<strong style="font-size: 15pt; color: green; font-weight: bold;"><c:out
+									value="Posiciones Posibles"></c:out></strong>
+						</p>
+					</div>
+
+
+
+					<table id="PedidoDesc">
+						<tr>
+							<th style="width: 70%;">Ojo</th>
+							<th style="width: 30px;">Usar</th>
+							<th style="width: 10px;">&nbsp</th>
+						</tr>
+
+						<div class="overflow-auto">
+							<c:forEach var="d" items="${infoOjos}">
+								<tr class="gradeD">
+									<td>${d}</td>
+									<td>
+										<!--  <a onclick="color('${d}')"><img id="${d}" alt="Iniciar" src="<%=basePath%>imagenes/icons/accept.png" border="0" style="width: 20px; filter: grayscale(100%);"></a>-->
+										<input type="radio" id="${d}" value="${d}" name="nombre" />
+									</td>
+								</tr>
+
+							</c:forEach>
+
+						</div>
+					</table>
+
+					<div class="field" align="center">
+						<div style="height: 5px;"></div>
+						<table>
+							<tr>
+								<td>
+									<p align="center">
+										<strong style="font-size: 10pt;"> Nueva </strong>
+									</p>
+
+								</td>
+								<td><input type="text" class="input" name="confirmarOjo"
+									id="nuevoOjo" value="" onchange="" /></td>
+
+							</tr>
+						</table>
+						<input class="col-100 button" type="button" name="1"
+							onclick="confirmar()" value="Confirmar" />
+					</div>
+				</div>
+		</c:if>
+	</form>
+
+
+
+
+	<audio id="xyz" src="<%=basePath%>/audio/error.mp3" preload="auto"></audio>
+	<c:if test="${menError!=null}">
+		<script type="text/javascript">
+				alert('${menError}');
+			</script>
+
+	</c:if></c:if>
+
+<c:remove var="menError" scope="session" />
+</body>
+</html>

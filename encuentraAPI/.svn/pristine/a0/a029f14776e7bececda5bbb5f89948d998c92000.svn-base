@@ -1,0 +1,234 @@
+package clienteLaIsla;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import com.google.gson.Gson;
+
+import beans.encuentra.DepositoMayorista;
+import clienteAPIEncuentra.Call_WS_APIENCUENTRA;
+import dataTypes.DTO_Articulo;
+import dataTypes.DataIDDescripcion;
+import dataTypes.StockDeposito;
+import logica.LogicaAPI;
+import persistencia._EncuentraConexionAPI2;
+
+public class SincroLaIsla {
+
+	public static void main(String[] args) {
+		//String[] nombresMetodos = {"almacenes", "categorias","marcas","talles","colores","temporadas","generos","productos","obtenerStock"};
+		String[] nombresMetodos = {"almacenes", "categorias","marcas","talles","colores","temporadas","generos","productos"};
+		//String[] nombresMetodos = {"obtenerStock"};
+		
+		Call_WS_APIENCUENTRA cwa = new Call_WS_APIENCUENTRA();
+		LogicaAPI logica = new LogicaAPI();
+		List<DataIDDescripcion> datos = null;
+		List<DTO_Articulo> datosArt = null;
+		SincroLaIsla s = new SincroLaIsla();
+		String token = logica.darToken(6);
+		for (String tabla : nombresMetodos) {
+			switch (tabla) {
+				case "almacenes":
+					System.out.println("BUSCANDO ALMACENES...");
+					datos = s.obtenerDatosGenericos(tabla);
+					List<DepositoMayorista> depos = new ArrayList<DepositoMayorista>();
+					for (DataIDDescripcion de : datos) 
+					{
+						DepositoMayorista  dps = new DepositoMayorista(de.getId()+"",de.getDescripcion() ,de.getDescripcion(), "LOCAL" );
+						depos.add(dps);
+					}
+					
+					System.out.println("INSERTANDO ALMACENES...");
+					cwa.putDeposM(token, depos);
+					break;
+			
+				case "categorias":
+					System.out.println("BUSCANDO CATEGORIAS...");
+					datos = s.obtenerDatosGenericos(tabla);
+					System.out.println("INSERTANDO CATEGORIAS...");
+					cwa.putMaestros(token, datos, "art_categoria");
+					break;
+
+				case "marcas":
+					System.out.println("BUSCANDO MARCAS...");
+					datos = s.obtenerDatosGenericos(tabla);
+					System.out.println("INSERTANDO MARCAS...");
+					cwa.putMaestros(token, datos, "art_marca");
+					break;
+
+				case "talles": //No existe
+					//datos = s.obtenerDatosGenericos(tabla);
+					//cwa.putMaestros(token, datos, "art_cagoria");
+					break;
+
+				case "colores":
+					System.out.println("BUSCANDO COLORES...");
+					datos = s.obtenerDatosGenericos(tabla);
+					System.out.println("INSERTANDO COLORES...");
+					cwa.putMaestros(token, datos, "art_colors");
+					break;
+
+				case "temporadas":
+					System.out.println("BUSCANDO TEMPORADAS...");
+					datos = s.obtenerDatosGenericos(tabla);
+					System.out.println("INSERTANDO TEMPORADAS...");
+					cwa.putMaestros(token, datos, "art_temporadas");
+					break;
+
+				case "generos":
+					System.out.println("BUSCANDO GENEROS...");
+					datos = s.obtenerDatosGenericos(tabla);
+					System.out.println("INSERTANDO GENEROS...");
+					cwa.putMaestros(token, datos, "art_genero");
+					break;
+			
+				case "productos":
+					try {
+						System.out.println("BUSCANDO PRODUCTOS...");
+						datosArt = s.obtenerDatosArticulos();
+						System.out.println("INSERTANDO PRODUCTOS...");
+						cwa.putArticulos(token, datosArt);
+					} catch (Exception e) {}
+					break;
+
+				case "obtenerStock":
+					try {
+						System.out.println("BUSCANDO STOCKS...");
+						List<StockDeposito> arts = s.obtenerStockArticulos();
+						System.out.println("INSERTANDO STOCKS...");
+						cwa.putStk(token, arts);
+					} catch (Exception e) {}
+					break;
+			}
+		}
+	}
+				
+	
+	
+	public List<DataIDDescripcion> obtenerDatosGenericos(String tabla) {
+		List<DataIDDescripcion> datos = new ArrayList<DataIDDescripcion>(); 
+		try {
+			
+			ClienteOdoo_LaIsla pruebas = new ClienteOdoo_LaIsla(false);
+			String json = pruebas.obtenerDatos(tabla);
+			System.out.println(json);
+			Gson gson = new Gson();
+			DatosGenericos[] lecturas = gson.fromJson(json, DatosGenericos[].class);
+			for (DatosGenericos dg : lecturas) 
+			{
+				DataIDDescripcion did = new DataIDDescripcion(dg.getId(), validarDescripcion(dg.getName()));
+				datos.add(did);
+			}
+			
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+			return datos;
+		}
+		return datos;
+	}
+	
+	
+	public List<DTO_Articulo> obtenerDatosArticulos() {
+		//List<DTO_Articulo> datos = new ArrayList<DTO_Articulo>(); 
+		Vector<DTO_Articulo> datos = new Vector<DTO_Articulo>();
+		_EncuentraConexionAPI2 ec = new _EncuentraConexionAPI2();
+		try {
+			
+			ClienteOdoo_LaIsla pruebas = new ClienteOdoo_LaIsla(false);
+			String json = pruebas.obtenerDatos("productos");
+			//System.out.println(json);
+			Gson gson = new Gson();
+			Articulo_Encuentra[] lecturas = gson.fromJson(json, Articulo_Encuentra[].class);
+			for (Articulo_Encuentra ae : lecturas) {
+				DTO_Articulo art = new DTO_Articulo(ae.getDefault_code(), validarDescripcion(ae.getName()), ae.getTalle_proveedor(),
+							ae.getColor_proveedor(), ae.getTemporada()+"", "", ae.getSeller_ids()+"", ae.getMarca()+"", "", ae.getCategoria()+"", ae.getSexo()+"", ae.getEan13());
+				datos.add(art);
+			}	
+			//System.out.println(gson.toJson(datos));
+		} catch (Exception e) 
+		{
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(datos));
+			e.printStackTrace();
+			return datos;
+		}
+		return datos;
+	}
+	
+	public List<StockDeposito> obtenerStockArticulos() {
+		//List<DTO_Articulo> datos = new ArrayList<DTO_Articulo>(); 
+		List<StockDeposito> artsStock = new ArrayList<StockDeposito>();
+		_EncuentraConexionAPI2 ec = new _EncuentraConexionAPI2();
+		try {
+			
+			ClienteOdoo_LaIsla pruebas = new ClienteOdoo_LaIsla(false);
+			artsStock = pruebas.obtenerStockArticulos();
+
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+			return artsStock;
+		}
+		return artsStock;
+	}
+	
+	public String validarDescripcion(String descripcion){
+			if(descripcion.contains("'")) {
+				descripcion = descripcion.replace('\'', ' ');
+			}
+			if(descripcion.contains("\"")) {
+				descripcion = descripcion.replace('"', ' ');
+			}
+			if(descripcion.contains("`")) {
+				descripcion = descripcion.replace('`', ' ');
+			}
+		return descripcion;
+	}
+	
+	public Integer abrirSessionVentas() {
+		int idSession = 0;
+		ClienteOdoo_LaIsla cli = new ClienteOdoo_LaIsla(false);
+		try {
+			idSession = cli.abrirSession();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return idSession;
+	}
+
+	public void cerrarSessionVentas(int idSession) {
+		ClienteOdoo_LaIsla cli = new ClienteOdoo_LaIsla(false);
+		try {
+			cli.cerrarSesion(idSession);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public List<Remito> albaranesListosParaRecibir(int idDeposito, int idEmpresa) {
+		ClienteOdoo_LaIsla cli = new ClienteOdoo_LaIsla(true);
+		List<EstadoAlbaranes> albaranes = new ArrayList<EstadoAlbaranes>();
+		List<Remito> remitos = new ArrayList<Remito>();
+		try {
+			albaranes = cli.albaranesListosParaRecibir(idDeposito);
+
+			String albaranesBuscados = "";
+			
+			for(EstadoAlbaranes albs : albaranes) {
+				albaranesBuscados += "" + albs.getId() + ",";
+			}
+			
+			if(!albaranesBuscados.equalsIgnoreCase("")) {
+				albaranesBuscados = albaranesBuscados.substring(0, albaranesBuscados.length() - 1);
+			}
+			
+			_EncuentraConexionAPI2 api = new _EncuentraConexionAPI2();
+			remitos = api.darRemitos(albaranesBuscados, idEmpresa);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return remitos;
+	}
+}

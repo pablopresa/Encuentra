@@ -1,0 +1,202 @@
+package web.picking;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import logica.Logica;
+import logica.Utilidades;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import dataTypes.DataIDDescripcion;
+
+import beans.ArticuloLineaReposicion;
+import beans.Fecha;
+import beans.Usuario;
+
+import beans.encuentra.Tarea;
+
+public class _EncuentraAltaPicking extends Action{
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception 
+	{
+		HttpSession session = request.getSession();
+		Logica Logica = new Logica();
+		System.out.println("alta de picking");
+		
+		Usuario uLog = (Usuario) session.getAttribute("uLogeado");
+		Utilidades util = new Utilidades();
+		int idEmpresa = util.darEmpresa(uLog);
+		if(idEmpresa==0)
+		{
+			return mapping.findForward("LOGIN");
+		}
+		List<ArticuloLineaReposicion> articulosIn = new ArrayList<ArticuloLineaReposicion>();
+		List<List<ArticuloLineaReposicion>> pickingsPedidos = null; //new ArrayList<List<ArticuloLineaReposicion>>(); 
+		String saveType = request.getParameter("tipoSave");
+		
+		List<ArticuloLineaReposicion> articulos = (List<ArticuloLineaReposicion>) session.getAttribute("articulosRepo");
+		int cantidades = 0;
+		String ecommerce = (String) session.getAttribute("ecommerce");
+		StringBuilder sb = new StringBuilder();
+		
+		for (ArticuloLineaReposicion ar : articulos) 
+		{
+			if(ecommerce.equals("1")){											//SI ES ECOMMERCE AGARRO TODOS LOS NUMEROS DE PEDIDOS Y VOY A BUSCAR LOS ARTICULOS A LA BASE
+				String param = request.getParameter(ar.getPedido()+"-"+ar.getIdArticulo());			//PARA QUE NO ME QUEDEN PEDIDOS PARCIALES
+				if(param!=null && param.equals("on"))
+				{					
+					sb.append(ar.getPedido()+",");
+				}
+			}
+			else{
+				String param = request.getParameter(ar.getSinc().getId()+"-"+ar.getIdArticulo()+"-"+ar.getDestino().getId());
+				if(param!=null && param.equals("on"))
+				{					
+					articulosIn.add(ar);
+					cantidades+=ar.getCantidad();
+				}
+			}
+			
+		}
+		if(ecommerce.equals("1")){												//SI ES ECOMMERCE VOY A BUSCAR LOS ARTICULOS
+			articulosIn = Logica.darArtsLineasRepoEC(sb,idEmpresa);						//Y SUMO SUS CANTIDADES
+			for(ArticuloLineaReposicion a:articulosIn){				
+				cantidades+= a.getCantidad();
+			}
+		}
+		
+		Hashtable<Integer, Integer> depositosHT = new Hashtable<Integer, Integer>();
+		int cantidaDestino =0;
+		
+		for (ArticuloLineaReposicion ar : articulosIn) 
+		{
+			depositosHT.put(ar.getDestino().getId(), ar.getDestino().getId());
+		}
+		
+		List <Integer> destinosList = new ArrayList<Integer>(depositosHT.values()); 
+		cantidaDestino = destinosList.size();
+		
+		if(cantidaDestino>1)
+		{
+			int capacidadClasificacion = 0;
+			try
+			{
+				capacidadClasificacion = (Integer) session.getAttribute("capacidadClasificacion");
+			}
+			catch(Exception e)
+			{
+				
+			}
+			
+			if(cantidaDestino>capacidadClasificacion)
+			{
+				request.setAttribute("menError", "Atencion: Seleccione menos destinos <br/> "+cantidaDestino+" destinos y "+capacidadClasificacion+" ubicaciones de clasificacion <br/> Puede generar pickings hasta a "+capacidadClasificacion+" destinos diferentes");
+				session.setAttribute("capacidadClasificacion", capacidadClasificacion);
+				return mapping.findForward("no");
+			}
+			else
+			{/*
+				Hashtable<Integer, Integer> destinosHt = new Hashtable<Integer, Integer>(); // la tabla de la que voy a consultar la posicion segun el destino
+				int posicion = 1;
+				for (Integer integer : destinosList) 
+				{
+					destinosHt.put(integer, posicion);// le asigno posicion a cada estion
+					posicion++;
+				}
+				
+				for (ArticuloLineaReposicion ar : articulos) 
+				{
+					int posicionDestino = destinosHt.get(ar.getDestino().getId());
+					ar.setPosClasif(posicionDestino);
+				}
+				*/
+				for (ArticuloLineaReposicion ar : articulos) 
+				{					
+					ar.setPosClasif(ar.getDestino().getId());
+				}
+				
+				
+			}
+		}
+		
+		session.setAttribute("depositosHTinRepo", depositosHT);
+		session.setAttribute("cantiInRepo", cantidades);
+		session.setAttribute("articulosIn",articulosIn);
+		
+		
+		if(saveType.equals("0"))
+		{					
+			session.setAttribute("singleTar", "0");		
+		}
+		else
+		{						
+			session.setAttribute("dipick", "dipick");			
+			session.setAttribute("singleTar", "1");		
+		}
+		
+		List <DataIDDescripcion> usuariosOperarios = Logica.encuentraDaroperarios(idEmpresa);
+		List<DataIDDescripcion> distribucionCarga = Logica.infoAvanceTareasOperarios(idEmpresa);
+		/*List <DataIDDescripcion> usuariosSuper = Logica.encuentraDarSuper(idEmpresa);
+		List <DataIDDescripcion> tiposTarea = Logica.encuentraDarTiposTarea(idEmpresa);*/
+		
+		Boolean paramRemision = util.darParametroEmpresaBool(idEmpresa, 22);
+		
+		request.setAttribute("paramRemision", paramRemision);
+		session.setAttribute("operarios", usuariosOperarios);
+		session.setAttribute("distribucionCarga", distribucionCarga);
+		
+		return mapping.findForward("tar");	
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

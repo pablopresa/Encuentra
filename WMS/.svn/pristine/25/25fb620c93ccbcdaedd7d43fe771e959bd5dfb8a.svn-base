@@ -1,0 +1,184 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+
+<input type="text" value= "<%=basePath%>" id ="basePath" style="display: none">   							
+                           		<table class="table table-compact table-bordered table-hover" id="tablaEnc-monitor">
+									<thead class="thead-dark">
+	                                	<tr>
+	                                     	<th class="text-center">Pedido</th>
+	                                      	<th class="text-center">Venta</th>
+	                                      	<th class="text-center">Cliente</th>
+	                                       	<th class="text-center">Estado<br/>Encuentra</th>
+	                                       	<c:if test="${aConsolidar!='on'}">
+												<th class="text-center">Articulo</th>
+											</c:if>
+											<c:if test="${aConsolidar!='on'}">	
+												<th class="text-center">Deposito<br/>Pedido</th>
+											</c:if>
+											<c:if test="${aConsolidar=='on'}">	
+												<th class="text-center">Cant.<br/>Depositos</th>
+												<th class="text-center" style="display: none;"></th>
+											</c:if>
+											<th class="text-center">Unidades<br/>Pedidas</th>
+											<th class="text-center">Unidades<br/>Procesadas</th>
+											<th class="text-center">Unidades<br/>Confirmadas</th>
+											<th class="text-center">Fecha<br/>Pedido</th>
+											<th class="text-center">Fecha<br/>Confirmado</th>
+											<th class="text-center">Fecha<br/>Procesado</th>
+											<th class="text-center">Usuario<br/>Procesa</th>
+											<th class="text-center">Fecha<br/>Despacho</th>
+											<th class="text-center">Fecha<br/>Entrega</th>
+											<th class="text-center">Forma Entrega</th>
+											<th class="text-center">Destino</th>
+											<th class="text-center">Estado<br/>Ecommerce</th>
+											<c:if test="${aConsolidar=='on'}">	
+												<th class="text-center">Consolidar</th>
+											</c:if>
+											<c:if test="${aConsolidar!='on'}">	
+												<th class="text-center" style="display: none;"></th>
+											</c:if>
+											<th class="text-center">Canal</th>
+											
+											<th class="text-center">Tracking</th>
+											<th class="text-center">Importe</th>
+											<th class="text-center">Email</th>
+											<th class="text-center">Telefono</th>
+											<th class="text-center">Observaciones</th>											
+											<th class="text-center">Departamento</th>
+											<th class="text-center">Localidad</th>
+											<th class="text-center">Direccion</th>
+											<th class="text-center">Cod. Postal</th>
+											
+											<th class="text-center">Acción</th>
+											
+											
+											
+										</tr>
+									</thead>
+	                                <tbody>
+	                            
+									<c:forEach var="p" items="${lstPedidosConsola}">
+										<c:if test="${p.change==1}">	
+											<c:set var="color" value="border-collapse:collapse;border-bottom:1pxdashedblack;font-size:13px;background:#87FF8D;"></c:set> 
+										</c:if>
+										<c:if test="${p.artMod==1}">	
+											<c:set var="color" value="border-collapse:collapse;border-bottom:1pxdashedblack;font-size:13px;background:#FFB861;"></c:set>													
+										</c:if>
+										<c:if test="${p.estado=='Cancelado'}">	
+											<c:set var="color" value="border-collapse:collapse;border-bottom:1pxdashedblack;font-size:13px;background:#FF6961;"></c:set> 													
+										</c:if>
+										<c:if test="${p.change!=1 && p.artMod!=1 && p.estado!='Cancelado'}">	
+											<c:set var="color" value="border-collapse:collapse;border-bottom:1pxdashedblack;font-size:13px;"></c:set> 
+										</c:if>
+										<c:if test="${p.aConsolidar=='SI'}">	
+											<c:set var="color" value="border-collapse:collapse;border-bottom:1pxdashedblack;font-size:13px;background:#ffeeba;"></c:set> 
+										</c:if>
+										<tr class="gradeD" style=<c:out value="${color}"></c:out>>											
+											<td class="text-center"><a href="<%=basePath%>EcommerceLogPedido.do?idPedido=${p.idPedido}">${p.idPedido}</a></td>
+											<td class="text-center"><a href="${urlMonitorEC}${p.idMS}" target="_blank">${p.idMS}</a></td>	
+											<td class="text-center">${p.descripcion}</td>													
+											<td class="text-center">${p.estado}</td>		
+											<c:if test="${aConsolidar!='on'}">											
+												<td class="text-center">${p.articulo} <br><strong>${p.descArt}</strong></td>
+											</c:if>
+											<c:if test="${aConsolidar!='on'}">											
+												<td class="text-center">${p.deposito}</td>
+											</c:if>
+											<c:if test="${aConsolidar=='on'}">											
+												<td class="text-center">${p.deposito}</td>
+												<td class="text-center" style="display: none;"></td>
+											</c:if>
+											
+											<td class="text-center">${p.cr}</td>
+											<td class="text-center">${p.cp}</td>
+											<td class="text-center">${p.cc}</td>
+											<td class="text-center">${p.fechaR}</td>
+											<td class="text-center">${p.fechaC}</td>
+											<td class="text-center">${p.fechaP}</td>
+											<td class="text-center">${p.usuClasifica}</td>
+											<td class="text-center">${p.fechaDespacho}</td>											
+											<td class="text-center">${p.fechaEntrega}</td>	
+											<td class="text-center">${p.formaEntrega}</td>										
+											<td class="text-center">${p.destinoNombre}</td>
+											<td class="text-center">${p.estadoEcommerce}</td>
+											<c:if test="${aConsolidar=='on'}">	
+												<c:if test="${p.aConsolidar=='SI'}">	
+													<td class="text-center"><span class="fas fa-code-branch" style="color: red;"></span><label class="hidden">${p.aConsolidar}</label></td>
+												</c:if>
+												<c:if test="${p.aConsolidar!='SI'}">	
+													<td class="text-center"><label class="hidden">${p.aConsolidar}</label></td>
+												</c:if>
+											</c:if>
+											<c:if test="${aConsolidar!='on'}">				
+												<td class="text-center" style="display: none;"></td>
+											</c:if>
+											<td class="text-center">${p.idCanal}</td>
+											
+											<td class="text-center">${p.tracking}</td>
+											<td class="text-center">${p.importe}</td>
+											<td class="text-center">${p.mail}</td>
+											<td class="text-center">${p.tel}</td>
+											<td class="text-center">${p.obs}</td>
+											
+											<td class="text-center">${p.dpto}</td>
+											<td class="text-center">${p.localidad}</td>
+											<td class="text-center">${p.calle}</td>
+											<td class="text-center">${p.codPostal}</td>
+											
+											<td class="text-center">
+												<div id="toolbar-options" class="hidden">
+													<a href="#" onclick="shippPedido(${p.idPedido},${p.idDestino},'${p.tracking}','${p.urlEriqueta}')">
+													<i class="fas fa-truck " style="color: white"></i></a>
+								                    <a href="#" onclick="editPedido(${p.idPedido})"><i class="feather icon-edit"></i></a>
+								                    <a href="#" onclick="printPedido(${p.idPedido})"><i class="feather icon-printer"></i></a>                                               
+								                </div>
+								                <div class="col-md-4 col-sm-6">
+									                 <div data-toolbar="user-options" class="btn-toolbar btn-success btn-toolbar-success" id="left-toolbar${p.idPedido}">
+									                   		<i class="feather icon-settings"></i>
+									                   </div>
+								                </div>
+												
+											</td>
+											
+											
+											
+										</tr>
+									</c:forEach>
+									</tbody>
+								</table>
+				
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="dataTypes.DataDetallePedido"%>								
+<script>
+function editPedido(pedido){
+	location.assign('<%=basePath%>editarPedidoEcommerce.do?idPedido='+pedido);
+}
+function printPedido(pedido){
+	location.assign('<%=basePath%>reprintEcommerce.do?req=ok&idPedido='+pedido);
+}
+
+
+
+$(window).on('load', function() {	
+	<%   
+        ArrayList<DataDetallePedido> pedidos = (ArrayList<DataDetallePedido>) session.getAttribute("lstPedidosConsola");
+        for (DataDetallePedido ev : pedidos) {
+        	out.print("$('#left-toolbar"+ ev.getIdPedido()+"').toolbar({");
+        	out.print(" content: '#toolbar-options',");
+        	out.print("position: 'left',");
+        	out.print(" style: 'success'");
+        	out.print("});");
+        }
+	%>	
+})	
+</script>
+
+
+		

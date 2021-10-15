@@ -1,0 +1,65 @@
+package beans.reportes;
+
+public class ProductividadPicking {
+	private String idPicking, fecha, clase, categoria, usuario, solicitadas, verificadas, remitidas, tiempoPicking, cantidadLineas, cantidadPosiciones;
+
+	public ProductividadPicking(String idPicking, String fecha, String clase, String categoria, String usuario,
+			String solicitadas, String verificadas, String remitidas, String tiempoPicking, String cantidadLineas, String cantidadPosiciones) {
+		this.idPicking = idPicking;
+		this.fecha = fecha;
+		this.clase = clase;
+		this.categoria = categoria;
+		this.usuario = usuario;
+		this.solicitadas = solicitadas;
+		this.remitidas = remitidas;
+		this.tiempoPicking = tiempoPicking;
+		this.verificadas = verificadas;
+		this.cantidadLineas = cantidadLineas;
+		this.cantidadPosiciones = cantidadPosiciones;
+	}
+
+	public String getIdPicking() {
+		return idPicking;
+	}
+
+	public String getFecha() {
+		return fecha;
+	}
+
+	public String getClase() {
+		return clase;
+	}
+
+	public String getCategoria() {
+		return categoria;
+	}
+
+	public String getUsuario() {
+		return usuario;
+	}
+
+	public String getSolicitadas() {
+		return solicitadas;
+	}
+
+	public String getRemitidas() {
+		return remitidas;
+	}
+
+	public String getTiempoPicking() {
+		return tiempoPicking;
+	}
+
+	public String getCantidadLineas() {
+		return cantidadLineas;
+	}
+	
+	public String getCantidadPosiciones(){
+		return cantidadPosiciones;
+	}
+	
+	public String getVerificadas(){
+		return verificadas;
+	}
+
+}

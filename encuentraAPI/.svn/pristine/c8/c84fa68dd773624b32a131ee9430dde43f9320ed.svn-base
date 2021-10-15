@@ -1,0 +1,6 @@
+puerto=3306
+bd=encuentra_api
+usuario=root
+password=@200SRL
+servidor=168.138.133.144
+prefijoURL=jdbc\:mysql\://

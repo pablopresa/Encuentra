@@ -1,0 +1,42 @@
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
+import com.itextpdf.text.DocumentException;
+
+import beans.Usuario;
+import beans.bulto;
+import beans.bultoContenido;
+import beans.encuentra.IPrint;
+
+import cliente_rest_Invoke.Call_WS_APIENCUENTRA;
+import clientesVisual_Store.forus.clienteWSVisual.ClienteWSVisualForus;
+import dataTypes.DataIDDescripcion;
+import logica.ImpresionesPDF;
+import logica.Logica;
+
+
+public class TestVS 
+{
+	public static void main(String[] args) throws FileNotFoundException, DocumentException 
+	{	
+		ClienteWSVisualForus cl = new ClienteWSVisualForus();
+		cl.GrabarArtBarra("0000500000000", "0000500000000_");
+	
+	}
+	
+
+	public TestVS() {
+	}
+	
+	
+	
+	
+	
+	
+	
+
+}

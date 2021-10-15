@@ -1,0 +1,49 @@
+package beans.encuentra;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jsonObjects.JSONProveedor;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Familias {
+
+	private String idFamilia;
+
+    private String idSubFamilia;
+
+    public String getIdFamilia ()
+    {
+        return idFamilia;
+    }
+
+    public void setIdFamilia (String idFamilia)
+    {
+        this.idFamilia = idFamilia;
+    }
+
+    public String getIdSubFamilia ()
+    {
+        return idSubFamilia;
+    }
+
+    public void setIdSubFamilia (String idSubFamilia)
+    {
+        this.idSubFamilia = idSubFamilia;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ClassPojo [idFamilia = "+idFamilia+", idSubFamilia = "+idSubFamilia+"]";
+    }  
+	
+}

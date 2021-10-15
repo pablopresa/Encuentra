@@ -1,0 +1,77 @@
+package beans.reportes;
+
+import java.util.List;
+
+public class Filtro 
+{
+	private String tipo, name, value,placeholder;
+	private List<String> values;
+	private boolean required;
+	public String getTipo() {
+		return tipo;
+	}
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
+	}
+	public String getPlaceholder() {
+		return placeholder;
+	}
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
+	}
+	public List<String> getValues() {
+		return values;
+	}
+	public void setValues(List<String> values) {
+		this.values = values;
+	}
+	public Filtro(String tipo, String name, String value, String placeholder,boolean required) {
+		this.tipo = tipo;
+		this.name = name;
+		this.value = value;
+		this.placeholder = placeholder;
+		this.required = required;
+	}
+	
+	public Filtro(String tipo, String name, String placeholder, List<String> values, boolean required) 
+	{
+		this.tipo = tipo;
+		this.name = name;
+		this.placeholder = placeholder;
+		this.values = values;
+		this.required = required;
+	}
+	
+	public Filtro(String tipo, String name, String value, String placeholder, List<String> values, boolean required) 
+	{
+		this.tipo = tipo;
+		this.name = name;
+		this.value = value;
+		this.placeholder = placeholder;
+		this.values = values;
+		this.required = required;
+	}
+	public boolean isRequired() {
+		return required;
+	}
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+	
+	
+	
+	
+
+}

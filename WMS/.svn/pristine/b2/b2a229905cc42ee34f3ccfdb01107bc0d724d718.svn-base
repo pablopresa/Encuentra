@@ -1,0 +1,192 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+
+
+<div class="col-sm-6 col-lg-4">
+	<div class="form-group">
+		<label class="col-md-12 control-label" for="art">Nro.
+			Pedido:&nbsp;</label>
+		<div class="col-md-10">
+			<div class="input-group input-group-sm">
+				<input type="text" class="form-control bg-white" aria-label="Small"
+					aria-describedby="inputGroup-sizing-sm" name="pedido"
+					value="${pedido}">
+
+			</div>
+		</div>
+	</div>
+</div>
+<div class="col-sm-6 col-lg-4">
+	<div class="form-group">
+		<label class="col-md-12 control-label" for="art">Vta.
+			Fenicio:&nbsp;</label>
+		<div class="col-md-10">
+			<div class="input-group input-group-sm">
+				<input type="text" class="form-control bg-white" aria-label="Small"
+					aria-describedby="inputGroup-sizing-sm" name="fenicio"
+					value="${fenicio}">
+			</div>
+		</div>
+	</div>
+</div>
+<div class="col-sm-6 col-lg-4">
+	<div class="form-group">
+		<label class="col-md-12 control-label" for="art">Articulo:&nbsp;</label>
+		<div class="col-md-10">
+			<div class="input-group input-group-sm">
+				<input type="text" class="form-control bg-white" aria-label="Small"
+					aria-describedby="inputGroup-sizing-sm" name="articulo"
+					value="${articulo}">
+			</div>
+		</div>
+	</div>
+</div>
+<div class="col-sm-6 col-lg-4">
+	<div class="form-group">
+		<label class="col-md-12 control-label" for="art">Fecha:&nbsp;</label>
+		<div class="col-md-10">
+			<input class="form-control form-control-sm bg-white rango"
+				type="text" name="fini" id="fini">
+		</div>
+
+	</div>
+</div>
+<div class="col-sm-6 col-lg-4">
+	<div class="form-group">
+		<label class="col-md-12 control-label" for="art">Estado:&nbsp;</label>
+		<div class="col-md-10">
+			<select class="select2-multi col-sm-12" multiple="multiple"
+				placeholder="Estanterías" name="estado">
+				<option value=""></option>
+				<c:forEach var="d" items="${estadosL}">
+					<c:if test="${estado==d.id}">
+						<option value="${d.id}" selected="selected">${d.descripcion}</option>
+					</c:if>
+					<c:if test="${estado!=d.id}">
+						<option value="${d.id}">${d.descripcion}</option>
+					</c:if>
+
+				</c:forEach>
+			</select>
+		</div>
+	</div>
+</div>
+<div class="col-sm-6 col-lg-4">
+	<div class="form-group">
+		<label class="col-md-12 control-label" for="art">Forma de
+			pago:&nbsp;</label>
+		<div class="col-md-10">
+			<select class="form-control bg-white" tabindex="6" name="forma">
+				<option value=""></option>
+				<c:forEach var="d" items="${formasPago}">
+					<c:if test="${forma==d.descripcion}">
+						<option value="${d.descripcion}" selected="selected">${d.descripcion}</option>
+					</c:if>
+					<c:if test="${forma!=d.descripcion}">
+						<option value="${d.descripcion}">${d.descripcion}</option>
+					</c:if>
+
+				</c:forEach>
+			</select>
+		</div>
+	</div>
+</div>
+<div class="col-sm-6 col-lg-4">
+	<div class="form-group">
+		<label class="col-md-12 control-label" for="art">Courier/Destino:&nbsp;</label>
+		<div class="col-md-10">
+			<select data-placeholder="Puede Seleccionar Varios"
+				class="select2-multi bg-enc" multiple="multiple" tabindex="6"
+				name="couriers">
+				<option value=""></option>
+				<c:forEach var="c" items="${couriers}">
+					<option value="${c.id}">${c.descripcion}</option>
+				</c:forEach>
+			</select>
+		</div>
+	</div>
+</div>
+<div class="flex-container">
+
+	<label class="p-2" for="switch-0">Sin Etiqueta:&nbsp;</label>
+	<div class="switch d-inline m-r-10">
+		<c:if test="${sinEtqt=='on'}">
+			<input type="checkbox" name="sinEtqt" id="switch-0" checked="checked">
+			<label for="switch-0" class="cr"></label>
+		</c:if>
+		<c:if test="${sinEtqt!='on'}">
+			<input type="checkbox" name="sinEtqt" id="switch-0">
+			<label for="switch-0" class="cr"></label>
+		</c:if>
+	</div>
+
+	<label class="p-2" for="switch-1">Sin Stock:&nbsp;</label>
+	<div class="switch d-inline m-r-10">
+		<c:if test="${DepCero=='on'}">
+			<input type="checkbox" name="DepCero" id="switch-1" checked="checked">
+			<label for="switch-1" class="cr"></label>
+		</c:if>
+		<c:if test="${DepCero!='on'}">
+			<input type="checkbox" name="DepCero" id="switch-1">
+			<label for="switch-1" class="cr"></label>
+		</c:if>
+	</div>
+
+	<label class="p-2" for="switch-2">Sin Factura:&nbsp;</label>
+	<div class="switch d-inline m-r-10">
+		<c:if test="${agrpTienda=='on'}">
+			<input type="checkbox" name="agrpTienda" id="switch-2"
+				checked="checked">
+			<label for="switch-2" class="cr"></label>
+		</c:if>
+		<c:if test="${agrpTienda!='on'}">
+			<input type="checkbox" name="agrpTienda" id="switch-2">
+			<label for="switch-2" class="cr"></label>
+		</c:if>
+	</div>
+
+	<label class="p-2" for="switch-2">A consolidar:&nbsp;</label>
+	<div class="switch d-inline m-r-10">
+		<c:if test="${aConsolidar=='on'}">
+			<input type="checkbox" name="aConsolidar" id="switch-3"
+				checked="checked">
+			<label for="switch-3" class="cr"></label>
+		</c:if>
+		<c:if test="${aConsolidar!='on'}">
+			<input type="checkbox" name="aConsolidar" id="switch-3">
+			<label for="switch-3" class="cr"></label>
+		</c:if>
+	</div>
+
+	<label class="p-2" for="switch-2">EXPORTAR EXCEL:&nbsp;</label>
+	<div class="switch d-inline m-r-10">
+		<c:if test="${exportE=='on'}">
+			<input type="checkbox" name="exportE" id="switch-4" checked="checked">
+			<label for="switch-4" class="cr"></label>
+		</c:if>
+		<c:if test="${exportE!='on'}">
+			<input type="checkbox" name="exportE" id="switch-4">
+			<label for="switch-4" class="cr"></label>
+		</c:if>
+	</div>
+
+
+</div>
+
+
+
+
+
+
+	<!-- <script>
+	function closeModal(id){
+		$(id).modal('hide');
+	}
+</script> -->

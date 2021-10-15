@@ -1,0 +1,62 @@
+import java.util.Hashtable;
+import java.util.List;
+
+import beans.Usuario;
+import logica.Logica;
+import cliente_rest_Invoke.Call_WS_APIENCUENTRA;
+import cliente_rest_Invoke.Call_WS_analoga;
+import dataTypes.DataArticuloEcommerceVerifR;
+import dataTypes.DataIDDescripcion;
+import dataTypes.trackingPedido;
+
+
+public class GetTrackingsEC 
+{
+	public static void main(String[] args) 
+	{	
+		Logica logica = new Logica();
+		Usuario u = logica.loginEncuentraSinEmpresa("Encuentra", "Forus!#$");		
+		int idEmpresa = u.getIdEmpresa();
+		
+		Call_WS_analoga call = new Call_WS_analoga(); 		
+		Call_WS_APIENCUENTRA api = new Call_WS_APIENCUENTRA();
+		
+		List<trackingPedido> trackings = logica.PedidosATrackear(idEmpresa);
+		for(trackingPedido t:trackings) {
+			DataIDDescripcion track = api.getTracking(t, idEmpresa);
+			if(track != null && track.getDescripcion() != null) {
+				if(track.getDescripcion().toUpperCase().equals("ENTREGADO")) {
+					/*String jotason="[ "+
+							 "     { "+
+							 "        \"id\":\""+t.getIdEcommerce()+"\", "+
+							 "        \"estado\":\"entregado\" "+
+							 "     } "+
+							 "]";
+					call.setPedidos(jotason, t.getCanal(), idEmpresa);*/
+					DataArticuloEcommerceVerifR r = logica.darArticuloEcommerceReqReclasifica(t.getIdPedido(),0,idEmpresa);
+					r.setFechaEntrega(track.getDescripcionB());
+					r.setEstadoEncuentra(6);
+					logica.CambioEstadoMarketPlace(idEmpresa, r);
+					logica.updateEcommerceEstadoFecha(t.getIdPedido(), 6, idEmpresa, u.getNumero(),track.getDescripcionB());
+				}
+			}
+			
+		}
+		
+		
+		TestEstadoPedidos estadosFenicio = new TestEstadoPedidos();
+		estadosFenicio.main(null);
+	
+	}	
+
+	public GetTrackingsEC() {
+	}
+	
+	
+	
+	
+	
+	
+	
+
+}

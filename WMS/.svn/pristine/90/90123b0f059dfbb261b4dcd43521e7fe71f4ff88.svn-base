@@ -1,0 +1,344 @@
+annotation.processing.enabled=true
+annotation.processing.enabled.in.editor=true
+annotation.processing.processors.list=
+annotation.processing.run.all.processors=true
+annotation.processing.source.output=${build.generated.sources.dir}/ap-source-output
+auxiliary.org-netbeans-modules-projectimport-eclipse-core.key=src=src;ant=libs.JAVAEE_5_CONTAINER.classpath;file=webApps/WEB-INF/lib/antlr-2.7.2.jar;file=webApps/WEB-INF/lib/aopalliance-1.0.jar;file=webApps/WEB-INF/lib/classworlds-1.1.jar;file=webApps/WEB-INF/lib/dwr-1.1.1.jar;file=webApps/WEB-INF/lib/ezmorph-1.0.3.jar;file=webApps/WEB-INF/lib/freemarker-2.3.15.jar;file=webApps/WEB-INF/lib/jstl-1.0.2.jar;file=webApps/WEB-INF/lib/mysql-connector-java-5.1.10-bin.jar;file=webApps/WEB-INF/lib/naming-factory.jar;file=webApps/WEB-INF/lib/ognl-2.7.3.jar;file=webApps/WEB-INF/lib/org.apache.felix.bundlerepository-1.2.1.jar;file=webApps/WEB-INF/lib/oro-2.0.8.jar;file=webApps/WEB-INF/lib/plexus-container-default-1.0-alpha-10.jar;file=webApps/WEB-INF/lib/plexus-utils-1.2.jar;file=webApps/WEB-INF/lib/sitemesh-2.4.2.jar;file=webApps/WEB-INF/lib/standard-1.0.6.jar;file=webApps/WEB-INF/lib/struts-core-1.3.10.jar;file=webApps/WEB-INF/lib/tiles-api-2.0.6.jar;file=webApps/WEB-INF/lib/tiles-jsp-2.0.6.jar;jre=JDK 1.6;output=webApps/WEB-INF/classes;web=webApps;context=/Std;file=webApps/WEB-INF/lib/commons-beanutils-1.8.0.jar;file=webApps/WEB-INF/lib/commons-chain-1.2.jar;file=webApps/WEB-INF/lib/commons-digester-1.8.jar;file=webApps/WEB-INF/lib/commons-el.jar;file=webApps/WEB-INF/lib/commons-fileupload-1.1.1.jar;file=webApps/WEB-INF/lib/commons-io-1.1.jar;file=webApps/WEB-INF/lib/commons-logging-1.0.4.jar;file=webApps/WEB-INF/lib/commons-validator-1.3.1.jar;file=webApps/WEB-INF/lib/jasper-compiler-jdt.jar;file=webApps/WEB-INF/lib/jasper-compiler.jar;file=webApps/WEB-INF/lib/jasper-runtime.jar;file=webApps/WEB-INF/lib/jsp-api.jar;file=webApps/WEB-INF/lib/naming-factory-dbcp.jar;file=webApps/WEB-INF/lib/naming-resources.jar;file=webApps/WEB-INF/lib/servlet-api.jar;file=webApps/WEB-INF/lib/commons-beanutils-1.7.0.jar;file=webApps/WEB-INF/lib/commons-collections-3.2.jar;file=webApps/WEB-INF/lib/commons-digester-2.0.jar;file=webApps/WEB-INF/lib/commons-fileupload-1.2.1.jar;file=webApps/WEB-INF/lib/commons-io-1.3.2.jar;file=webApps/WEB-INF/lib/commons-lang-2.3.jar;file=webApps/WEB-INF/lib/commons-logging-api-1.1.jar;file=webApps/WEB-INF/lib/json-lib-2.1.jar;file=webApps/WEB-INF/lib/org.apache.felix.framework-1.4.1.jar;file=webApps/WEB-INF/lib/org.apache.felix.main-1.4.1.jar;file=webApps/WEB-INF/lib/org.apache.felix.shell-1.0.2.jar;file=webApps/WEB-INF/lib/org.apache.felix.shell.tui-1.0.2.jar;file=webApps/WEB-INF/lib/oval-1.31.jar;file=webApps/WEB-INF/lib/spring-beans-2.5.6.jar;file=webApps/WEB-INF/lib/spring-context-2.5.6.jar;file=webApps/WEB-INF/lib/spring-core-2.5.6.jar;file=webApps/WEB-INF/lib/spring-test-2.5.6.jar;file=webApps/WEB-INF/lib/spring-web-2.5.6.jar;file=webApps/WEB-INF/lib/sslext-1.2-0.jar;file=webApps/WEB-INF/lib/struts2-codebehind-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-config-browser-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-convention-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-core-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-dojo-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-dwr-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-embeddedjsp-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-jasperreports-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-javatemplates-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-jfreechart-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-jsf-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-json-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-junit-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-osgi-admin-bundle-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-osgi-demo-bundle-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-osgi-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-oval-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-pell-multipart-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-plexus-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-portlet-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-rest-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-sitegraph-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-sitemesh-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-spring-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-struts1-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-testng-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/struts2-tiles-plugin-2.1.8.1.jar;file=webApps/WEB-INF/lib/testng-5.1.jar;file=webApps/WEB-INF/lib/tiles-core-2.0.6.jar;
+auxiliary.org-netbeans-modules-projectimport-eclipse-core.project=.
+auxiliary.org-netbeans-modules-projectimport-eclipse-core.timestamp=1284210665356
+auxiliary.org-netbeans-modules-projectimport-eclipse-core.workspace=..
+build.classes.dir=${build.web.dir}/WEB-INF/classes
+build.classes.excludes=**/*.java,**/*.form
+build.dir=build
+build.generated.dir=${build.dir}/generated
+build.generated.sources.dir=${build.dir}/generated-sources
+build.test.classes.dir=${build.dir}/test/classes
+build.test.results.dir=${build.dir}/test/results
+build.web.dir=${build.dir}/web
+build.web.excludes=${build.classes.excludes}
+client.urlPart=
+compile.jsps=false
+conf.dir=conf
+debug.classpath=${build.classes.dir}:${javac.classpath}
+debug.test.classpath=\
+    ${run.test.classpath}
+display.browser=true
+dist.dir=dist
+dist.ear.war=${dist.dir}/${war.ear.name}
+dist.javadoc.dir=${dist.dir}/javadoc
+dist.war=${dist.dir}/${war.name}
+excludes=
+file.reference.antlr-2.7.2.jar=webApps/WEB-INF/lib/antlr-2.7.2.jar
+file.reference.antlr-2.7.2.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\antlr-2.7.2.jar
+file.reference.antlr-2.7.2.jar-2=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\antlr-2.7.2.jar
+file.reference.aopalliance-1.0.jar=webApps/WEB-INF/lib/aopalliance-1.0.jar
+file.reference.aopalliance-1.0.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\aopalliance-1.0.jar
+file.reference.classworlds-1.1.jar=webApps/WEB-INF/lib/classworlds-1.1.jar
+file.reference.classworlds-1.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\classworlds-1.1.jar
+file.reference.commons-beanutils-1.7.0.jar=webApps/WEB-INF/lib/commons-beanutils-1.7.0.jar
+file.reference.commons-beanutils-1.7.0.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-beanutils-1.7.0.jar
+file.reference.commons-beanutils-1.8.0.jar=webApps/WEB-INF/lib/commons-beanutils-1.8.0.jar
+file.reference.commons-beanutils-1.8.0.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\commons-beanutils-1.8.0.jar
+file.reference.commons-chain-1.2.jar=webApps/WEB-INF/lib/commons-chain-1.2.jar
+file.reference.commons-chain-1.2.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\commons-chain-1.2.jar
+file.reference.commons-chain-1.2.jar-2=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-chain-1.2.jar
+file.reference.commons-collections-3.2.jar=webApps/WEB-INF/lib/commons-collections-3.2.jar
+file.reference.commons-collections-3.2.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-collections-3.2.jar
+file.reference.commons-digester-1.8.jar=webApps/WEB-INF/lib/commons-digester-1.8.jar
+file.reference.commons-digester-1.8.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\commons-digester-1.8.jar
+file.reference.commons-digester-2.0.jar=webApps/WEB-INF/lib/commons-digester-2.0.jar
+file.reference.commons-digester-2.0.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-digester-2.0.jar
+file.reference.commons-el.jar=webApps/WEB-INF/lib/commons-el.jar
+file.reference.commons-el.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\commons-el.jar
+file.reference.commons-fileupload-1.1.1.jar=webApps/WEB-INF/lib/commons-fileupload-1.1.1.jar
+file.reference.commons-fileupload-1.1.1.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\commons-fileupload-1.1.1.jar
+file.reference.commons-fileupload-1.2.1.jar=webApps/WEB-INF/lib/commons-fileupload-1.2.1.jar
+file.reference.commons-fileupload-1.2.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-fileupload-1.2.1.jar
+file.reference.commons-io-1.1.jar=webApps/WEB-INF/lib/commons-io-1.1.jar
+file.reference.commons-io-1.1.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\commons-io-1.1.jar
+file.reference.commons-io-1.3.2.jar=webApps/WEB-INF/lib/commons-io-1.3.2.jar
+file.reference.commons-io-1.3.2.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-io-1.3.2.jar
+file.reference.commons-lang-2.3.jar=webApps/WEB-INF/lib/commons-lang-2.3.jar
+file.reference.commons-lang-2.3.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-lang-2.3.jar
+file.reference.commons-logging-1.0.4.jar=webApps/WEB-INF/lib/commons-logging-1.0.4.jar
+file.reference.commons-logging-1.0.4.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\commons-logging-1.0.4.jar
+file.reference.commons-logging-1.0.4.jar-2=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-logging-1.0.4.jar
+file.reference.commons-logging-api-1.1.jar=webApps/WEB-INF/lib/commons-logging-api-1.1.jar
+file.reference.commons-logging-api-1.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-logging-api-1.1.jar
+file.reference.commons-validator-1.3.1.jar=webApps/WEB-INF/lib/commons-validator-1.3.1.jar
+file.reference.commons-validator-1.3.1.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\commons-validator-1.3.1.jar
+file.reference.commons-validator-1.3.1.jar-2=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\commons-validator-1.3.1.jar
+file.reference.dwr-1.1.1.jar=webApps/WEB-INF/lib/dwr-1.1.1.jar
+file.reference.dwr-1.1.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\dwr-1.1.1.jar
+file.reference.ezmorph-1.0.3.jar=webApps/WEB-INF/lib/ezmorph-1.0.3.jar
+file.reference.ezmorph-1.0.3.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\ezmorph-1.0.3.jar
+file.reference.freemarker-2.3.15.jar=webApps/WEB-INF/lib/freemarker-2.3.15.jar
+file.reference.freemarker-2.3.15.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\freemarker-2.3.15.jar
+file.reference.jasper-compiler-jdt.jar=webApps/WEB-INF/lib/jasper-compiler-jdt.jar
+file.reference.jasper-compiler-jdt.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\jasper-compiler-jdt.jar
+file.reference.jasper-compiler.jar=webApps/WEB-INF/lib/jasper-compiler.jar
+file.reference.jasper-compiler.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\jasper-compiler.jar
+file.reference.jasper-runtime.jar=webApps/WEB-INF/lib/jasper-runtime.jar
+file.reference.jasper-runtime.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\jasper-runtime.jar
+file.reference.json-lib-2.1.jar=webApps/WEB-INF/lib/json-lib-2.1.jar
+file.reference.json-lib-2.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\json-lib-2.1.jar
+file.reference.jsp-api.jar=webApps/WEB-INF/lib/jsp-api.jar
+file.reference.jsp-api.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\jsp-api.jar
+file.reference.jstl-1.0.2.jar=webApps/WEB-INF/lib/jstl-1.0.2.jar
+file.reference.jstl-1.0.2.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\jstl-1.0.2.jar
+file.reference.mysql-connector-java-5.1.10-bin.jar=webApps/WEB-INF/lib/mysql-connector-java-5.1.10-bin.jar
+file.reference.mysql-connector-java-5.1.10-bin.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\mysql-connector-java-5.1.10-bin.jar
+file.reference.naming-factory-dbcp.jar=webApps/WEB-INF/lib/naming-factory-dbcp.jar
+file.reference.naming-factory-dbcp.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\naming-factory-dbcp.jar
+file.reference.naming-factory.jar=webApps/WEB-INF/lib/naming-factory.jar
+file.reference.naming-factory.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\naming-factory.jar
+file.reference.naming-resources.jar=webApps/WEB-INF/lib/naming-resources.jar
+file.reference.naming-resources.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\naming-resources.jar
+file.reference.ognl-2.7.3.jar=webApps/WEB-INF/lib/ognl-2.7.3.jar
+file.reference.ognl-2.7.3.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\ognl-2.7.3.jar
+file.reference.org.apache.felix.bundlerepository-1.2.1.jar=webApps/WEB-INF/lib/org.apache.felix.bundlerepository-1.2.1.jar
+file.reference.org.apache.felix.bundlerepository-1.2.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\org.apache.felix.bundlerepository-1.2.1.jar
+file.reference.org.apache.felix.framework-1.4.1.jar=webApps/WEB-INF/lib/org.apache.felix.framework-1.4.1.jar
+file.reference.org.apache.felix.framework-1.4.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\org.apache.felix.framework-1.4.1.jar
+file.reference.org.apache.felix.main-1.4.1.jar=webApps/WEB-INF/lib/org.apache.felix.main-1.4.1.jar
+file.reference.org.apache.felix.main-1.4.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\org.apache.felix.main-1.4.1.jar
+file.reference.org.apache.felix.shell-1.0.2.jar=webApps/WEB-INF/lib/org.apache.felix.shell-1.0.2.jar
+file.reference.org.apache.felix.shell-1.0.2.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\org.apache.felix.shell-1.0.2.jar
+file.reference.org.apache.felix.shell.tui-1.0.2.jar=webApps/WEB-INF/lib/org.apache.felix.shell.tui-1.0.2.jar
+file.reference.org.apache.felix.shell.tui-1.0.2.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\org.apache.felix.shell.tui-1.0.2.jar
+file.reference.oro-2.0.8.jar=webApps/WEB-INF/lib/oro-2.0.8.jar
+file.reference.oro-2.0.8.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\oro-2.0.8.jar
+file.reference.oro-2.0.8.jar-2=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\oro-2.0.8.jar
+file.reference.oval-1.31.jar=webApps/WEB-INF/lib/oval-1.31.jar
+file.reference.oval-1.31.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\oval-1.31.jar
+file.reference.plexus-container-default-1.0-alpha-10.jar=webApps/WEB-INF/lib/plexus-container-default-1.0-alpha-10.jar
+file.reference.plexus-container-default-1.0-alpha-10.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\plexus-container-default-1.0-alpha-10.jar
+file.reference.plexus-utils-1.2.jar=webApps/WEB-INF/lib/plexus-utils-1.2.jar
+file.reference.plexus-utils-1.2.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\plexus-utils-1.2.jar
+file.reference.servlet-api.jar=webApps/WEB-INF/lib/servlet-api.jar
+file.reference.servlet-api.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\servlet-api.jar
+file.reference.sitemesh-2.4.2.jar=webApps/WEB-INF/lib/sitemesh-2.4.2.jar
+file.reference.sitemesh-2.4.2.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\sitemesh-2.4.2.jar
+file.reference.spring-beans-2.5.6.jar=webApps/WEB-INF/lib/spring-beans-2.5.6.jar
+file.reference.spring-beans-2.5.6.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\spring-beans-2.5.6.jar
+file.reference.spring-context-2.5.6.jar=webApps/WEB-INF/lib/spring-context-2.5.6.jar
+file.reference.spring-context-2.5.6.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\spring-context-2.5.6.jar
+file.reference.spring-core-2.5.6.jar=webApps/WEB-INF/lib/spring-core-2.5.6.jar
+file.reference.spring-core-2.5.6.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\spring-core-2.5.6.jar
+file.reference.spring-test-2.5.6.jar=webApps/WEB-INF/lib/spring-test-2.5.6.jar
+file.reference.spring-test-2.5.6.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\spring-test-2.5.6.jar
+file.reference.spring-web-2.5.6.jar=webApps/WEB-INF/lib/spring-web-2.5.6.jar
+file.reference.spring-web-2.5.6.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\spring-web-2.5.6.jar
+file.reference.sslext-1.2-0.jar=webApps/WEB-INF/lib/sslext-1.2-0.jar
+file.reference.sslext-1.2-0.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\sslext-1.2-0.jar
+file.reference.standard-1.0.6.jar=webApps/WEB-INF/lib/standard-1.0.6.jar
+file.reference.standard-1.0.6.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\standard-1.0.6.jar
+file.reference.Std-src=src
+file.reference.struts-core-1.3.10.jar=webApps/WEB-INF/lib/struts-core-1.3.10.jar
+file.reference.struts-core-1.3.10.jar-1=C:\\Users\\Gonza\\Desktop\\lib\\struts-core-1.3.10.jar
+file.reference.struts-core-1.3.10.jar-2=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts-core-1.3.10.jar
+file.reference.struts2-codebehind-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-codebehind-plugin-2.1.8.1.jar
+file.reference.struts2-codebehind-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-codebehind-plugin-2.1.8.1.jar
+file.reference.struts2-config-browser-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-config-browser-plugin-2.1.8.1.jar
+file.reference.struts2-config-browser-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-config-browser-plugin-2.1.8.1.jar
+file.reference.struts2-convention-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-convention-plugin-2.1.8.1.jar
+file.reference.struts2-convention-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-convention-plugin-2.1.8.1.jar
+file.reference.struts2-core-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-core-2.1.8.1.jar
+file.reference.struts2-core-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-core-2.1.8.1.jar
+file.reference.struts2-dojo-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-dojo-plugin-2.1.8.1.jar
+file.reference.struts2-dojo-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-dojo-plugin-2.1.8.1.jar
+file.reference.struts2-dwr-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-dwr-plugin-2.1.8.1.jar
+file.reference.struts2-dwr-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-dwr-plugin-2.1.8.1.jar
+file.reference.struts2-embeddedjsp-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-embeddedjsp-plugin-2.1.8.1.jar
+file.reference.struts2-embeddedjsp-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-embeddedjsp-plugin-2.1.8.1.jar
+file.reference.struts2-jasperreports-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-jasperreports-plugin-2.1.8.1.jar
+file.reference.struts2-jasperreports-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-jasperreports-plugin-2.1.8.1.jar
+file.reference.struts2-javatemplates-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-javatemplates-plugin-2.1.8.1.jar
+file.reference.struts2-javatemplates-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-javatemplates-plugin-2.1.8.1.jar
+file.reference.struts2-jfreechart-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-jfreechart-plugin-2.1.8.1.jar
+file.reference.struts2-jfreechart-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-jfreechart-plugin-2.1.8.1.jar
+file.reference.struts2-jsf-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-jsf-plugin-2.1.8.1.jar
+file.reference.struts2-jsf-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-jsf-plugin-2.1.8.1.jar
+file.reference.struts2-json-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-json-plugin-2.1.8.1.jar
+file.reference.struts2-json-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-json-plugin-2.1.8.1.jar
+file.reference.struts2-junit-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-junit-plugin-2.1.8.1.jar
+file.reference.struts2-junit-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-junit-plugin-2.1.8.1.jar
+file.reference.struts2-osgi-admin-bundle-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-osgi-admin-bundle-2.1.8.1.jar
+file.reference.struts2-osgi-admin-bundle-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-osgi-admin-bundle-2.1.8.1.jar
+file.reference.struts2-osgi-demo-bundle-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-osgi-demo-bundle-2.1.8.1.jar
+file.reference.struts2-osgi-demo-bundle-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-osgi-demo-bundle-2.1.8.1.jar
+file.reference.struts2-osgi-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-osgi-plugin-2.1.8.1.jar
+file.reference.struts2-osgi-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-osgi-plugin-2.1.8.1.jar
+file.reference.struts2-oval-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-oval-plugin-2.1.8.1.jar
+file.reference.struts2-oval-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-oval-plugin-2.1.8.1.jar
+file.reference.struts2-pell-multipart-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-pell-multipart-plugin-2.1.8.1.jar
+file.reference.struts2-pell-multipart-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-pell-multipart-plugin-2.1.8.1.jar
+file.reference.struts2-plexus-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-plexus-plugin-2.1.8.1.jar
+file.reference.struts2-plexus-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-plexus-plugin-2.1.8.1.jar
+file.reference.struts2-portlet-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-portlet-plugin-2.1.8.1.jar
+file.reference.struts2-portlet-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-portlet-plugin-2.1.8.1.jar
+file.reference.struts2-rest-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-rest-plugin-2.1.8.1.jar
+file.reference.struts2-rest-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-rest-plugin-2.1.8.1.jar
+file.reference.struts2-sitegraph-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-sitegraph-plugin-2.1.8.1.jar
+file.reference.struts2-sitegraph-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-sitegraph-plugin-2.1.8.1.jar
+file.reference.struts2-sitemesh-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-sitemesh-plugin-2.1.8.1.jar
+file.reference.struts2-sitemesh-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-sitemesh-plugin-2.1.8.1.jar
+file.reference.struts2-spring-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-spring-plugin-2.1.8.1.jar
+file.reference.struts2-spring-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-spring-plugin-2.1.8.1.jar
+file.reference.struts2-struts1-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-struts1-plugin-2.1.8.1.jar
+file.reference.struts2-struts1-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-struts1-plugin-2.1.8.1.jar
+file.reference.struts2-testng-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-testng-plugin-2.1.8.1.jar
+file.reference.struts2-testng-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-testng-plugin-2.1.8.1.jar
+file.reference.struts2-tiles-plugin-2.1.8.1.jar=webApps/WEB-INF/lib/struts2-tiles-plugin-2.1.8.1.jar
+file.reference.struts2-tiles-plugin-2.1.8.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\struts2-tiles-plugin-2.1.8.1.jar
+file.reference.testng-5.1.jar=webApps/WEB-INF/lib/testng-5.1.jar
+file.reference.testng-5.1.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\testng-5.1.jar
+file.reference.tiles-api-2.0.6.jar=webApps/WEB-INF/lib/tiles-api-2.0.6.jar
+file.reference.tiles-api-2.0.6.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\tiles-api-2.0.6.jar
+file.reference.tiles-core-2.0.6.jar=webApps/WEB-INF/lib/tiles-core-2.0.6.jar
+file.reference.tiles-core-2.0.6.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\tiles-core-2.0.6.jar
+file.reference.tiles-jsp-2.0.6.jar=webApps/WEB-INF/lib/tiles-jsp-2.0.6.jar
+file.reference.tiles-jsp-2.0.6.jar-1=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\tiles-jsp-2.0.6.jar
+file.reference.velocity-1.5.jar=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\velocity-1.5.jar
+file.reference.velocity-tools-1.3.jar=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\velocity-tools-1.3.jar
+file.reference.xpp3_min-1.1.3.4.O.jar=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\xpp3_min-1.1.3.4.O.jar
+file.reference.xstream-1.2.2.jar=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\xstream-1.2.2.jar
+file.reference.xwork-core-2.1.6.jar=C:\\Users\\Gonza\\Desktop\\struts-2.1.8.1\\lib\\xwork-core-2.1.6.jar
+includes=**
+j2ee.deploy.on.save=true
+j2ee.platform=1.5
+j2ee.platform.classpath=${j2ee.server.home}\\lib\\annotations-api.jar:${j2ee.server.home}\\lib\\catalina-ant.jar:${j2ee.server.home}\\lib\\catalina-ha.jar:${j2ee.server.home}\\lib\\catalina-tribes.jar:${j2ee.server.home}\\lib\\catalina.jar:${j2ee.server.home}\\lib\\el-api.jar:${j2ee.server.home}\\lib\\jasper-el.jar:${j2ee.server.home}\\lib\\jasper.jar:${j2ee.server.home}\\lib\\jsp-api.jar:${j2ee.server.home}\\lib\\servlet-api.jar:${j2ee.server.home}\\lib\\tomcat-coyote.jar:${j2ee.server.home}\\lib\\tomcat-dbcp.jar:${j2ee.server.home}\\lib\\tomcat-i18n-es.jar:${j2ee.server.home}\\lib\\tomcat-i18n-fr.jar:${j2ee.server.home}\\lib\\tomcat-i18n-ja.jar:${j2ee.server.home}\\bin\\tomcat-juli.jar
+j2ee.server.type=Tomcat60
+jar.compress=false
+java.source.based=true
+javac.classpath=\
+    ${file.reference.tiles-core-2.0.6.jar}:\
+    ${file.reference.struts2-convention-plugin-2.1.8.1.jar}:\
+    ${file.reference.jsp-api.jar}:\
+    ${file.reference.struts2-javatemplates-plugin-2.1.8.1.jar}:\
+    ${file.reference.naming-resources.jar}:\
+    ${file.reference.commons-io-1.3.2.jar}:\
+    ${file.reference.antlr-2.7.2.jar}:\
+    ${file.reference.spring-context-2.5.6.jar}:\
+    ${file.reference.struts2-junit-plugin-2.1.8.1.jar}:\
+    ${file.reference.aopalliance-1.0.jar}:\
+    ${file.reference.struts2-osgi-admin-bundle-2.1.8.1.jar}:\
+    ${file.reference.struts2-sitegraph-plugin-2.1.8.1.jar}:\
+    ${file.reference.plexus-utils-1.2.jar}:\
+    ${file.reference.spring-beans-2.5.6.jar}:\
+    ${file.reference.commons-logging-1.0.4.jar}:\
+    ${file.reference.org.apache.felix.framework-1.4.1.jar}:\
+    ${file.reference.commons-digester-1.8.jar}:\
+    ${file.reference.mysql-connector-java-5.1.10-bin.jar}:\
+    ${file.reference.struts2-dwr-plugin-2.1.8.1.jar}:\
+    ${file.reference.org.apache.felix.shell-1.0.2.jar}:\
+    ${file.reference.servlet-api.jar}:\
+    ${file.reference.ezmorph-1.0.3.jar}:\
+    ${file.reference.struts-core-1.3.10.jar}:\
+    ${file.reference.commons-fileupload-1.1.1.jar}:\
+    ${file.reference.struts2-dojo-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-struts1-plugin-2.1.8.1.jar}:\
+    ${file.reference.commons-beanutils-1.7.0.jar}:\
+    ${file.reference.json-lib-2.1.jar}:\
+    ${file.reference.org.apache.felix.shell.tui-1.0.2.jar}:\
+    ${file.reference.testng-5.1.jar}:\
+    ${file.reference.oval-1.31.jar}:\
+    ${file.reference.commons-lang-2.3.jar}:\
+    ${file.reference.tiles-jsp-2.0.6.jar}:\
+    ${file.reference.sslext-1.2-0.jar}:\
+    ${file.reference.commons-collections-3.2.jar}:\
+    ${file.reference.struts2-json-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-plexus-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-embeddedjsp-plugin-2.1.8.1.jar}:\
+    ${file.reference.commons-chain-1.2.jar}:\
+    ${file.reference.standard-1.0.6.jar}:\
+    ${file.reference.oro-2.0.8.jar}:\
+    ${file.reference.struts2-tiles-plugin-2.1.8.1.jar}:\
+    ${file.reference.spring-core-2.5.6.jar}:\
+    ${file.reference.spring-web-2.5.6.jar}:\
+    ${file.reference.commons-logging-api-1.1.jar}:\
+    ${file.reference.commons-digester-2.0.jar}:\
+    ${file.reference.classworlds-1.1.jar}:\
+    ${file.reference.jasper-compiler.jar}:\
+    ${file.reference.commons-el.jar}:\
+    ${file.reference.commons-fileupload-1.2.1.jar}:\
+    ${file.reference.dwr-1.1.1.jar}:\
+    ${file.reference.struts2-jsf-plugin-2.1.8.1.jar}:\
+    ${file.reference.org.apache.felix.bundlerepository-1.2.1.jar}:\
+    ${file.reference.struts2-oval-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-osgi-plugin-2.1.8.1.jar}:\
+    ${file.reference.naming-factory-dbcp.jar}:\
+    ${file.reference.struts2-codebehind-plugin-2.1.8.1.jar}:\
+    ${file.reference.tiles-api-2.0.6.jar}:\
+    ${file.reference.sitemesh-2.4.2.jar}:\
+    ${file.reference.struts2-core-2.1.8.1.jar}:\
+    ${file.reference.jasper-runtime.jar}:\
+    ${file.reference.freemarker-2.3.15.jar}:\
+    ${file.reference.struts2-pell-multipart-plugin-2.1.8.1.jar}:\
+    ${file.reference.ognl-2.7.3.jar}:\
+    ${file.reference.commons-validator-1.3.1.jar}:\
+    ${file.reference.org.apache.felix.main-1.4.1.jar}:\
+    ${file.reference.naming-factory.jar}:\
+    ${file.reference.struts2-config-browser-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-testng-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-spring-plugin-2.1.8.1.jar}:\
+    ${file.reference.commons-io-1.1.jar}:\
+    ${file.reference.commons-beanutils-1.8.0.jar}:\
+    ${file.reference.spring-test-2.5.6.jar}:\
+    ${file.reference.jstl-1.0.2.jar}:\
+    ${file.reference.struts2-rest-plugin-2.1.8.1.jar}:\
+    ${file.reference.jasper-compiler-jdt.jar}:\
+    ${file.reference.struts2-osgi-demo-bundle-2.1.8.1.jar}:\
+    ${file.reference.plexus-container-default-1.0-alpha-10.jar}:\
+    ${file.reference.struts2-jasperreports-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-portlet-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-sitemesh-plugin-2.1.8.1.jar}:\
+    ${file.reference.struts2-jfreechart-plugin-2.1.8.1.jar}:\
+    ${libs.JAVAEE_5_CONTAINER.classpath}
+# Space-separated list of extra javac options
+javac.compilerargs=
+javac.debug=true
+javac.deprecation=false
+javac.processorpath=\
+    ${javac.classpath}
+javac.source=1.5
+javac.target=1.5
+javac.test.classpath=\
+    ${javac.classpath}:\
+    ${build.classes.dir}:\
+    ${libs.junit.classpath}:\
+    ${libs.junit_4.classpath}
+javac.test.processorpath=\
+    ${javac.test.classpath}
+javadoc.additionalparam=
+javadoc.author=false
+javadoc.encoding=${source.encoding}
+javadoc.noindex=false
+javadoc.nonavbar=false
+javadoc.notree=false
+javadoc.preview=true
+javadoc.private=false
+javadoc.splitindex=true
+javadoc.use=true
+javadoc.version=false
+javadoc.windowtitle=
+lib.dir=webApps/WEB-INF/lib
+no.dependencies=false
+persistence.xml.dir=${conf.dir}
+platform.active=JDK_1.6
+resource.dir=setup
+run.test.classpath=\
+    ${javac.test.classpath}:\
+    ${build.test.classes.dir}
+# Space-separated list of JVM arguments used when running a class with a main method or a unit test
+# (you may also define separate properties like run-sys-prop.name=value instead of -Dname=value):
+runmain.jvmargs=
+source.encoding=UTF-8
+source.root=.
+src.dir=${file.reference.Std-src}
+test.src.dir=
+war.content.additional=
+war.ear.name=Std.war
+war.name=Std.war
+web.docbase.dir=webApps
+webinf.dir=webApps/WEB-INF

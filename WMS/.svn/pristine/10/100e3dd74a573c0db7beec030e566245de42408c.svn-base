@@ -1,0 +1,83 @@
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
+import com.itextpdf.text.DocumentException;
+
+import beans.Usuario;
+import beans.bulto;
+import beans.bultoContenido;
+import beans.encuentra.IPrint;
+import clienteWSVisual.ClienteWSVisualForus;
+import cliente_rest_Invoke.Call_WS_APIENCUENTRA;
+import dataTypes.DataIDDescripcion;
+import logica.ImpresionesPDF;
+import logica.Logica;
+
+
+public class TestVS 
+{
+	public static void main(String[] args) throws FileNotFoundException, DocumentException 
+	{	
+		Logica Logica = new Logica();
+		Usuario u = Logica.loginEncuentraSinEmpresa("Encuentra", "Forus!#$");
+		
+		int idEmpresa = u.getIdEmpresa();
+		Hashtable<String, bulto> cajasAbiertas = Logica.BultosAbiertos(idEmpresa);
+		List<bulto> boxe = new ArrayList<bulto>(cajasAbiertas.values());
+		for(bulto b:boxe){
+			Hashtable<String, DataIDDescripcion> articulosHT = new Hashtable<String, DataIDDescripcion>();
+			List<DataIDDescripcion> articulos = null;
+			
+			Enumeration<String> elements = b.getContenido().keys();
+			
+			bultoContenido bc = null;
+			String key = "";
+			int unidades = 0;
+			while(elements.hasMoreElements()){
+				key=elements.nextElement();
+				bc = b.getContenido().get(key);
+				unidades += bc.getCantidad();
+				
+				if(articulosHT.get(bc.getIdArticulo())==null){
+					articulosHT.put(bc.getIdArticulo(), new DataIDDescripcion(bc.getCantidad(),bc.getIdArticulo()));
+				}
+				else{
+					int cant = articulosHT.get(bc.getIdArticulo()).getId() + bc.getCantidad();
+					articulosHT.get(bc.getIdArticulo()).setId(cant);
+				}
+			}
+			/*
+			articulos = new ArrayList<DataIDDescripcion>(articulosHT.values());
+			 */
+			
+			ClienteWSVisualForus ws = new ClienteWSVisualForus();
+			articulos = new ArrayList<DataIDDescripcion>();
+			articulos = Logica.DescripcionArticulos(articulos,idEmpresa);
+			Collections.sort(articulos);
+			
+		
+			articulos.add(new DataIDDescripcion(1, "1230700510430"));
+			
+			DataIDDescripcion remito = ws.GrabarTransferencia(9000, Integer.parseInt(b.getDestino()), 0, articulos,	"Transferencia realizada por Nicolas 200 desde encuentra");
+			ImpresionesPDF.imprimirTicketMovStock(9000, 1200, "1119", "Movimiento hacia tienda "+100,articulos, remito.getId(),false, 10,2);
+		}
+		
+	
+	}
+	
+
+	public TestVS() {
+	}
+	
+	
+	
+	
+	
+	
+	
+
+}

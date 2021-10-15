@@ -1,0 +1,187 @@
+package logica;
+
+import java.math.BigDecimal;
+
+import java.util.List;
+
+import beans.Usuario;
+import persistencia.MSSQL;
+
+public class Utilidades 
+{
+	public Utilidades(){}
+
+	public List<Integer> darSeries(int cuantos, String uso)
+	{
+		
+		String insert = "insert into utilseries (IdTipo) values ";
+		String values = "";
+		for (int i = 0; i < cuantos; i++) 
+		{
+			values+="('"+uso+"'),";
+		}
+		
+		values = values.substring(0, values.length()-1);
+		
+		Logica l = new Logica();
+		return l.darSeries(insert+values);
+		
+		
+	}
+	
+	public  double redondea(double numero, int decimales) 
+	{ 
+	  double resultado;
+	  BigDecimal res;
+
+	  res = new BigDecimal(numero).setScale(decimales, BigDecimal.ROUND_UP);
+	  resultado = res.doubleValue();
+	  return resultado; 
+	}  
+	
+	
+	public  String darNombreMes(int idMes)
+	{
+		switch (idMes) 
+		{
+			case 1:
+				return "ene";
+			case 2:
+				return "feb";
+			case 3:
+				return "mar";
+			case 4:
+				return "abr";
+			case 5:
+				return "may";
+			case 6:
+				return "jun";
+			case 7:
+				return "jul";
+			case 8:
+				return "ago";
+			case 9:
+				return "sep";
+			case 10:
+				return "oct";
+			case 11:
+				return "nov";
+			case 12:
+				return "dic";
+			
+
+		default:
+			return "N/D";
+		}
+	}
+	
+	
+	public  int darDiasDiff(String fecha1, String fecha2) {
+		String consulta = "SELECT DATEDIFF(day, '" + fecha1 + "', '" + fecha2
+				+ "');";
+
+		return MSSQL.darDiasDiff(consulta);
+
+	}
+	
+	
+
+	public  String clearComillas(String input, boolean invertir)
+	{
+		String ouput="";
+		String repleacement = "#€@";
+		if(invertir)
+		{
+			/*busca las comillas y las pasa a #€@*/
+			ouput = input.replace("'", repleacement);
+		}
+		else
+		{
+			ouput = input.replace(repleacement, "'");
+		}
+		
+		return ouput;
+	}
+	
+	
+	public int tryParse (String in)
+	{
+		int retorno = 0;
+		try
+		{
+			retorno = Integer.parseInt(in);
+		}
+		catch (Exception e) 
+		{
+			
+		}
+		
+		return retorno;
+	}
+	
+	
+	public int darEmpresa(Usuario u)
+	{
+		int idEmpresa = 0;
+		try
+		{
+				idEmpresa = u.getIdEmpresa();
+		}
+		catch (Exception e) 
+		{
+			
+		}
+		
+		return idEmpresa;
+	}
+
+	public Long tryParseL(String in) 
+	{
+		Long retorno = 0L;
+		try
+		{
+			retorno = Long.parseLong(in);
+		}
+		catch (Exception e) 
+		{
+			
+		}
+		
+		return retorno;
+	}
+
+	public String darParametroEmpresaSTR(int idEmpresa, int idParametro) 
+	{
+		Logica l = new Logica();
+		return l.darParametroEmpresa(idEmpresa,idParametro);
+	}
+	
+	public int darParametroEmpresaINT(int idEmpresa, int idParametro) 
+	{
+		Logica l = new Logica();
+		try
+		{
+			return Integer.parseInt(l.darParametroEmpresa(idEmpresa,idParametro));
+		}
+		catch (Exception e) 
+		{
+			return -1;
+		}
+	}
+
+	public boolean darParametroEmpresaBool(int idEmpresa, int idParametro) 
+	{
+		Logica l = new Logica();
+		int bol = Integer.parseInt(l.darParametroEmpresa(idEmpresa,idParametro));
+		
+		if(bol==1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
+}

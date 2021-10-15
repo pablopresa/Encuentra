@@ -1,0 +1,87 @@
+package aTest;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.itextpdf.text.DocumentException;
+
+import beans.Fecha;
+import beans.Usuario;
+import beans.bulto;
+import beans.bultoContenido;
+import beans.encuentra.IPrint;
+import beans.encuentra.ValueObjects.VORecepcionSinOrden;
+import logica.Logica;
+import logica.Utilidades;
+
+public class generarBultosDesdePacking {
+	
+	public static void main(String[] args) throws FileNotFoundException, DocumentException 
+	{	
+		
+	Logica logica = new Logica();
+	Utilidades util = new Utilidades();
+	
+	List<bulto> bultos = new LinkedList<bulto>(); 
+	int idRecepcion = 234;
+	int idEmpresa = 5;
+	
+	List<VORecepcionSinOrden> listaPacking = new LinkedList<VORecepcionSinOrden>(); 
+	listaPacking = logica.darPackingDeRecepcion(idRecepcion,idEmpresa); 
+	
+	//CON LA INFO DEL PACKING VOY A CREAR LOS BULTOS
+	String[] indices = util.auxIndices(cantidadBultosRecepcion(listaPacking));
+	int numeroIndice = 0;
+	for(VORecepcionSinOrden linea: listaPacking)
+	{
+		for(int i=0; i<linea.getCantidadBultos(); i++)
+		{
+			int posicion = 0;
+			int equipo = 2;
+			Fecha fecha = new Fecha(0,0,0);
+			fecha.now();
+			String id= "R"+indices[numeroIndice]+equipo+posicion+fecha.darFechaString();
+			bulto bul = new bulto(id, "Recepcion "+idRecepcion, true, 0, 0, 0, 0.0, false, "", 1119,"1",idEmpresa);
+			List<bultoContenido> listaContenido = new ArrayList<bultoContenido>();
+			bultoContenido bc = new bultoContenido(linea.getIdArticulo(),linea.getCantidadPacking(), idRecepcion, 1119);
+			bul.Agregar_A_Bulto_NO_persist(bc);
+			listaContenido.add(bc);
+			bul.setContenidoList(listaContenido);
+			
+			bultos.add(bul);
+			System.out.println(linea);
+			numeroIndice++;
+		}
+	}
+	
+	//prueba crear bulto
+	
+	//.crearBultos(idRecepcion, bultos, idEmpresa);
+	
+	
+	//PRUEBA IMPRIMIR ETIQUETAS     
+	IPrint ip = new IPrint();
+	Hashtable<String, Integer> totalesPorMark = new Hashtable<String, Integer>();
+	
+	//obtengo los totales por mark
+	for(VORecepcionSinOrden linea: listaPacking)
+	{
+		totalesPorMark.put(linea.getIdArticulo(), linea.getCantidadBultos());
+	}
+	
+	ip.ImprimirEtiquetasBultosRSinOC(bultos, "Recepcion_"+idRecepcion+"_"+idEmpresa, totalesPorMark);
+	}
+	
+	public static int cantidadBultosRecepcion(List<VORecepcionSinOrden> listaPacking)
+	{
+		int total = 0;
+		for(VORecepcionSinOrden linea: listaPacking)
+		{
+			total+=linea.getCantidadBultos();
+		}
+		return total;
+	}
+}

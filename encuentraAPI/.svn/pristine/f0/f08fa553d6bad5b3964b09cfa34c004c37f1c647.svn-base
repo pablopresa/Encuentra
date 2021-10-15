@@ -1,0 +1,393 @@
+package ws;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import json_objects.RetornoPedido;
+import logica.Logica;
+import logica.LogicaAPI;
+
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.google.gson.Gson;
+
+import beans.Usuario;
+import beans.api.GrabarRecepcion;
+import beans.api.MovStock;
+
+import beans.api.ResponseOrder;
+import beans.api.ResponseOrderFunctions;
+import beans.api.articuloBarra;
+import clienteAPIEncuentra.Call_WS_APIENCUENTRA;
+import clientesVisual_Store.Std.clienteWSVS.WSCommunicate;
+import clientesVisual_Store.elReyEC.ClienteWS;
+import clientesVisual_Store.forus.clienteWSVisual.ClienteWSVisualForus;
+import clientesVisual_Store.forus.clienteWSVisual1200.ClienteWSVisualForus1200;
+import dataTypes.DataIDDescripcion;
+
+@Path("/ERPintegrations")
+public class ERPintegrations 
+{	
+		
+	@POST
+	@Path("/stockMovement")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String movStock(String data,@QueryParam ("token") String token, @QueryParam ("resend") String resend) throws IOException
+	{
+	      //System.out.println(data);
+		
+		String json = "";
+		Gson gson = new Gson();
+		Usuario u = LogicaAPI.loginEncuentraAPI2(token);
+		DataIDDescripcion erp = null;
+		Boolean reEnvio = false;
+		try {
+			reEnvio = Boolean.parseBoolean(resend);
+		} catch (Exception e) {}
+		
+		if (u.getNick() == null) 
+		{
+			erp = new DataIDDescripcion(0,"");
+		}
+		else {
+			int idEmpresa = u.getIdEmpresa();
+			System.out.println(data);
+			MovStock m = new MovStock();
+			m = gson.fromJson(data, MovStock.class);
+			
+			LogicaAPI l = new LogicaAPI();
+			int idMov = 0;			
+			int idDoc = 0;
+			
+			try {
+				if(!reEnvio) {
+					idMov = l.RegistrarMovimientoStock(m.getOrigen(), m.getDestino(), m.getIdUsuario(), m.getDetalle(), idEmpresa, 
+							m.getOrigenDoc(), m.getDocSolicitud(), m.getRazon());
+					m.setId(idMov);
+				}				
+				
+				switch (idEmpresa) {
+				case 1:		//STADIUM
+					WSCommunicate cl = new WSCommunicate();
+					int tienda = m.getOrigen();
+					int idEquipo = 2000+tienda;
+					if(tienda==99)
+					{
+						erp= cl.GrabarTransferencia(tienda, m.getDestino(), m.getDetalle(), "Generado por encuentra", (short)99, (short)1, 
+								(short)99, Long.parseLong(m.getIdUsuario()+""), false,  "Generado por encuentra", m.getRazon());
+						idDoc = erp.getId();
+					}
+					else
+					{
+						erp= cl.GrabarTransferenciaTienda(tienda, m.getDestino(), m.getDetalle(), "Generado por encuentra", (short)tienda, 
+								(short)idEquipo, (short)tienda, Long.parseLong(m.getIdUsuario()+""), false,  "Generado por encuentra", m.getRazon());
+						idDoc = erp.getId();
+					}
+					break;
+					
+					
+				case 2:		//FORUS
+					Call_WS_APIENCUENTRA api = new Call_WS_APIENCUENTRA();
+					Hashtable<String, Integer> stocks = api.vistaStocks(m.getDetalle(), m.getOrigen(), idEmpresa);
+					ClienteWSVisualForus ws = new ClienteWSVisualForus();
+					if(m.getDocSolicitud()==0) {	//remito						
+						erp = ws.GrabarTransferencia(m.getOrigen(), m.getDestino(), m.getRazon(), m.getDetalle(),
+								"Transferencia realizada por "+m.getUsuario()+" desde encuentra", stocks);
+						idDoc = erp.getId();
+					}
+					else {	//afectacion de orden
+						erp = ws.EntregaPrepararYTerminar(m.getDocSolicitud(), m.getDetalle(),m.getDestino(), stocks);
+						idDoc = m.getDocSolicitud();
+					}
+					break;	
+					
+					
+				case 4:		//EL REY DEL ENTRETENIMIENTO
+					ClienteWS wsEC = new ClienteWS();
+					erp = wsEC.GrabarTransferencia(m.getOrigen(), m.getDestino(), m.getRazon(), m.getDetalle(),
+							"Transferencia realizada desde encuentra");
+					idDoc = erp.getId();
+					
+					break;	
+					
+					
+				case 5:		//PEPE GANGA
+					break;
+					
+					
+				default:
+					break;
+				}
+				
+				//REGISTRO LA SALIDA DEL MOVIMIENTO DE STOCK
+				if(erp.getId()==0){
+					l.RegistrarDocMovimientoStock(0, m.getId(), idDoc, erp.getDescripcion(), 
+							idEmpresa,m.getIdUsuario(),erp.getIdB());
+				}
+				else {
+					l.RegistrarDocMovimientoStock(1, m.getId(), idDoc, erp.getDescripcion(),
+							idEmpresa,m.getIdUsuario(),erp.getIdB());
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}					
+			
+		}
+		
+		json = gson.toJson(erp);      
+		
+		return json;
+	   }	
+
+	@POST
+	@Path("/confirmTransf")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String confirmTransf(String data,@QueryParam ("token") String token) throws IOException
+	{
+	      //System.out.println(data);
+		
+		String json = "";
+		Gson gson = new Gson();
+		
+		Usuario u = LogicaAPI.loginEncuentraAPI2(token);
+		boolean grabo = false;
+		
+		if (u.getNick() == null) 
+		{
+			
+		}
+		else {
+			int idEmpresa = u.getIdEmpresa();
+			System.out.println(data);
+			MovStock m = new MovStock();
+			m = gson.fromJson(data, MovStock.class);
+			
+			LogicaAPI l = new LogicaAPI();
+			int idMov = 0;
+			
+			try {
+				idMov = l.RegistrarConfirmacionTransferencia(m.getOrigen(), m.getDestino(), m.getIdUsuario(), m.getDetalle(), idEmpresa, 
+						m.getOrigenDoc(), m.getDocSolicitud(), m.getRazon(),m.getDoc());
+				
+				
+				switch (idEmpresa) {
+				case 1:		//STADIUM
+					
+					break;
+					
+					
+				case 2:		//FORUS
+					short idTienda = 1;
+					
+					if(m.getDestino()==1200)
+					{
+						idTienda=1200;
+						ClienteWSVisualForus1200 vs = new ClienteWSVisualForus1200();
+						grabo = vs.ConfirmarTransferencia(m.getOrigen(), m.getDestino(), m.getDoc(), m.getDetalle(), 
+								"Confirmacion desde encuentra por "+m.getUsuario(),idTienda);
+					}
+					else
+					{
+						ClienteWSVisualForus vs = new ClienteWSVisualForus();
+						grabo = vs.ConfirmarTransferencia(m.getOrigen(), m.getDestino(), m.getDoc(), m.getDetalle(), 
+								"Confirmacion desde encuentra por "+m.getUsuario(),idTienda);
+					}
+					break;	
+					
+					
+				case 4:		//EL REY DEL ENTRETENIMIENTO
+					
+					
+					break;	
+					
+					
+				case 5:		//PEPE GANGA
+					break;
+					
+					
+				default:
+					break;
+				}
+				
+				//REGISTRO LA SALIDA DEL MOVIMIENTO DE STOCK
+				l.RegistrarEstadoConfirmacionTransferencia(grabo, idMov, "", idEmpresa,m.getIdUsuario(),1);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}					
+			
+		}
+		
+		json = gson.toJson(grabo);      
+		
+		return json;
+	   }	
+	
+	@POST
+	@Path("/grabarRecepcion")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String grabarRecepcion(String data,@QueryParam ("token") String token) throws IOException
+	{
+	      //System.out.println(data);
+		
+		String json = "";
+		Gson gson = new Gson();
+		Usuario u = LogicaAPI.loginEncuentraAPI2(token);
+		boolean grabo = false;
+		
+		if (u.getNick() == null) 
+		{
+			
+		}
+		else {
+			int idEmpresa = u.getIdEmpresa();
+			System.out.println(data);
+			GrabarRecepcion r = new GrabarRecepcion();
+			r = gson.fromJson(data, GrabarRecepcion.class);
+			
+			LogicaAPI l = new LogicaAPI();
+			int idReg = 0;
+			
+			try {
+				idReg = l.RegistrarRecepcion(r);				
+				
+				switch (idEmpresa) {
+				case 1:		//STADIUM
+					
+					break;
+					
+					
+				case 2:		//FORUS
+					ClienteWSVisualForus ws=new ClienteWSVisualForus();
+					grabo = ws.GrabarRecepcion(r.getDetalle(),r.getTipoAfecta(),r.getObservacion(), r.getNumeroDoc(), 
+							r.getNroProveedor(), r.getSerieRemito(),r.getNroRemito());
+					
+					break;	
+					
+					
+				case 4:		//EL REY DEL ENTRETENIMIENTO
+					
+					
+					break;	
+					
+					
+				case 5:		//PEPE GANGA
+					break;
+					
+					
+				default:
+					break;
+				}
+				
+				//REGISTRO LA SALIDA DEL MOVIMIENTO DE STOCK
+				l.RegistrarEstadoConfirmacionTransferencia(grabo, idReg, "", idEmpresa,r.getIdUsuario(),1);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}					
+			
+		}
+		
+		json = gson.toJson(grabo);      
+		
+		return json;
+	   }
+	
+	@POST
+	@Path("/grabarBarra")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String grabarBarra(String data,@QueryParam ("token") String token) throws IOException
+	{
+	      //System.out.println(data);
+		
+		String json = "";
+		Gson gson = new Gson();
+		Usuario u = LogicaAPI.loginEncuentraAPI2(token);
+		boolean grabo = false;
+		articuloBarra art = new articuloBarra();
+		
+		if (u.getNick() == null) 
+		{
+			art.setRespuesta("fail");
+		}
+		else {
+			int idEmpresa = u.getIdEmpresa();
+			System.out.println(data);
+			
+			art = gson.fromJson(data, articuloBarra.class);
+			
+			try {
+				switch (idEmpresa) {
+				case 1:		//STADIUM
+					
+					break;
+					
+					
+				case 2:		//FORUS
+					ClienteWSVisualForus ws=new ClienteWSVisualForus();
+					grabo = ws.GrabarArtBarra(art.getArticulo(), art.getBarra());
+					
+					break;	
+					
+					
+				case 4:		//EL REY DEL ENTRETENIMIENTO
+					
+					
+					break;	
+					
+					
+				case 5:		//PEPE GANGA
+					break;
+					
+					
+				default:
+					break;
+				}
+				
+				if(grabo) {
+					art.setRespuesta("ok");
+				}
+				else {
+					art.setRespuesta("fail");
+				}
+				
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				art.setRespuesta("fail");
+			}					
+			
+		}
+		
+		json = gson.toJson(art);      
+		
+		return json;
+	   }
+	
+}

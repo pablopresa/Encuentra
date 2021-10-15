@@ -1,0 +1,55 @@
+package web.util;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import logica.Logica;
+import logica.Utilidades;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import beans.Usuario;
+
+
+public class _EncuentraAsociarBarras extends Action 
+{
+	
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception 
+	{
+		HttpSession session = request.getSession();
+		Logica Logica = new Logica();
+		Usuario uLog = (Usuario) session.getAttribute("uLogeado");
+		Utilidades util = new Utilidades();
+		int idEmpresa = util.darEmpresa(uLog);
+		if(idEmpresa==0)
+		{
+			return mapping.findForward("LOGIN");
+		}
+		
+		String articulo = request.getParameter("art");
+		String barra = request.getParameter("bar");
+		
+		Logica.GenerarVinculo(barra, articulo, idEmpresa);
+		
+		uLog.registrarEventoMin(session.getId(), "Se agrega nueva barra ("+barra+") para el articulo: "+articulo);
+		
+		String mensaje = "Se agrega nueva barra ("+barra+") para el articulo: "+articulo;
+		request.setAttribute("menError", mensaje);
+		
+		if(request.getParameter("barraManual")!=null)
+		{
+			return mapping.findForward("nuevaBarra");
+		}
+		
+		return mapping.findForward("ok");
+		
+	}
+
+}

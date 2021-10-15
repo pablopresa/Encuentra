@@ -1,0 +1,111 @@
+package clienteLaIsla;
+
+public class Producto {
+	String descripcion,codigobarra,idArticulo,Talle,Color,IdTemporada,Coleccion,IdProveedor,IdMarca,IdClase,IdCategoria;
+	
+	public Producto(String descripcion, String codigobarra, String idArticulo, String talle, String color,
+			String idTemporada, String coleccion, String idProveedor, String idMarca, String idClase,
+			String idCategoria) {
+		this.descripcion = descripcion;
+		this.codigobarra = codigobarra;
+		this.idArticulo = idArticulo;
+		Talle = talle;
+		Color = color;
+		IdTemporada = idTemporada;
+		Coleccion = coleccion;
+		IdProveedor = idProveedor;
+		IdMarca = idMarca;
+		IdClase = idClase;
+		IdCategoria = idCategoria;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public String getCodigobarra() {
+		return codigobarra;
+	}
+
+	public String getIdArticulo() {
+		return idArticulo;
+	}
+
+	public String getTalle() {
+		return Talle;
+	}
+
+	public String getColor() {
+		return Color;
+	}
+
+	public String getIdTemporada() {
+		return IdTemporada;
+	}
+
+	public String getColeccion() {
+		return Coleccion;
+	}
+
+	public String getIdProveedor() {
+		return IdProveedor;
+	}
+
+	public String getIdMarca() {
+		return IdMarca;
+	}
+
+	public String getIdClase() {
+		return IdClase;
+	}
+
+	public String getIdCategoria() {
+		return IdCategoria;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	public void setCodigobarra(String codigobarra) {
+		this.codigobarra = codigobarra;
+	}
+
+	public void setIdArticulo(String idArticulo) {
+		this.idArticulo = idArticulo;
+	}
+
+	public void setTalle(String talle) {
+		Talle = talle;
+	}
+
+	public void setColor(String color) {
+		Color = color;
+	}
+
+	public void setIdTemporada(String idTemporada) {
+		IdTemporada = idTemporada;
+	}
+
+	public void setColeccion(String coleccion) {
+		Coleccion = coleccion;
+	}
+
+	public void setIdProveedor(String idProveedor) {
+		IdProveedor = idProveedor;
+	}
+
+	public void setIdMarca(String idMarca) {
+		IdMarca = idMarca;
+	}
+
+	public void setIdClase(String idClase) {
+		IdClase = idClase;
+	}
+
+	public void setIdCategoria(String idCategoria) {
+		IdCategoria = idCategoria;
+	}
+
+	
+}

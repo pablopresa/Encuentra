@@ -1,0 +1,91 @@
+package web.almacen;
+
+import java.util.Hashtable;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import logica.Logica;
+import logica.Utilidades;
+import main.utilidades.CallWSRFID;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import beans.Usuario;
+
+public class _EncuentraValidateRealTime extends Action 
+{
+
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception 
+	{
+		HttpSession session = request.getSession();
+		
+		Usuario uLog = (Usuario) session.getAttribute("uLogeado");		
+		Utilidades util = new Utilidades();
+		Logica logica = new Logica();
+		int idEmpresa = util.darEmpresa(uLog);
+		if(idEmpresa==0)
+		{
+			return mapping.findForward("LOGIN");
+		}
+		ServletContext context = request.getSession().getServletContext();
+		Hashtable<String, String> artBarra = (Hashtable<String, String>) context.getAttribute("barras_"+idEmpresa);
+		
+		try{
+			String cod = request.getParameter("codigo");
+			boolean valido = false;
+			String descripcion="";
+	
+			try
+			{
+				cod = artBarra.get(cod.toUpperCase()).toUpperCase();
+				String codComillas="'"+cod+"'"; 
+				Hashtable<String, String> articuloHash = logica.darDescripcionArticulos(codComillas, idEmpresa);
+				descripcion = articuloHash.get(cod);
+				valido = true;
+			}
+			catch(Exception e)
+			{
+				if(idEmpresa == 8) {
+					CallWSRFID call = new CallWSRFID();
+					String devuelve = call.darEan(cod);
+					if(devuelve != null && !devuelve.equals("404") ) {
+						valido = true;
+					}
+				}
+				
+				
+			}
+			
+			if ( descripcion.equals("")) {
+				descripcion = "SIN DESCRIPCION";
+			}
+			
+			String existeDescripcion=
+					 "     { "+
+					 "        \"existe\":\""+valido+"\", "+
+					 "        \"descripcion\":\""+descripcion+"\" "+
+					 "     } "
+					 ;	
+			
+			session.setAttribute("html",existeDescripcion );
+			
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		return mapping.findForward("ok");
+			
+	}
+	
+
+}

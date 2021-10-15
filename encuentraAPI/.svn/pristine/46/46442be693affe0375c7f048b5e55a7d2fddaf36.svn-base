@@ -1,0 +1,94 @@
+package beans.api;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
+
+public class BarcodeReader
+{
+	private List<String> barcodes;
+	  
+
+	public List<String> getBarcodes() {
+		return barcodes;
+	}
+
+	public void setBarcodes(List<String> barcodes) {
+		this.barcodes = barcodes;
+	}
+	
+	
+	 public BarcodeReader(String filePath, int courier, int cantidad) {
+	    
+		 this.barcodes = new ArrayList<String>();
+		 String barra = "";
+		 
+		 List<Integer> cortes = new ArrayList<Integer>();		 
+		 int corte0 = 0;
+		 int corte = 0;
+		 int finPag = 0;
+		 
+		 switch (courier) {
+		 case 50000:
+		 case 800000:
+			corte0 = 17;
+			finPag = 2;
+			break;
+
+		default:
+			break;
+		}
+		 for(int i = 1; i<=cantidad; i++) {
+			 corte = corte + corte0 - 1;
+			 cortes.add(corte);
+			 corte = corte+finPag + 1;
+		 }
+		 
+		 try {
+			 File f = new File(filePath);
+		     if(f.exists())
+		     {    	
+		    	 try (PDDocument document = PDDocument.load(new File(filePath))) 
+		    	 {
+
+		             document.getClass();
+
+		             if (!document.isEncrypted()) {
+		 			
+		                 PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+		                 stripper.setSortByPosition(true);
+
+		                 PDFTextStripper tStripper = new PDFTextStripper();
+
+		                 String pdfFileInText = tStripper.getText(document);
+		                
+		                 String lines[] = pdfFileInText.split("\\r?\\n");
+		                 
+		                 for(Integer c: cortes) {
+		                     barra = lines[c];
+		                     System.out.println(barra);
+		                     this.barcodes.add(barra);
+		                 }
+		                 		                 
+		             }
+
+		         }
+		    	 catch (Exception e) 
+		    	 {
+					// TODO: handle exception
+				}
+		     }
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	 }
+	 
+	 public static void main(String[] args) {
+		 String path = "C:\\Program Files\\apache-tomcat-7.0.64\\webapps\\encuentraAPI\\pdf\\870-979177.pdf";
+		 BarcodeReader br= new BarcodeReader(path,800000, 1);
+	}
+}

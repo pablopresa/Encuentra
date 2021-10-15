@@ -1,0 +1,169 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+
+import com.itextpdf.text.DocumentException;
+
+import beans.Fecha;
+import beans.encuentra.DataPicking;
+import cliente_rest_Invoke.Call_WS_analoga;
+import dataTypes.DataIDIDDescripcion;
+import logica.ImpresionesPDF;
+import logica.Logica;
+import logica.Utilidades;
+
+import java.io.IOException;
+import java.net.Authenticator;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+
+public class MyMain{
+
+
+	static String removerTildes(String cadena) {
+	    return cadena.replace("Á", "A")
+	            .replace("É", "E")
+	            .replace("Í", "I")
+	            .replace("Ó", "O") 
+	            .replace("Ú", "U")
+	            .replace("á", "a")
+	            .replace("é", "e")
+	            .replace("í", "i")
+	            .replace("ó", "o")
+	            .replace("ú", "u");
+	}
+	
+    public static void main(String[] args) 
+    {
+    	
+  
+    	
+    	
+    	/*
+    	Fecha fecha = new Fecha(true,3);
+    	 
+    	System.out.println(fecha.darHoraMinutoSegundoZ());
+    	System.out.println(fecha.getDiaSemana());
+    	
+    	Utilidades ut = new Utilidades();
+    	Fecha posible = ut.darHoraHabilDeposito(512,2,fecha) ;
+    	
+    	System.out.println(posible.darHoraMinutoSegundoZ());
+    	System.out.println(posible.getDiaSemana());
+    	
+    	Fecha fechaPe = new Fecha(posible.getDia(), posible.getMes(), posible.getAnio(), posible.getHora(), posible.getMinuto(),3,"");
+    	
+    	System.out.println("fecha pedidosYA "+ fechaPe.darHoraMinutoSegundoZ());
+    	System.out.println(posible.getDiaSemana());
+    	/*
+    	Call_WS_analoga call = new Call_WS_analoga();
+    	
+    	
+    	int diaspatras = 10;
+    	
+    	for (int i = 1; i < diaspatras; i++) 
+    	{
+    		System.out.println("Consultando "+i+" dias para atras");
+    		String urlE = call.reSetEtiquetas("1248766", 150819L, 6, 2,i);
+    		if(urlE!=null)
+    		{
+    			System.out.println(urlE);
+    			break;
+    			
+    		}
+    			
+		}
+    	
+    	for (int i = 1; i < diaspatras; i++) 
+    	{
+    		System.out.println("Consultando "+i+" dias para atras");
+    		String urlE = call.reSetEtiquetas("1248977", 150834L, 6, 2,i);
+    		if(urlE!=null)
+    		{
+    			System.out.println(urlE);
+    			break;
+    			
+    		}
+    			
+		}
+    	for (int i = 1; i < diaspatras; i++) 
+    	{
+    		System.out.println("Consultando "+i+" dias para atras");
+    		String urlE = call.reSetEtiquetas("1249001", 150848L, 6, 2,i);
+    		if(urlE!=null)
+    		{
+    			System.out.println(urlE);
+    			break;
+    			
+    		}
+    			
+		}
+    	for (int i = 1; i < diaspatras; i++) 
+    	{
+    		System.out.println("Consultando "+i+" dias para atras");
+    		String urlE = call.reSetEtiquetas("1248999", 150851L, 6, 2,i);
+    		if(urlE!=null)
+    		{
+    			System.out.println(urlE);
+    			break;
+    			
+    		}
+    			
+		}
+    	for (int i = 1; i < diaspatras; i++) 
+    	{
+    		System.out.println("Consultando "+i+" dias para atras");
+    		String urlE = call.reSetEtiquetas("1249014", 150860L, 6, 2,i);
+    		if(urlE!=null)
+    		{
+    			System.out.println(urlE);
+    			break;
+    			
+    		}
+    			
+		}
+    	for (int i = 1; i < diaspatras; i++) 
+    	{
+    		System.out.println("Consultando "+i+" dias para atras");
+    		String urlE = call.reSetEtiquetas("1248769", 150885L, 6, 2,i);
+    		if(urlE!=null)
+    		{
+    			System.out.println(urlE);
+    			break;
+    			
+    		}
+    			
+		}
+    	for (int i = 1; i < diaspatras; i++) 
+    	{
+    		System.out.println("Consultando "+i+" dias para atras");
+    		String urlE = call.reSetEtiquetas("1249066", 150893L, 6, 2,i);
+    		if(urlE!=null)
+    		{
+    			System.out.println(urlE);
+    			break;
+    			
+    		}
+    			
+		}
+    	for (int i = 1; i < diaspatras; i++) 
+    	{
+    		System.out.println("Consultando "+i+" dias para atras");
+    		String urlE = call.reSetEtiquetas("1248584", 150950L, 6, 2,i);
+    		if(urlE!=null)
+    		{
+    			System.out.println(urlE);
+    			break;
+    			
+    		}
+    			
+		}
+    	
+    	
+		*/
+    }
+}
+

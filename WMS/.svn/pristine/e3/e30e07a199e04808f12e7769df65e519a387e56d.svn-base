@@ -1,0 +1,14 @@
+{
+  "name": "7520f817f5a584fb",
+  "main": "7520f817f5a584fb@560.js",
+  "version": "560.0.0",
+  "homepage": "https://observablehq.com/d/7520f817f5a584fb",
+  "author": {
+    "name": "Gonzalo Monzon",
+    "url": "https://observablehq.com/@gonzamoon5"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4"
+  }
+}

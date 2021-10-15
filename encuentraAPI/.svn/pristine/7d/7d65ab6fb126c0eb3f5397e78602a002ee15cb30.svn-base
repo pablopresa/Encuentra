@@ -1,0 +1,13 @@
+package marketPlaceIntegrations;
+
+import java.util.Hashtable;
+import java.util.List;
+
+import beans.encuentra.EncuentraPedido;
+
+public interface marketPlaceInterface {
+	List<UpdateStateResponse> UpdateState(String json,int canal);
+	List<EncuentraPedido> getPedidos(int canal);
+}
+
+

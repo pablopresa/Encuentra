@@ -1,0 +1,17 @@
+package integraciones.marketplaces.objetos;
+
+import java.util.Hashtable;
+import java.util.List;
+
+import org.apache.http.client.HttpClient;
+
+import beans.encuentra.EncuentraPedido;
+
+public interface marketPlaceInterface {
+	List<UpdateStateResponse> UpdateState(String json,int canal);
+	List<EncuentraPedido> getPedidos(int canal);
+	String callPostOKHttp(String urlFuncion, int canal, String json);
+	
+}
+
+

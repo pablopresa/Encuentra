@@ -1,0 +1,193 @@
+package beans.encuentra;
+
+import java.util.List;
+
+import dataTypes.DataIDDescripcion;
+
+
+public class EncuentraPedido 
+{
+	private int cantidad, cerrado, ml, idDepositoEnvio;
+	private String descripcion, estado,urlEtiqueta, sucursalPick, formaPago,fecha;
+	private Double descuento,precio, montoEnvio;
+	private List <EncuentraPedidoArticulo> articulosPedido;
+	private List <EncuentraPedidoArticuloReq> articulosPedidoReq;
+	private DataIDDescripcion canalMercadoLibre;
+	private int canalAnaloga;
+	private String personaRetira;
+	private Long idPedido;
+	private String idPedidoSTR;
+	private String idEcommerce;
+	private String ticketNumber;
+	private String trackingNumber;
+	private Cliente cliente;
+	private boolean freshipping;
+	public Double getPrecio() {
+		return precio;
+	}
+	public void setPrecio(Double precio) {
+		this.precio = precio;
+	}
+	public Double getMontoEnvio() {
+		return montoEnvio;
+	}
+	public void setMontoEnvio(Double montoEnvio) {
+		this.montoEnvio = montoEnvio;
+	}
+	public String getIdPedidoSTR() {
+		return idPedidoSTR;
+	}
+	public void setIdPedidoSTR(String idPedidoSTR) {
+		this.idPedidoSTR = idPedidoSTR;
+	}
+	
+	public String getPersonaRetira() {
+		return personaRetira;
+	}
+	public void setPersonaRetira(String personaRetira) {
+		this.personaRetira = personaRetira;
+	}
+	public int getCanalAnaloga() {
+		return canalAnaloga;
+	}
+	public void setCanalAnaloga(int canalAnaloga) {
+		this.canalAnaloga = canalAnaloga;
+	}
+	public DataIDDescripcion getCanalMercadoLibre() {
+		return canalMercadoLibre;
+	}
+	public void setCanalMercadoLibre(DataIDDescripcion canalMercadoLibre) {
+		this.canalMercadoLibre = canalMercadoLibre;
+	}
+	public int getMl() {
+		return ml;
+	}
+	public void setMl(int ml) {
+		this.ml = ml;
+	}
+	public String getSucursalPick() {
+		return sucursalPick;
+	}
+	public void setSucursalPick(String sucursalPick) {
+		this.sucursalPick = sucursalPick;
+	}
+	public Double getDescuento() {
+		return descuento;
+	}
+	public void setDescuento(Double descuento) {
+		this.descuento = descuento;
+	}
+	public List<EncuentraPedidoArticulo> getArticulosPedido() {
+		return articulosPedido;
+	}
+	public void setArticulosPedido(List<EncuentraPedidoArticulo> articulosPedido) {
+		this.articulosPedido = articulosPedido;
+	}
+	public List<EncuentraPedidoArticuloReq> getArticulosPedidoReq() {
+		return articulosPedidoReq;
+	}
+	public void setArticulosPedidoReq(
+			List<EncuentraPedidoArticuloReq> articulosPedidoReq) {
+		this.articulosPedidoReq = articulosPedidoReq;
+	}
+	public Long getIdPedido() {
+		return idPedido;
+	}
+	public void setIdPedido(Long idPedido) {
+		this.idPedido = idPedido;
+	}
+	public int getCantidad() {
+		return cantidad;
+	}
+	public void setCantidad(int cantidad) {
+		this.cantidad = cantidad;
+	}
+	public int getCerrado() {
+		return cerrado;
+	}
+	public void setCerrado(int cerrado) {
+		this.cerrado = cerrado;
+	}
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	public String getEstado() {
+		return estado;
+	}
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+	public String getUrlEtiqueta() {
+		return urlEtiqueta;
+	}
+	public void setUrlEtiqueta(String urlEtiqueta) {
+		this.urlEtiqueta = urlEtiqueta;
+	}
+	public EncuentraPedido() {
+	}
+	
+	
+	
+	public String getFormaPago() {
+		return formaPago;
+	}
+	public void setFormaPago(String formaPago) {
+		this.formaPago = formaPago;
+	}
+	
+	
+	
+	
+	
+	public int getIdDepositoEnvio() {
+		return idDepositoEnvio;
+	}
+	public void setIdDepositoEnvio(int idDepositoEnvio) {
+		this.idDepositoEnvio = idDepositoEnvio;
+	}
+	
+	public String getIdFenicio() {
+		return idEcommerce;
+	}
+	public void setIdFenicio(String id) {
+		this.idEcommerce = id;
+	}
+	public String getFecha() {
+		return fecha;
+	}
+	public void setFecha(String fecha) {
+		this.fecha = fecha;
+	}
+	public String getTicketNumber() {
+		return ticketNumber;
+	}
+	public void setTicketNumber(String ticketNumber) {
+		this.ticketNumber = ticketNumber;
+	}
+	public String getTrackingNumber() {
+		return trackingNumber;
+	}
+	public void setTrackingNumber(String trackingNumber) {
+		this.trackingNumber = trackingNumber;
+	}
+	public Cliente getCliente() {
+		return cliente;
+	}
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+	public boolean isFreshipping() {
+		return freshipping;
+	}
+	public void setFreshipping(boolean freshipping) {
+		this.freshipping = freshipping;
+	}
+	
+	
+
+	
+	
+}

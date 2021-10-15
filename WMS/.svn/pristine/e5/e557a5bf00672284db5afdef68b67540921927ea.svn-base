@@ -1,0 +1,202 @@
+package web.picking;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import logica.Logica;
+import logica.Utilidades;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import beans.Fecha;
+import beans.Usuario;
+import beans.bulto;
+import beans.bultoContenido;
+import beans.encuentra.DataPicking;
+
+
+
+public class _EncuentraConfirmarDistPick extends Action 
+{
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		 HttpSession session = request.getSession();
+		 Logica Logica = new Logica();
+		 Usuario uLog = (Usuario) session.getAttribute("uLogeado");
+			Utilidades util = new Utilidades();
+			int idEmpresa = util.darEmpresa(uLog);
+			if(idEmpresa==0)
+			{
+				return mapping.findForward("LOGIN");
+			}
+		 int equipo = 0;
+		 
+		 if(uLog!=null){
+			 equipo = uLog.getEquipo_trabajo();
+			 ServletContext context = request.getSession().getServletContext();
+			 Hashtable<String, bulto> cajasAbiertas = (Hashtable<String, bulto>) context.getAttribute("cajasAbiertas");
+			try 
+			{
+				if(cajasAbiertas==null || cajasAbiertas.size()==0){
+					cajasAbiertas = Logica.BultosAbiertos(idEmpresa);
+				}
+				
+				int cantS = 0;
+				List<DataPicking> pickings = (List<DataPicking>) session.getAttribute("pickings");
+				String art = request.getParameter("art");
+				String posicion = request.getParameter("posicion");
+				int idPick = 0;
+				List<DataPicking> pickingsSel = new ArrayList<DataPicking>();
+				
+				for (DataPicking pi : pickings) 
+				{
+					if(pi.getArticulo().equals(art) && pi.getPosSort().equals(posicion))
+					{
+						pi.setVerificada(1);
+						pickingsSel.add(pi);
+						idPick = pi.getIdPicking();
+						break;
+					}
+				}
+				
+				if (idPick!=0){
+					bulto b = null;
+					bultoContenido bc = null;
+					if(cajasAbiertas.get(equipo+"-"+posicion)==null){
+						Fecha fecha = new Fecha(0,0,0);
+						b = new bulto(equipo+posicion+fecha.darFechaString(),"Caja distribucion lc."+posicion,false,0,0,0,0.0,false,"",
+								uLog.getNumero(),posicion.replace(" ", ""),idEmpresa);
+						b.setEquipo_trabajo(equipo);
+						bc = new bultoContenido();
+						bc.setIdArticulo(art);
+						bc.setCantidad(1);
+						bc.setPicking(idPick);
+						bc.setUsuario(uLog.getNumero());
+						b.Crear_Bulto(idEmpresa);
+						b.Agregar_A_Bulto(bc);
+						cajasAbiertas.put(equipo+"-"+posicion, b);
+						
+						Logica.encuentraMoverOjos(posicion+"P",b.getIdBulto(),1,uLog.getNumero(),idEmpresa);		//AGREGO BULTO A ZONA DE CLASIFICACION
+						Logica.IngresarMovimientoArticuloTipo("", posicion+"P", b.getIdBulto(), 1,  uLog.getNumero(),"ADD",idEmpresa);	//REGISTRO LA UBICACION DEL BULTO
+					}
+					else{
+						bc = new bultoContenido();
+						bc.setIdArticulo(art);
+						bc.setCantidad(1);
+						bc.setPicking(idPick);
+						bc.setUsuario(uLog.getNumero());
+						cajasAbiertas.get(equipo+"-"+posicion).Agregar_A_Bulto(bc);
+						b = cajasAbiertas.get(equipo+"-"+posicion);
+					}
+					
+					context.setAttribute("cajasAbiertas", cajasAbiertas);
+					
+					Logica.encuentraUpdateClasifPicking(pickingsSel,idEmpresa);
+					
+					Logica.encuentraBajaArticulosOjos(1,art, "1",idEmpresa);	//BAJO DE ZONA DE PICKING
+					Logica.IngresarMovimientoArticuloTipo("1", b.getIdBulto(), art, 1,  uLog.getNumero(),"BUL",idEmpresa);	//REGISTRO EL MOVIMIENTO DE PICKING AL BULTO
+					
+					//LOGUEAMOS EVENTO
+					uLog.registrarEvento(idPick, 1,112,0,true, session.getId(), "Verificando articulo "+art+", ingresado en caja "+b.getIdBulto());
+					
+					pickings = Logica.encuentraDarPicking(idPick,idEmpresa);
+					List <DataPicking> pickingsToVer = new ArrayList<DataPicking>();
+					StringBuilder arregloArts = new StringBuilder();
+					StringBuilder arregloDestino = new StringBuilder();
+					
+					for (DataPicking d : pickings) 
+					{
+						if(d.getSol()-d.getVerificada()>0)
+						{
+							arregloArts.append("'"+d.getArticulo()+"',");
+							arregloDestino.append("'"+d.getPosSort()+"',");
+							pickingsToVer.add(d);
+							
+						}
+						
+					}
+					
+					if(pickingsToVer.size()>0)
+					{
+						session.setAttribute("pickings", pickingsToVer);
+						int corteA = arregloArts.toString().length()-1;
+						int corteB = arregloDestino.toString().length()-1;
+						
+						session.setAttribute("arregloArticulos", arregloArts.toString().substring(0, corteA));
+						session.setAttribute("arregloDestinos", arregloDestino.toString().substring(0, corteB));
+						return mapping.findForward("ok");
+					}
+					else
+					{
+						request.setAttribute("menError", "Ha clasificado todos los articulos del picking "+idPick);
+						if(idPick>0){
+							try {
+								//CAMBIO ESTADO REPO
+								Logica.UpdatePickingStatus(7, pickings.get(0).getIdPicking(),idEmpresa);					
+								//COMENTARIO LOG
+								uLog.registrarEventoHilo(session.getId(), "Se finalizo la verificacion del picking", pickings.get(0).getIdPicking(), 112);
+							} catch (Exception e) {
+								// TODO: handle exception
+							}
+						}
+						else{
+							request.setAttribute("menError", "Ha clasificado todos los articulos del picking "+idPick+", pero no se pudo marcar como terminado");
+						}
+						
+						
+						return mapping.findForward("fin");
+					}
+				}
+				else{
+					request.setAttribute("menError", "ESTE ARTICULO NO SE GUARDO EN LA CAJA, CIERRE SESSION E INTENTELO NUEVAMENTE");
+					return mapping.findForward("ok");
+				}
+					
+				
+			}
+			catch (Exception e) 
+			{
+				System.out.println("llegamos al catch");
+				e.printStackTrace();
+				session.setAttribute("mensaje", e.getMessage());
+				return mapping.findForward("ok");
+
+			}	
+		 }
+		 else{
+				return mapping.findForward("log");
+			}
+		 
+		
+		
+	}
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

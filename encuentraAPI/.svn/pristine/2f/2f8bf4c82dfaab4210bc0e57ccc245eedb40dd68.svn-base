@@ -1,0 +1,164 @@
+package elRey;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+
+import beans.Usuario;
+import beans.api.MovStock;
+import beans.api.pedidoFactura;
+import clienteVisualObject.OrdenVenta;
+import logica.LogicaAPI;
+import beans.encuentra.Cliente;
+import clienteAPIEncuentra.Call_WS_APIENCUENTRA;
+import clientesVisual_Store.elRey.ClienteWSELREY;
+import clientesVisual_Store.elReyEC.ClienteWS;
+import clientesVisual_Store.elReycomercioelectronico.ClienteWSfacturacion;
+import dataTypes.DataIDDescripcion;
+import json_objects.SendMail;
+import json_objects.SendMailSpooler;
+
+
+
+public class SincMovimientosEC 
+{
+	static LogicaAPI lo = new LogicaAPI();
+	static ClienteWSELREY ws = new ClienteWSELREY();
+	static ClienteWS wsEC = new ClienteWS();
+	static ClienteWSfacturacion wsF = new ClienteWSfacturacion();
+	static Call_WS_APIENCUENTRA api = new Call_WS_APIENCUENTRA();
+	static String msj, idMail;
+	
+	public static void main(String[] args) 
+	{	
+		LogicaAPI logica = new LogicaAPI();
+		String token = logica.darToken(4,4000);
+		Usuario u = LogicaAPI.loginEncuentraAPI2(token);
+		int idEmpresa = u.getIdEmpresa();
+				
+		while (true) {
+			msj = "";
+			idMail = "";
+			//putClientes(idEmpresa);
+			try {
+				putMovimientosStocks(idEmpresa);
+			} catch (Exception e) {System.out.println("Error grabando movimientos de stock");}
+			
+			try {
+				Hashtable<Integer,pedidoFactura> pedidos = putFacturacion(idEmpresa);
+				BuscarFacturas(pedidos, token);
+			} catch (Exception e) {System.out.println("Error grabando facturas");}
+			
+			try {
+				if(!msj.equals("")) {
+					MailErrores(idMail, msj);
+				}				
+			} catch (Exception e) {System.out.println("Error enviando mail de errores");}
+			
+			try {
+				Thread.sleep(60000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+				 
+	}
+	private static void putMovimientosStocks(int idEmpresa)
+	{
+		List<MovStock> movs = lo.queuePendingMovsStock(idEmpresa,0);
+		
+		DataIDDescripcion respVisual;
+		for(MovStock mov:movs) {
+			try {
+				respVisual = wsEC.GrabarTransferencia(mov.getOrigen(), mov.getDestino(), 0, mov.getDetalle(),
+					"Transferencia realizada desde encuentra");
+				if(respVisual.getId()==0) {
+					lo.RegistrarDocMovimientoStock(0,  mov.getId(), mov.getDoc(), respVisual.getDescripcion(),
+							idEmpresa,0,respVisual.getIdB());
+					//notificacion de errores
+					msj += respVisual.getDescripcion()+" \r\n";
+					idMail = mov.getOrigenDoc()+"";
+				}
+				else {
+					lo.RegistrarDocMovimientoStock(1,  mov.getId(), respVisual.getId(), respVisual.getDescripcion(),
+							idEmpresa,0,respVisual.getIdB());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}			
+		}
+	}
+
+	private static Hashtable<Integer,pedidoFactura> putFacturacion(int idEmpresa) {
+		Hashtable<Integer,pedidoFactura> pedidos = new Hashtable<Integer, pedidoFactura>();
+		List<OrdenVenta> ordenes = lo.darOrdensSinFacturar(idEmpresa);
+		
+		DataIDDescripcion respVisual;
+		for(OrdenVenta o:ordenes) {
+			try {
+				Cliente c= lo.darCliente(o.getIdCarrito(), idEmpresa);
+				respVisual = wsF.GrabarFactura(o, c);
+				
+				lo.RegistrarFactura(o.getIdCarrito(), respVisual.getId(), idEmpresa,respVisual.getDescripcion());
+				if(respVisual.getId()!=0) {
+					lo.SincronizarCliente(c.getDocumentoNro(), idEmpresa);
+					
+					pedidos.put(respVisual.getId(), new pedidoFactura(o.getIdCarrito(), respVisual.getId()));
+				}
+				else {
+					
+					if(respVisual.getDescripcion().contains("Cliente")){
+						c = lo.darClienteProducteca(o.getIdCarrito());
+						if(c != null) {
+							lo.saveImport1Customer(c, idEmpresa);
+						}
+						
+					}
+					//notificacion de errores
+					msj += respVisual.getDescripcion()+" \r\n";
+					idMail = o.getIdCarrito()+"";
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+			}			
+		}
+		
+		return pedidos;
+	}
+	
+	private static void putClientes(int idEmpresa) {
+		List<Cliente> clientes = lo.darClientesSinGrabar(idEmpresa);
+		
+		for(Cliente c:clientes) {
+			ws.AltaCliente(c);
+			lo.SincronizarCliente(c.getDocumentoNro(), idEmpresa);
+		}
+	}
+
+	public static void BuscarFacturas(Hashtable<Integer,pedidoFactura> pedidos, String token) {
+		
+		//miro si hay facturas sin pdf
+		pedidos = lo.pedidosSinFactura(pedidos);
+		
+		//voy a buscar las facturas a visual
+		pedidos = lo.facturasVisual(pedidos);
+		
+		//persisto pdfs en bd
+		List<pedidoFactura> listaPedidos= new ArrayList<pedidoFactura>(pedidos.values());
+		lo.guardarFacturas(listaPedidos);
+		
+		//envio facturas a WMS
+		api.putFacturas(token, listaPedidos);
+	}
+
+	public static void MailErrores(String idMail,String msj) {
+		String bodyName = msj;
+		SendMail mail = new SendMail("SMREY"+idMail, "mguerra@200.com.uy,onviera@200.com.uy,gmonzon@200.com.uy", "Error en sincro de pedidos - EL REY", bodyName, "encuentra@200.com.uy");
+		SendMailSpooler mails = new SendMailSpooler();
+		mails.setMails(new SendMail[]{mail});
+		
+		LogicaAPI.PutMailSpooler(mails.getMails(), 4);
+	}
+}

@@ -1,0 +1,17 @@
+@charset "ISO-8859-1";
+
+body{
+	background-color: black;
+}
+
+input[type=radio]{
+	content: url(imagenes/icons/accept.png);
+	
+	filter: grayscale(100%);
+}
+input[type=radio]:checked{
+	content: url(imagenes/icons/accept.png);
+}
+	
+
+

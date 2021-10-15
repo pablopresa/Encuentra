@@ -1,0 +1,157 @@
+package web.tareas;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import beans.Usuario;
+import beans.encuentra.DataLineaListaTareasMob;
+import beans.encuentra.DataPicking;
+import beans.encuentra.ValueObjects.VORecepcionSinOrden;
+import dataTypes.DataIDDescripcion;
+import logica.ImpresionesPDF;
+import logica.Logica;
+import logica.Utilidades;
+
+
+public class tESTfORM extends Action //CLASE QUE EJECUTA LA ACCION
+{
+	
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception 
+	{
+		HttpSession session = request.getSession();
+		Logica Logica = new Logica();
+		
+		
+		Usuario uLog = (Usuario) session.getAttribute("uLogeado");
+		Utilidades util = new Utilidades();
+		int idEmpresa = util.darEmpresa(uLog);
+		if(idEmpresa==0)
+		{
+			return mapping.findForward("LOGIN");
+		}
+		
+		
+		
+		try 
+		{
+			String idT = request.getParameter("idTarea");
+			int idTarea = Integer.parseInt(idT);
+			session.setAttribute("idTarea", idT);
+			int idMain = Integer.parseInt(request.getParameter("idMain"));
+			List<DataPicking> pickings = Logica.encuentraDarClasificacion(idMain,idEmpresa);
+			Logica.encuentraAltaEventoTarea(idTarea, 1, uLog.getNumero(),0,idEmpresa);
+			
+			int totalSol = 0;
+			int totalEnc = 0;
+			int totalVer = 0;
+			
+			for (DataPicking p : pickings) 
+			{
+			
+				totalSol+=p.getSol();
+				totalEnc+=p.getPick();
+				totalVer+=p.getVerificada();
+				
+			}
+		
+			session.setAttribute("totSol",totalSol);
+			session.setAttribute("totEnc",totalEnc);
+			session.setAttribute("totVer",totalVer);
+			request.setAttribute("destinoSort", "");
+			
+			session.setAttribute("pickings", pickings);
+			
+			
+				
+			StringBuilder arregloArts = new StringBuilder();
+			StringBuilder arregloDestino = new StringBuilder();
+			
+			List <DataPicking> pickingsToVer = new ArrayList<DataPicking>();
+			for (DataPicking d : pickings) 
+			{
+				if(d.getSol()-d.getVerificada()>0)
+				{
+					arregloArts.append("'"+d.getArticulo()+"',");
+					arregloDestino.append("'"+d.getDescripcion()+"',");
+					pickingsToVer.add(d);
+					
+				}
+				
+			}
+			if(pickingsToVer.size()>0)
+			{
+				session.setAttribute("pickings", pickingsToVer);
+				int corteA = arregloArts.toString().length()-1;
+				int corteB = arregloDestino.toString().length()-1;
+				
+				session.setAttribute("arregloArticulos", arregloArts.toString().substring(0, corteA));
+				session.setAttribute("arregloDestinos", arregloDestino.toString().substring(0, corteB));
+				
+				return mapping.findForward("ok");
+			}
+			else
+			{
+				request.setAttribute("menError", "ya se clasificaron todos los articulos ");
+				//Si se termina la tarea, vuelve a pedir todas las tareas del usuario para cargarlas en la Session
+				//int idDeposito = Integer.parseInt(uLog.getDeposito());
+				List<DataLineaListaTareasMob> tarMob = Logica.encuentraDarTareasMob(uLog.getNumero(),idEmpresa);
+				session.setAttribute("tarMob", tarMob);
+				return mapping.findForward("fin");
+			}
+			
+			
+
+		} catch (Exception e) {
+			System.out.println("llegamos al catch");
+			session.setAttribute("mensaje", e.getMessage());
+			return mapping.findForward("ok");
+
+		}
+		
+		
+/*		List<String> liste = new ArrayList<String>();
+		liste.add("B32423432234324322332");
+		liste.add("B4433343r3r434r34r4r4");
+		liste.add("Bffer343r34fff4333333");
+		liste.add("B986756hh66h6666gh666");
+		liste.add("B12dfsdfdsf333dgh666");
+		liste.add("B5fgdg6534434666gh666");
+		liste.add("B2dsfsdfsr4d6gh666");
+		liste.add("B44444h66h6666gh666");
+		liste.add("B986756hh66hngfgf6666gh666");
+		liste.add("B986756hhfgfdf66h6666gh666");
+		liste.add("B986756hhfffg66h6666gh666");
+		liste.add("B986756hddh66h6666gh666");
+		liste.add("B986756hhgfdd66h6666gh666");
+		liste.add("B986756hh6gfgffg6h6666gh666");
+		liste.add("B986756hhgfgffg66h6666gh666");
+		liste.add("B986756hhgfgfg66h6666gh666");
+		liste.add("B986756hhfggfgf66h6666gh666");
+		liste.add("B12221fdfdgffgg66h6666gh666");
+		liste.add("B4bghfgfgfhgfhfhgfh6666gh666");
+		liste.add("B7gfhnfghfhgfhgf6h6666gh666");
+		liste.add("B96hgfgfhfhfghfghfhh66h6666gh666");
+		liste.add("B933ff3hh66h6666gh666");
+		
+		
+		request.setAttribute("liste", liste);
+			
+		return mapping.findForward("ok");   */
+		
+	}
+
+}

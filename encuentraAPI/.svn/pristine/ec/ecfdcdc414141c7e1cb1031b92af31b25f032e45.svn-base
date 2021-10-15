@@ -1,0 +1,502 @@
+package clienteAPIEncuentra;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Hashtable;
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.AbstractHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
+import com.google.gson.Gson;
+
+import beans.api.ColeccionHasStringInt;
+import beans.api.pedidoFactura;
+import beans.encuentra.Cliente;
+import beans.encuentra.ContenedorListaDataIdDesc;
+import beans.encuentra.EncuentraPedido;
+import dataTypes.DataArticuloEcommerceVerifR;
+import dataTypes.DataDescDescripcion;
+
+import dataTypes.DataIDDescripcion;
+
+import helper.PropertiesHelper;
+
+import jsonObjects.DISTRIaltaEnvio;
+import logica.LogicaAPI;
+
+
+public class Call_WS_APIENCUENTRA 
+{
+	private String callWSPOST_ParamJSON(String URLbase, String jotason)
+	{
+		String retorno = "";
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		try 
+		{
+	    	
+	    	System.out.println("llamando a "+URLbase);
+	    	System.out.println("Parametros JSON "+jotason);
+	    	System.out.println("Respuesta");
+
+	    	String payload = jotason;
+	    	StringEntity entityI;
+	    	
+	    	entityI = new StringEntity(payload, ContentType.APPLICATION_JSON);
+	    
+	    	HttpPost request = new HttpPost(URLbase);
+	    	request.setEntity(entityI);
+	    	
+		  	HttpResponse httpResponse = httpClient.execute(request);
+		  	
+		  	
+		  	int code=httpResponse.getStatusLine().getStatusCode();
+		  	HttpEntity entity = httpResponse.getEntity();
+		  	
+		  	byte[] buffer = new byte[1024];
+		    
+		  	if (entity != null) 
+		  	{
+		        InputStream inputStream = entity.getContent();
+		        try 
+		        {
+		          int bytesRead = 0;
+		          BufferedInputStream bis = new BufferedInputStream(inputStream);
+		          byte[] contents = new byte[1024];
+		          String strFileContents=""; 
+		          while((bytesRead = bis.read(contents)) != -1) 
+		          { 
+		              strFileContents += new String(contents, 0, bytesRead);              
+		          }
+
+		          return strFileContents;
+		          
+		          
+		        }
+		        catch (RuntimeException runtimeException) 
+		        {
+		          // In case of an unexpected exception you may want to abort
+		          // the HTTP request in order to shut down the underlying
+		          // connection immediately.
+		          request.abort();
+		          runtimeException.printStackTrace();
+		        }
+		        finally 
+		        {
+		          // Closing the input stream will trigger connection release
+		          try 
+		          {
+		            inputStream.close();
+		          } 
+		          catch (Exception ignore) 
+		          {
+		        	  
+		          }
+		        }
+		      }
+		    } 
+	    	catch (ClientProtocolException e) 
+		    {
+		      e.printStackTrace();
+		    }
+	    	catch (IOException e) 
+	    	{
+		      // thrown by entity.getContent();
+		      e.printStackTrace();
+		    }
+	    	finally 
+	    	{
+		      httpClient.getConnectionManager().shutdown();
+		    }
+		System.out.println(retorno);
+		return retorno;
+		
+	}
+	
+	private String callWSGET(String URL)
+	{
+		String retorno = "";
+		HttpClient httpClient = new DefaultHttpClient();
+		
+	    ((AbstractHttpClient) httpClient).getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),new UsernamePasswordCredentials("produccion@200data.com", "200data2017"));
+	    try 
+		{
+	    	HttpGet httpGetRequest = new HttpGet(URL);
+	    	
+		  	HttpResponse httpResponse = httpClient.execute(httpGetRequest);
+		  	HttpEntity entity = httpResponse.getEntity();
+		  	
+		  	byte[] buffer = new byte[1024];
+		    
+		  	if (entity != null) 
+		  	{
+		        InputStream inputStream = entity.getContent();
+		        try 
+		        {
+		          int bytesRead = 0;
+		          BufferedInputStream bis = new BufferedInputStream(inputStream);
+		          byte[] contents = new byte[1024];
+		          String strFileContents=""; 
+		          while((bytesRead = bis.read(contents)) != -1) 
+		          { 
+		              strFileContents += new String(contents, 0, bytesRead);              
+		          }
+
+		          
+		          
+		          return strFileContents;
+		          
+		          
+		          
+		        }
+		        catch (RuntimeException runtimeException) 
+		        {
+		          // In case of an unexpected exception you may want to abort
+		          // the HTTP request in order to shut down the underlying
+		          // connection immediately.
+		          httpGetRequest.abort();
+		          runtimeException.printStackTrace();
+		        }
+		        finally 
+		        {
+		          // Closing the input stream will trigger connection release
+		          try 
+		          {
+		            inputStream.close();
+		          } 
+		          catch (Exception ignore) 
+		          {
+		        	  
+		          }
+		        }
+		      }
+		    } 
+	    	catch (ClientProtocolException e) 
+		    {
+		      e.printStackTrace();
+		    }
+	    	catch (IOException e) 
+	    	{
+		      // thrown by entity.getContent();
+		      e.printStackTrace();
+		    }
+	    	finally 
+	    	{
+		      httpClient.getConnectionManager().shutdown();
+		    }
+		return retorno;
+		
+	}
+	
+	public String callWSPOSTparam(String URLbase, List<DataIDDescripcion> params)
+	{
+		
+	
+		String retorno = "";
+		HttpClient httpClient = new DefaultHttpClient();
+		
+	    try 
+		{
+	    	
+	    	System.out.println("Respuesta");
+	    	HttpPost httpPostRequest = new HttpPost(URLbase);
+	    	
+	    	//StringEntity params =new StringEntity(jotason);
+	    	httpPostRequest.setHeader("Content-type", "application/x-www-form-urlencoded");
+	    	
+	    	//httpPostRequest.setEntity(params);
+	    	
+	    	ArrayList<NameValuePair> postParameters;
+	    	postParameters = new ArrayList<NameValuePair>();
+	    	for(DataIDDescripcion p:params){
+	    		postParameters.add(new BasicNameValuePair(p.getDescripcion(), p.getDescripcionB()));
+	    	}
+	        
+	        httpPostRequest.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));    	
+	    	
+	    	
+		  	HttpResponse httpResponse = httpClient.execute(httpPostRequest);
+		  	int code=httpResponse.getStatusLine().getStatusCode();
+		  	HttpEntity entity = httpResponse.getEntity();
+		  	
+		  	byte[] buffer = new byte[1024];
+		    
+		  	if (entity != null) 
+		  	{
+		        InputStream inputStream = entity.getContent();
+		        try 
+		        {
+		          int bytesRead = 0;
+		          BufferedInputStream bis = new BufferedInputStream(inputStream);
+		          byte[] contents = new byte[1024];
+		          String strFileContents=""; 
+		          while((bytesRead = bis.read(contents)) != -1) 
+		          { 
+		              strFileContents += new String(contents, 0, bytesRead);              
+		          }
+
+		          System.out.println(strFileContents);
+		          return strFileContents;
+		          
+		          
+		        }
+		        catch (RuntimeException runtimeException) 
+		        {
+		          // In case of an unexpected exception you may want to abort
+		          // the HTTP request in order to shut down the underlying
+		          // connection immediately.
+		          httpPostRequest.abort();
+		          runtimeException.printStackTrace();
+		          return "error";
+		        }
+		        finally 
+		        {
+		          // Closing the input stream will trigger connection release
+		          try 
+		          {
+		            inputStream.close();
+		          } 
+		          catch (Exception ignore) 
+		          {
+		        	  
+		          }
+		        }
+		      }
+		    } 
+	    	catch (ClientProtocolException e) 
+		    {
+		      e.printStackTrace();
+		      return "error";
+		      
+		    }
+	    	catch (IOException e) 
+	    	{
+		      // thrown by entity.getContent();
+		      e.printStackTrace();
+		      return "error";
+		    }
+	    	finally 
+	    	{
+		      httpClient.getConnectionManager().shutdown();
+		    }
+		return retorno;
+	
+		
+	}
+	
+	public List<DataIDDescripcion> DarDatosPutOrders(String token, int idTabla)
+	{
+		try {
+			
+			String host = "encuentra.200.com.uy";
+			
+			String servicio = "http://"+host+"/WMS/Integraciones/DarDatosPutOrders/tablas?token="+token; 
+						
+			String json = "{ "+
+						"	   \"id\":"+idTabla+", "+
+						"	   \"descripcion\":\"\" "+
+						"	}";
+			
+			String salida =  callWSPOST_ParamJSON(servicio, json);
+			
+			
+			ContenedorListaDataIdDesc cont =  new ContenedorListaDataIdDesc(salida);
+			return cont.getDatos();
+			
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	public List<DataIDDescripcion> SaveOrders(String token, List<EncuentraPedido> listaPedidos)
+	{
+		try {
+			
+			String host = "encuentra.200.com.uy";
+		
+			String servicio = "http://"+host+"/WMS/Integraciones/SaveOrders/save?token="+token; 
+			Gson gson = new Gson();
+			
+			String json = gson.toJson(listaPedidos, ArrayList.class);
+			System.out.println(json);
+			String padre = "{ \"idTabla\":0,\"datos\": ";
+			String salida =  callWSPOST_ParamJSON(servicio, padre+json+"}");
+			
+			
+			
+			ContenedorListaDataIdDesc cont =  new ContenedorListaDataIdDesc(salida);
+			
+			return cont.getDatos();
+			
+		} catch (Exception e) {
+		
+		}
+		return null;
+	}
+
+	public List<DataIDDescripcion> SaveCustomers(String token, List<Cliente> clientes) 
+	{
+		
+		try {
+			
+			String host = "encuentra.200.com.uy";
+			
+			String servicio = "http://"+host+"/WMS/Integraciones/SaveCustomers/save?token="+token; 
+			Gson gson = new Gson();
+			
+			String json = gson.toJson(clientes, ArrayList.class);
+			System.out.println(json);
+			String padre = "{ \"idTabla\":0,\"datos\": ";
+			String salida =  callWSPOST_ParamJSON(servicio, padre+json+"}");
+			
+			
+			
+			ContenedorListaDataIdDesc cont =  new ContenedorListaDataIdDesc(salida);
+			
+			return cont.getDatos();
+			
+		} catch (Exception e) {
+		
+		}
+		return null;
+	}
+	
+	public List<DataIDDescripcion> ordersNotDispatched(int canal,String token)
+	{
+		try {
+			
+			String host = "encuentra.200.com.uy";
+			//String host = "10.108.0.165:8080";
+		
+			String servicio = "http://"+host+"/WMS/Integraciones/OrderFunctions/ordersNotDispatched?token="+token+"&canal="+canal; 
+			
+			String salida =  callWSGET(servicio);
+						
+			ContenedorListaDataIdDesc cont =  new ContenedorListaDataIdDesc(salida);
+			
+			return cont.getDatos();
+			
+		} catch (Exception e) {
+		
+		}
+		return null;
+	}
+	
+	public void updateOrdersStatus(String token, List<DataIDDescripcion> pedidos)
+	{
+		try {
+			
+			String host = "encuentra.200.com.uy";
+			//String host = "10.108.0.165:8080";
+		
+			String servicio = "http://"+host+"/WMS/Integraciones/OrderFunctions/updateOrdersStatus?token="+token; 
+
+			Gson gson = new Gson();
+			String json = gson.toJson(pedidos);
+			json = "{ \"coleccion\" : "+json+"}";
+			
+			String salida =  callWSPOST_ParamJSON(servicio,json);
+						
+			
+		} catch (Exception e) {
+		
+		}
+	}
+	
+	public void putFacturas(String token, List<pedidoFactura> facturas)
+	{
+		try {
+			
+			String host = "encuentra.200.com.uy";
+			//String host = "10.108.0.165:8080";
+		
+			String servicio = "http://"+host+"/WMS/Integraciones/OrderFunctions/putFacturas?token="+token; 
+
+			Gson gson = new Gson();
+			String json = gson.toJson(facturas);
+			json = "{ \"coleccion\" : "+json+"}";
+			
+			String salida =  callWSPOST_ParamJSON(servicio,json);
+						
+			
+		} catch (Exception e) {
+		
+		}
+	}
+	
+	public Hashtable<String, Integer> vistaStocks(List<DataIDDescripcion> lista, int origen, int idEmpresa)
+	{
+		try {
+			LogicaAPI logica = new LogicaAPI();
+			String token = logica.darToken(2,2000);
+			
+			String host = "encuentra.200.com.uy";
+			//String host = "10.108.0.165:8080";
+		
+			String servicio = "http://"+host+"/WMS/Integraciones/Views/stocks?token="+token+"&origen="+origen; 
+			
+			Gson gson = new Gson();
+			String json = gson.toJson(lista);
+			json = "{ \"coleccion\" : "+json+"}";
+			
+			String salida =  callWSPOST_ParamJSON(servicio, json);
+			/*String salida = "{" + 
+					"    \"coleccion\": {" + 
+					"        \"BRX9020211380\": 29," + 
+					"        \"BBC7873VN0000\": 15" + 
+					"    }" + 
+					"}";*/
+						
+			ColeccionHasStringInt cont =  gson.fromJson(salida, ColeccionHasStringInt.class);
+			
+			return cont.getColeccion();
+			
+		} catch (Exception e) {
+		
+		}
+		return null;
+	}
+
+	public void verificarRepoArticulos(String token) {
+		try {
+			
+			String host = "encuentra.200.com.uy";
+			//String host = "10.108.0.165:8080";
+		
+			String servicio = "http://"+host+"/WMS/Integraciones/OrderFunctions/verificarRepoArticulos?token="+token; 
+
+			
+			
+			callWSPOST_ParamJSON(servicio,"");						
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+

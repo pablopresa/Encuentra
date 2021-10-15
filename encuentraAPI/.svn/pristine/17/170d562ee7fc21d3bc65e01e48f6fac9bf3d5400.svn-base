@@ -1,0 +1,40 @@
+package marketPlaceIntegrations.orderDerivation;
+
+
+
+import java.util.Collections;
+import java.util.List;
+
+import clienteAPIEncuentra.Call_WS_APIENCUENTRA;
+import logica.LogicaAPI;
+import marketPlaceIntegrations.Fenicio.FenicioLAISLA;
+
+public class OrderDerivator 
+{
+	
+	public static void main(String[] args) 
+	{
+		FenicioLAISLA f = new FenicioLAISLA();
+		LogicaAPI logica = new LogicaAPI();
+		String token = logica.darToken(f.getIdEmpresa());
+		Call_WS_APIENCUENTRA cen = new Call_WS_APIENCUENTRA();
+		
+		List<Deposito> depositos = cen.vistaDepositos(f.getIdEmpresa());
+		
+		//por cada venta me guardo los articulos en un hash
+		//armo la consulta de stock
+		
+		
+		Collections.sort(depositos);
+		
+		
+		for (Deposito d : depositos) 
+		{
+			System.out.println(d.getId());
+		}
+		
+		
+		
+	}
+
+}

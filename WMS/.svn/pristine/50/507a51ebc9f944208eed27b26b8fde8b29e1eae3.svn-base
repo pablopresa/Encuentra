@@ -1,0 +1,72 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+
+<jsp:include page="/v3/util/menu.jsp"></jsp:include>
+		<div class="row">
+			<div class="col-md-12">
+				<h3>
+					Inventario&nbsp;<i class="fa fa-angle-double-right"
+						aria-hidden="true"></i>&nbsp;Ubicaciones en Cero
+				</h3>
+				<h6>Detalle de las ubicaciones en Cero de las Estanterias ya
+					inventariadas</h6>
+			</div>
+		</div>
+		<!-- /. ROW  -->
+		<hr />
+		<div class="row">
+			<div class="col-md-12">
+				<c:if test="${menError!=null}">
+					<h6>
+						<strong>Mensaje:</strong>
+					</h6>
+					<div class="alert alert-info">
+						<strong style="color: red"> <c:out value="${menError}"></c:out></strong>
+					</div>
+				</c:if>
+				<!-- Advanced Tables -->
+				<div class="card">
+					<div class="card-header">
+						<h5>Articulos en ubicaciones</h5>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-striped table-bordered table-hover"
+								id="encuentra-default">
+								<thead class="thead-dark">
+									<tr>
+										<th>Descripción</th>
+										<th>Cod. Ubicación</th>
+										<th>Cantidad</th>
+									</tr>
+								</thead>
+								<tbody>
+									<c:forEach var="o" items="${listaO}">
+										<tr class="gradeD">
+											<td><c:out value="${o.desc}"></c:out></td>
+											<td><c:out value="${o.idOjo}"></c:out></td>
+											<td><c:out value="${o.cant}"></c:out></td>
+										</tr>
+									</c:forEach>
+									
+								</tbody>
+
+							</table>
+
+						</div>
+
+					</div>
+				</div>
+				<!--End Advanced Tables -->
+			</div>
+		</div>
+		<!-- /. ROW  -->
+<!-- /. PAGE WRAPPER  -->
+<jsp:include page="/v3/util/footer.jsp"></jsp:include>

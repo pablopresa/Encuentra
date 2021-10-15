@@ -1,0 +1,251 @@
+package webservices;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import com.google.gson.Gson;
+import com.itextpdf.text.DocumentException;
+
+import beans.Nota;
+import beans.Usuario;
+import beans.api.ResponseOrder;
+import beans.api.ResponseOrderFunctions;
+import beans.encuentra.ContenedorListaClientes;
+import beans.encuentra.ContenedorListaPedidos;
+import beans.encuentra.IPrint;
+import cliente_rest_Invoke.Call_WS_analoga;
+import dataTypes.ColectionDataIDDescripcion;
+import dataTypes.DataArticuloEcommerceVerifR;
+import dataTypes.DataIDDescripcion;
+import eCommerce_jsonObjectsII.Cliente;
+import eCommerce_jsonObjectsII.EncuentraPedido;
+import eCommerce_jsonObjectsII.EncuentraPedidoArticulo;
+import eCommerce_jsonObjectsII.Items;
+import logica.Logica;
+import logica.Utilidades;
+
+
+
+
+@Path("/OrderFunctions")
+public class OrderFunctions 
+{
+	@POST
+	@Path("/updateStatus")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String updateStatus(String data,@QueryParam ("token") String a) throws IOException
+	{	   
+		Logica l = new Logica();	
+		Gson gson = new Gson();
+		DataIDDescripcion retorno = new DataIDDescripcion();
+		String json = "";		
+		
+		try
+		{		
+			Usuario u = l.loginEncuentraAPI2(a);
+			
+			if(u!=null && u.getIdEmpresa()!=0) {
+				int idEmpresa = u.getIdEmpresa();						
+				
+				DataArticuloEcommerceVerifR pedido = gson.fromJson(data, DataArticuloEcommerceVerifR.class);
+				
+				l.updateEcommerceEstado(pedido.getIdPedido(), pedido.getEstadoEncuentra(), idEmpresa, u.getNumero());
+				l.logPedido(pedido.getIdPedido(), u.getNumero(), pedido.getEstadoEncuentra(), "Cambio de estado generado por fuera de Encuentra",4,idEmpresa);
+				
+				retorno.setIdLong(pedido.getIdPedido());
+				retorno.setDescripcion("Estado cambiado correctamente");
+			}
+			else {
+				retorno.setDescripcion("Token incorrecto");
+			}			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			retorno.setDescripcion("Sucedio un error");
+		}
+		
+		json = gson.toJson(retorno);
+		json = json.replace("\"id\":0,", "");
+		json = json.replace("\"idB\":0,", "");
+		json = json.replace("\"in\":false,", "");
+		
+		return json;
+	}
+	
+	@POST
+	@Path("/saveNote")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String saveNote(String data,@QueryParam ("token") String a) throws IOException
+	{	   
+		Logica l = new Logica();	
+		Gson gson = new Gson();
+		DataIDDescripcion retorno = new DataIDDescripcion();
+		String json = "";		
+		
+		try
+		{		
+			Usuario u = l.loginEncuentraAPI2(a);
+			
+			if(u==null) {
+				retorno.setDescripcion("Token incorrecto");
+			}
+			else {
+				int idEmpresa = u.getIdEmpresa();						
+				
+				Nota nuevaNota = gson.fromJson(data, Nota.class);
+				
+				nuevaNota.setIdUsuario(u.getNumero());
+				l.AltaNota(nuevaNota,idEmpresa);
+				
+				retorno.setIdLong(nuevaNota.getIdPedido());
+				retorno.setDescripcion("Nota ingresada correctamente");
+			}			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			retorno.setDescripcion("Sucedio un error");
+		}
+		
+		json = gson.toJson(retorno);
+		json = json.replace("\"id\":0,", "");
+		json = json.replace("\"idB\":0,", "");
+		json = json.replace("\"in\":false,", "");
+		
+		return json;
+	}
+
+	@GET
+	@Path("/ordersNoLabel")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public List<DataIDDescripcion> ordersNoLabel(@QueryParam ("canal") String canal,@QueryParam ("token") String a) throws IOException
+	{	   
+		Logica l = new Logica();	
+		Gson gson = new Gson();
+		List<DataIDDescripcion> retorno = new ArrayList<DataIDDescripcion>();
+		
+		try
+		{		
+			Usuario u = l.loginEncuentraAPI2(a);
+			int c = Integer.parseInt(canal);
+			
+			if(u!=null) {
+				int idEmpresa = u.getIdEmpresa();					
+				retorno = new ArrayList<DataIDDescripcion>(l.darPedidosPorCanalFenicio(c, idEmpresa).values());				
+			}			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		return retorno;
+	}
+	
+	@GET
+	@Path("/ordersNotDispatched")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String ordersNotDispatched(@QueryParam ("canal") String canal,@QueryParam ("token") String a) throws IOException
+	{	   
+		Logica l = new Logica();	;
+		List<DataIDDescripcion> retorno = null;
+		String json = "";
+		try
+		{		
+			Usuario u = l.loginEncuentraAPI2(a);
+			int c = Integer.parseInt(canal);
+			Gson gson = new Gson();
+						
+			if(u!=null) {
+				int idEmpresa = u.getIdEmpresa();					
+				retorno = l.pedidosSinDespachar(idEmpresa);	
+				json = "{ \"idTabla\":0,\"datos\": "+gson.toJson(retorno)+"}";
+			}			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		return json;
+	}
+	
+	@POST
+	@Path("/updateOrdersStatus")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String updateOrdersStatus(String data,@QueryParam ("token") String a) throws IOException
+	{	   
+		Logica l = new Logica();	
+		Gson gson = new Gson();
+		ResponseOrderFunctions response = new ResponseOrderFunctions();
+		response.setOrders(new ArrayList<ResponseOrder>());
+		String json = "";		
+		
+		try
+		{		
+			Usuario u = l.loginEncuentraAPI2(a);
+			
+			if(u!=null && u.getIdEmpresa()!=0) {
+				int idEmpresa = u.getIdEmpresa();						
+				
+				ColectionDataIDDescripcion coleccionPedidos = gson.fromJson(data, ColectionDataIDDescripcion.class);
+				
+				for(DataIDDescripcion pedido: coleccionPedidos.getColeccion()) {
+					try {
+						l.updateEcommerceEstado(new Long(pedido.getDescripcion()), pedido.getId(), idEmpresa, u.getNumero());
+						l.logPedido(new Long(pedido.getDescripcion()), u.getNumero(), pedido.getId(), "Cambio de estado generado por fuera de Encuentra",4,idEmpresa);
+						
+						response.getOrders().add(new ResponseOrder(new Long(pedido.getDescripcion()),"ok"));						
+					} catch (Exception e) {
+						response.getOrders().add(new ResponseOrder(new Long(pedido.getDescripcion()),"fail"));	
+					}					
+				}				
+			}
+			else {
+				response.setMessage("Token incorrecto");
+			}			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			response.setMessage("Sucedio un error");
+		}
+		
+		json = gson.toJson(response);
+		
+		return json;
+	}
+	
+}
