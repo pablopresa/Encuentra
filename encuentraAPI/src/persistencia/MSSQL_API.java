@@ -514,7 +514,7 @@ public class MSSQL_API
 
 	
 	
-	public static List<Compras> darComprasWeb(String query,Hashtable<String, String> depositosPickHT,int ultimaVenta, int idEmpresa, Hashtable<String, DataIDDescripcion> destinoPedidos, int idCanal) 
+	public static List<Compras> darComprasWeb(String query,Map<String, String> depositosPickHT,int ultimaVenta, int idEmpresa, Map<String, DataIDDescripcion> destinoPedidos, int idCanal) 
 	{
 		LogicaAPI Logica = new LogicaAPI();
 		List<Compras> pedidos = new ArrayList<>();

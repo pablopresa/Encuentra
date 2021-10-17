@@ -59,6 +59,8 @@ public class ClienteStdFenicio
 		 Map<String, Integer> mapDepositos = new HashMap<>();
 		 for(DataIDDescripcion d: depositosDestino) 
 		 {
+			
+			 
 			 mailsDepositos.put(d.getId(), d.getDescripcionB());
 			 mapDepositos.put(d.getDescripcion(), d.getId());
 		 }
@@ -66,7 +68,7 @@ public class ClienteStdFenicio
 		 for(marketPlace mp : mps) {
 			 Map<Integer, CanalMarketPlace> canales = mp.getCanales();			 
 			 List<CanalMarketPlace> canalesL = new ArrayList<> (canales.values());
-			 
+
 			 for (CanalMarketPlace canal : canalesL) 
 			 {
 				 Map<String, Integer> deposCanal = cen.darDepositosEcommerce(token, canal.getId());

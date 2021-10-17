@@ -1,7 +1,8 @@
-package integraciones.mains.laCancha;
+package integraciones.mains.lacancha;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,10 +11,14 @@ import beans.jsonEstadoMP;
 import beans.api.ImpresionesPDF_API;
 import beans.api.json.SendMail;
 import beans.datatypes.DataIDDescripcion;
+import beans.datatypes.StockDeposito;
 import beans.derivation.DepositoStock;
 import beans.derivation.OrderDerivator;
 import beans.encuentra.EncuentraPedido;
 import beans.encuentra.EncuentraPedidoArticulo;
+import integraciones.erp.contawin.lacancha.ClienteContaWinLaCancha;
+import integraciones.erp.odoo.laIsla.ArticuloCantidadEncuentra;
+import integraciones.erp.odoo.laIsla.StockArticulos;
 import integraciones.marketplaces.fenicio.Ordenes;
 import integraciones.marketplaces.fenicioTrack.FenicioLaCancha;
 import integraciones.marketplaces.objetos.CanalMarketPlace;
@@ -22,7 +27,8 @@ import logica.LogicaAPI;
 
 public class ClienteLaCanchaFenicio {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		
 		FenicioLaCancha f = new FenicioLaCancha();
 		
@@ -33,65 +39,105 @@ public class ClienteLaCanchaFenicio {
 		LogicaAPI logica = new LogicaAPI();
 		String token = logica.darToken(f.getIdEmpresa());
 		Call_WS_APIENCUENTRA wms = new Call_WS_APIENCUENTRA();
+
 		Map<Integer, String> parametros = wms.darParametros(token, "");
+
 		Map<Integer, String> integraciones = wms.darIntegraciones(token);
 
 		String cambioEstado = integraciones.get(3) != null ? integraciones.get(3) : "0";
 
-		int idDepositoEcommerce = 158; // Integer.parseInt(parametros.get(5));
+		int idDepositoEcommerce = Integer.parseInt(parametros.get(5));
 		int idDepositoCentral = Integer.parseInt(parametros.get(4));
-		int diasBusqueda = 7;
+		int diasBusqueda = 1;
 
 		for (CanalMarketPlace canal : canalesL) {
+			
+			// 1 - le pedimos los pedidos a fenicio API (son datos complementarios)
 			List<Ordenes> pedidosFenicio = f.getPedidosAPI(canal.getId(), diasBusqueda);
-			List<EncuentraPedido> pedidosALL = f.getPedidos(canal.getId(), "procesando", diasBusqueda, null, null);
+			// 2 - le pedimos los pedidos a fenicio Tracking estructura del pedido
+			List<EncuentraPedido> pedidosALL = f.getPedidos(canal.getId(), "procesando", diasBusqueda);
+			// 3 - traemos los pedidos de encuentra para determinar cuales son los que debemos sincronizar y cuales no
 			Map<String, String> pedidosEncuentra = wms.PedidosID(token, diasBusqueda, "");
+			
+			
+			//esta es la lista de pedidos buenos, los que vamos a meter en encuentra
 			List<EncuentraPedido> pedidos = new ArrayList<>();
-//			for (EncuentraPedido p : pedidosALL) {
-//				if (!pedidosEncuentra.containsKey(p.getIdPedido() + "")) {
-//					p.setTrackingNumber(p.getIdPedido() + "");
-//					List<EncuentraPedidoArticulo> removes = new ArrayList<>();
-//
-//					for (EncuentraPedidoArticulo a : p.getArticulosPedido()) {
-//						if (a.getImporte()!=null && a.getImporte() < 0.0) {
-//							p.setCantidad(p.getCantidad() - a.getCantidad());
-//							removes.add(a);
-//						}
-//					}
-//
-//					if (!removes.isEmpty()) {
-//						for (EncuentraPedidoArticulo r : removes) {
-//							p.getArticulosPedido().remove(r);
-//						}
-//					}
-//
-//					pedidos.add(p);
-//
-//				}
-//			}
+			
+			//
+			for (EncuentraPedido p : pedidosALL) {
+				if (!pedidosEncuentra.containsKey(p.getIdPedido() + "")) {
+					p.setTrackingNumber(p.getIdPedido() + "");
+					List<EncuentraPedidoArticulo> removes = new ArrayList<>();
 
-//			Map<String, String> articulos = new HashMap<>();
-//
-//			for (EncuentraPedido p : pedidos) {
-//				int contador = 0;
-//				System.out.println(p.getIdFenicio());
-//
-//				if (p.getIdFenicio().equals("76717") || p.getIdFenicio().equals("76766")) {
-//					System.out.println("test");
-//				}
-//
-//				for (EncuentraPedidoArticulo a : p.getArticulosPedido()) {
-//					String arti = a.getCodFenicio();
-//
-//					articulos.put(arti, arti);
-//					a.setOrigen(1);
-//					a.setArticulo(arti);
-//
-//					// SETTEAR EL OVL con el valor del str nuevo del idArticulo
-//					p.getOrden().getOrdenVentaLineas().get(contador).setIdArticulo(arti);
-//				}
-//
-//			}
+					for (EncuentraPedidoArticulo a : p.getArticulosPedido()) {
+						if (a.getImporte()!=null && a.getImporte() < 0.0) {
+							p.setCantidad(p.getCantidad() - a.getCantidad());
+							removes.add(a);
+						}
+					}
+
+					if (!removes.isEmpty()) {
+						for (EncuentraPedidoArticulo r : removes) {
+							p.getArticulosPedido().remove(r);
+						}
+					}
+
+					pedidos.add(p);
+
+				}
+			}
+
+
+			Hashtable<String, String> couriersHT = new Hashtable<String, String>();
+			Hashtable<String, String> puisHT = new Hashtable<String, String>();
+
+					
+			
+			
+			Map<String, String> articulos = new HashMap<>();
+
+			
+			
+			
+			
+			for (EncuentraPedido p : pedidos)
+			{
+				int contador = 0;
+				System.out.println(p.getIdFenicio());
+
+			
+				for (EncuentraPedidoArticulo a : p.getArticulosPedido()) {
+					
+					String articulo = a.getSKUFenicio();
+					
+					articulo = articulo.replace("[A]", "");
+					articulo = articulo.replace("[T]", "");
+					articulo = articulo.replace(":", "-");
+					try
+					{
+						String preGuion = articulo.substring(0, articulo.lastIndexOf('-'));
+						String postGuion = articulo.substring(articulo.lastIndexOf('-') + 1);
+							
+						articulo = preGuion + postGuion;
+						
+					}
+					catch (Exception e) 
+					{
+						System.out.println("el articulo "+articulo+" no entra");
+					}
+					articulos.put(articulo, articulo);
+					a.setOrigen(1);
+					a.setArticulo(articulo);
+
+					
+
+				
+
+					// SETTEAR EL OVL con el valor del str nuevo del idArticulo
+					p.getOrden().getOrdenVentaLineas().get(contador).setIdArticulo(articulo);
+				}
+
+			}
 			List<DataIDDescripcion> listaOK = wms.SaveOrders(token, pedidos);
 
 			List<EncuentraPedido> pedidos2 = new ArrayList<>();
@@ -121,33 +167,17 @@ public class ClienteLaCanchaFenicio {
 
 			List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2);
 
-			Map<Integer, String> mailsDepositos = new HashMap<>();
+			 Map<Integer, DataIDDescripcion> mailsDepositos = new HashMap<>();
 			for (DataIDDescripcion d : depositosDestino) {
-				mailsDepositos.put(d.getId(), d.getDescripcionB());
+				 mailsDepositos.put(d.getId(), d);
 			}
 
-//			articulos = new HashMap<>();
-
-			for (EncuentraPedido p : pedidos) {
+			
+			
+			
+			for (EncuentraPedido p : pedidos) 
+			{
 				Ordenes ovf = f.OrdenVentaFenicio(p.getIdPedido(), f.getIdEmpresa(), 1);
-
-				for (EncuentraPedidoArticulo a : p.getArticulosPedido()) {
-//					 Formato: [A]03-BV3786-489[T]L
-					String articulo = a.getArticulo();
-
-					articulo = articulo.replace("[A]", "");
-					articulo = articulo.replace("[T]", "");
-					articulo = articulo.replace(":", "-");
-					
-					String preGuion = articulo.substring(0, articulo.lastIndexOf('-'));
-					String postGuion = articulo.substring(articulo.lastIndexOf('-') + 1);
-					
-					articulo = preGuion + postGuion;
-					
-					System.out.println(articulo);
-//					articulos.put(articulo, articulo);
-				}
-
 				try {
 					boolean found = false;
 
@@ -200,45 +230,18 @@ public class ClienteLaCanchaFenicio {
 
 			List<DataIDDescripcion> arts = new ArrayList<>();
 
-//			Map<String, ArticuloCantidadEncuentra> hashartCantEnc = new HashMap<>();
+			Map<String, ArticuloCantidadEncuentra> hashartCantEnc = new HashMap<>();
 
-//			for(Entry<String, String> entry : articulos.entrySet()) {
-//			for (String a : articulosS) {
-//				arts.add(new DataIDDescripcion(1, entry.getValue()));
-//				ArticuloCantidadEncuentra ace = new ArticuloCantidadEncuentra(1.0, 0, entry.getValue());
-
-//				hashartCantEnc.put(entry.getValue(), ace);
-				// artCantEnc.add(ace);
-//			}
-
-//			Va contra el ERP, trae el stock de los artículos y lo persiste en la base de datos
+			for(Entry<String, String> articulo : articulos.entrySet()) {
 			
-//			 ClienteContaWinLaCancha clienteCLC = new ClienteContaWinLaCancha(false);
-//			 
-//			
-//			 List<StockArticulos> stockContawin = clienteCLC.buscarStockArticulo(new ArrayList<>(hashartCantEnc.values()), new HashMap<>());
-//			 List<StockDeposito> stockContawinDeposito = new ArrayList<>();
-//			 
-//			 for (StockArticulos s : stockContawin) 
-//			 {
-//				stockContawinDeposito.add(new StockDeposito(""+s.getOrigen(), s.getIdArticulo(), Double.parseDouble(""+s.getStockDisponible())));
-//				try {
-//					hashartCantEnc.remove(s.getIdArticulo());
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//				
-//			 }
-				 
-//			 if(!hashartCantEnc.isEmpty()) {
-//					for (String key : hashartCantEnc.keySet()) {
-//						stockContawinDeposito.add(new StockDeposito("0", key, 0.0));						
-//					}
-//			 }
-//			 
-//			 cen.putStk(token,stockOdoD);
+				arts.add(new DataIDDescripcion(1, articulo.getValue()));
+			
+			}
 
-			int idCanal = 1;
+			
+			
+			 
+			int idCanal = canal.getId();
 			
 			List<DepositoStock> stock = wms.darDepositos(arts, token, idCanal);
 
@@ -253,7 +256,8 @@ public class ClienteLaCanchaFenicio {
 			Map<Integer, List<EncuentraPedido>> pedidosTiendas = new HashMap<>();
 			Map<Integer, List<EncuentraPedidoArticulo>> solicitudesTiendas = new HashMap<>();
 
-			for (EncuentraPedido p : pedidos) {
+			for (EncuentraPedido p : pedidos) 
+			{
 
 				if (p.isPreparaTienda()) {
 					p.setShippingType(new DataIDDescripcion(3, ""));
@@ -263,7 +267,8 @@ public class ClienteLaCanchaFenicio {
 				/************ orden de venta ************/
 				p.getOrden().save("", f.getIdEmpresa());
 
-				if (p.isPreparaTienda()) {
+				if (p.isPreparaTienda()) 
+				{
 					List<EncuentraPedido> lista = null;
 					if (pedidosTiendas.get(p.getArticulosPedido().get(0).getOrigen()) == null) {
 						lista = new ArrayList<>();
@@ -274,19 +279,25 @@ public class ClienteLaCanchaFenicio {
 					lista.add(p);
 					pedidosTiendas.put(p.getArticulosPedido().get(0).getOrigen(), lista);
 
-				} else {
+				}
+				else 
+				{
 
 					/************ movimiento de stock ************/
 					boolean todosMismoOrigen = true;
 					boolean central = false;
 					int origenAnt = 0;
 					boolean pri = true;
-					for (EncuentraPedidoArticulo arp : p.getArticulosPedido()) {
+					for (EncuentraPedidoArticulo arp : p.getArticulosPedido()) 
+					{
 						List<EncuentraPedidoArticulo> solis = null;
-						if (solicitudesTiendas.get(arp.getOrigen()) == null) {
+						if (solicitudesTiendas.get(arp.getOrigen()) == null) 
+						{
 							solis = new ArrayList<>();
 
-						} else {
+						} 
+						else 
+						{
 							solis = solicitudesTiendas.get(arp.getOrigen());
 						}
 						solis.add(arp);
@@ -297,35 +308,41 @@ public class ClienteLaCanchaFenicio {
 							origenAnt = arp.getOrigen();
 						}
 
-						if (arp.getOrigen() != idDepositoCentral) {
+						if (arp.getOrigen() != idDepositoCentral) 
+						{
 							boolean confirmarMovimiento = false;
-							// 158 deposito de transito
-							llamarMovimientoStock(arp, idDepositoEcommerce, logica, ip, f.getIdEmpresa(),
-									p.getIdPedido(), confirmarMovimiento, false);
-						} else {
+							
+							llamarMovimientoStock(arp, idDepositoEcommerce, logica, ip, f.getIdEmpresa(),p.getIdPedido(), confirmarMovimiento, false);
+						} 
+						else 
+						{
 							central = true;
 						}
 
-						if (origenAnt != arp.getOrigen()) {
+						if (origenAnt != arp.getOrigen()) 
+						{
 							todosMismoOrigen = false;
 						}
 
 						origenAnt = arp.getOrigen();
 					}
 
-					if (central && todosMismoOrigen) {
-						for (EncuentraPedidoArticulo arp : p.getArticulosPedido()) {
+					if (central && todosMismoOrigen) 
+					{
+						for (EncuentraPedidoArticulo arp : p.getArticulosPedido()) 
+						{
 							boolean confirmarMovimiento = true;
-							llamarMovimientoStock(arp, idDepositoEcommerce, logica, ip, f.getIdEmpresa(),
-									p.getIdPedido(), confirmarMovimiento, central);
+							llamarMovimientoStock(arp, idDepositoEcommerce, logica, ip, f.getIdEmpresa(),p.getIdPedido(), confirmarMovimiento, central);
 						}
-					} else if (central && !todosMismoOrigen) {
+					} 
+					else if (central && !todosMismoOrigen) 
+					{
 						for (EncuentraPedidoArticulo arp : p.getArticulosPedido()) {
 
 							if (arp.getOrigen() == idDepositoCentral) {
+								
 								boolean confirmarMovimiento = false;
-								llamarMovimientoStock(arp, idDepositoEcommerce, logica, ip, f.getIdEmpresa(),
-										p.getIdPedido(), confirmarMovimiento, central);
+								llamarMovimientoStock(arp, idDepositoEcommerce, logica, ip, f.getIdEmpresa(),p.getIdPedido(), confirmarMovimiento, central);
 							}
 						}
 					}
@@ -334,42 +351,45 @@ public class ClienteLaCanchaFenicio {
 
 			List<SendMail> mails = new ArrayList<>();
 
-			for (Entry<Integer,List<EncuentraPedido>> entry : pedidosTiendas.entrySet()) {
+			for (Entry<Integer,List<EncuentraPedido>> pedido : pedidosTiendas.entrySet()) 
+			{
 				
-				List<EncuentraPedido> pedidosTienda = entry.getValue();
+				List<EncuentraPedido> pedidosTienda = pedido.getValue();
 
 				for (EncuentraPedido p : pedidosTienda) {
 					/************ movimiento de stock ************/
 					List<DataIDDescripcion> movsStock = new ArrayList<>();
-					for (EncuentraPedidoArticulo arp : p.getArticulosPedido()) {
+					for (EncuentraPedidoArticulo arp : p.getArticulosPedido()) 
+					{
 						movsStock.add(new DataIDDescripcion(arp.getCantidad(), arp.getArticulo()));
 					}
 
 					// PERSISTO MOVIMIENTOS DE STOCK
 					boolean confirmarMovimiento = true;
 
-					int idMS = logica.RegistrarMovimientoStock(entry.getKey(), idDepositoEcommerce, 0, movsStock,
-							f.getIdEmpresa(), p.getIdPedido(), 0, 0, confirmarMovimiento);
-					ip.imprimirTicketMovStock(entry.getKey(), idDepositoEcommerce, 0, "Para Venta WEB " + p.getIdPedido(),
-							movsStock, idMS, entry.getKey());
+					int idMS = logica.RegistrarMovimientoStock(pedido.getKey(), idDepositoEcommerce, 0, movsStock,	f.getIdEmpresa(), p.getIdPedido(), 0, 0, confirmarMovimiento);
+					ip.imprimirTicketMovStock(pedido.getKey(), idDepositoEcommerce, 0, "Para Venta WEB " + p.getIdPedido(),	movsStock, idMS, pedido.getKey());
 				}
 
-				try {
-					ip.ImprimirPedidosArticuloReq(pedidosTienda, entry.getKey());
+				try 
+				{
+					ip.ImprimirPedidosArticuloReq(pedidosTienda, pedido.getKey());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
 				// mails
 
-				//mails.add(od.mailsSolicitudPickup(pedidosTienda, mailsDepositos.get(entry.getKey()), entry.getKey()));
+
+				mails.add(od.mailsSolicitudPickup(pedidosTienda, mailsDepositos.get(pedido.getKey())));
+
 			}
 
 			for (Entry<Integer, List<EncuentraPedidoArticulo>> entry : solicitudesTiendas.entrySet())
 			{
 				List<EncuentraPedidoArticulo> solicitudesTienda = entry.getValue();
-				// mails
-				//mails.add(od.mailsSolicitudWeb(solicitudesTienda, mailsDepositos.get(entry.getKey()), entry.getKey()));
+				mails.add(od.mailsSolicitudWeb(solicitudesTienda, mailsDepositos.get(entry.getKey())));
+
 			}
 
 			// envio mails
@@ -393,18 +413,15 @@ public class ClienteLaCanchaFenicio {
 		} // for de canales
 	}
 
-	static void llamarMovimientoStock(EncuentraPedidoArticulo arp, int idDepositoEcommerce, LogicaAPI logica,
-			ImpresionesPDF_API ip, int idEmpresa, Long idPedido, boolean confirmarMovimiento, boolean central) {
+	static void llamarMovimientoStock(EncuentraPedidoArticulo arp, int idDepositoEcommerce, LogicaAPI logica,ImpresionesPDF_API ip, int idEmpresa, Long idPedido, boolean confirmarMovimiento, boolean central) 
+	{
 		List<DataIDDescripcion> movsStock = new ArrayList<>();
 		movsStock.add(new DataIDDescripcion(arp.getCantidad(), arp.getArticulo()));
-		idDepositoEcommerce = 158;
-		int idMS = logica.RegistrarMovimientoStock(arp.getOrigen(), idDepositoEcommerce, 0, movsStock, idEmpresa,
-				idPedido, 0, 0, confirmarMovimiento);
+		
+		int idMS = logica.RegistrarMovimientoStock(arp.getOrigen(), idDepositoEcommerce, 0, movsStock, idEmpresa,idPedido, 0, 0, confirmarMovimiento);
 		if (!confirmarMovimiento || (confirmarMovimiento && !central)) {
 			ip.imprimirTicketMovStock(arp.getOrigen(), idDepositoEcommerce, 0, "Para Venta WEB " + idPedido, movsStock,
 					idMS, arp.getOrigen());
 		}
-
 	}
-
 }

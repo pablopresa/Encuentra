@@ -97,7 +97,7 @@ public class ClienteSap {
 		
 		empresaId = idEmpresa;
 		nombreBdd = bd;
-		sessionId = new Login(usuario, password, bd).doLogin();
+		sessionId = new Login(usuario, password, bd).doLogin(urlBase);
 		logica = new LogicaAPI();
 	}
 
