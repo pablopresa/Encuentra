@@ -1,3 +1,0 @@
-connectionUrl=jdbc\:sqlserver\://10.108.0.1\:1433; databaseName\=VsStadium;
-u=sa
-p=sqlstadium

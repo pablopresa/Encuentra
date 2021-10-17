@@ -1,6 +1,0 @@
-puerto=3306
-bd=encuentra
-usuario=root
-password=Std1
-servidor=10.108.0.8
-prefijoURL=jdbc\:mysql\://

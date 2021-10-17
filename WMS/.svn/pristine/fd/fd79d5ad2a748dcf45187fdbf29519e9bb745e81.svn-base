@@ -1,5 +1,0 @@
-[genuitec-file-id="wc1-578"],[genuitec-lp-path="/encuentra/webApps/gentelella-master/gentelella-master/vendors/pnotify/dist/pnotify.nonblock.css"],[genuitec-lp-enabled=false]{
-  /* for codelive */
-}
-
-.ui-pnotify.ui-pnotify-nonblock-fade{opacity:.2}.ui-pnotify.ui-pnotify-nonblock-hide{display:none!important}
