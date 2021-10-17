@@ -40,7 +40,7 @@ public class ClienteStdFenicio
 		FenicioStd f = new FenicioStd();
 		MercadoLibre ml = new MercadoLibre();		
 		mps.add(ml);
-		//mps.add(f);
+		mps.add(f);
 			 
 		 
 		 LogicaAPI logica = new LogicaAPI();
