@@ -31,6 +31,7 @@ import eCommerce_jsonObjectsII.EncuentraPedidoArticulo;
 import logica.Logica;
 import logica.Utilidades;
 import main.utilidades.PonerEnReposicionArtElRey;
+import net.schmizz.sshj.sftp.PacketReader;
 
 
 
@@ -157,6 +158,7 @@ public class SaveOrders
 					DataIDDescripcion did;
 					for (EncuentraPedidoArticulo it : p.getArticulosPedido())
 					{
+						System.err.println("pedido "+p.getIdFenicio() +" articulo "+it.getArticulo()+" origen "+ it.getOrigen());
 						if(it.getVariacion()==null)
 						{
 							it.setVariacion("");
@@ -270,6 +272,7 @@ public class SaveOrders
 		            int idPicking = l.encuentraAltaPicking(articulosIn, cantidades, "Sin filtros aplicados",idEmpresa,true,false);						
 		            tarea = util.CompleteTask(tarea, idPicking, observacion, articulosIn, cantidades);	
 		            tarea.setIdDeposito(deposito);
+		            
 		            
 		            HttpSession session = util.darDummySesion("SINCRO");
 		            
