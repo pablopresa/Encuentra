@@ -24,7 +24,7 @@ public class SincMastersStadium
 		LogicaAPI logica = new LogicaAPI();
 		String token = logica.darToken(1,10);
 		
-		/*cwa.putMaestros(token, ma.getCategorias(), "art_categoria");
+		cwa.putMaestros(token, ma.getCategorias(), "art_categoria");
 		cwa.putMaestros(token, ma.getGeneros(), "art_genero");
 		cwa.putMaestros(token, ma.getMarcas(), "art_marca");
 		cwa.putMaestros(token, ma.getSecciones(), "art_seccion");
@@ -32,7 +32,7 @@ public class SincMastersStadium
 		cwa.putMaestros(token, ma.getTemporadas(), "art_temporadas");
 		
 		
-		cwa.putArticulos(token,ma.getArticuos());*/
+		cwa.putArticulos(token,ma.getArticuos());
 		cwa.putDeposM(token, ma.getDepositos());
 		
 		

@@ -111,7 +111,7 @@ public class productosFenicio {
 							+ " ON t00.idArticulo = AD.id\r\n"
 							// + " WHERE t00.stk > 0"
 							+ " ORDER BY AD.id";
-					System.out.println(q);
+					//System.out.println(q);
 
 				}
 

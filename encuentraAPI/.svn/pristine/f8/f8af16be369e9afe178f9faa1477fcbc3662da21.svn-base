@@ -1,6 +1,0 @@
-puerto=3306
-bd=encuentra_bantey
-usuario=root
-password=@200SRL
-servidor=169.57.133.41
-prefijoURL=jdbc\:mysql\://

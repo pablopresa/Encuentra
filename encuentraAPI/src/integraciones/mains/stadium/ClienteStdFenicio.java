@@ -39,26 +39,28 @@ public class ClienteStdFenicio
 		List<marketPlace> mps = new ArrayList<marketPlace>();
 		FenicioStd f = new FenicioStd();
 		MercadoLibre ml = new MercadoLibre();		
-		mps.add(ml);
-		//mps.add(f);
+		//mps.add(ml);
+		mps.add(f);
 			 
 		 
 		 LogicaAPI logica = new LogicaAPI();
 		 String token = logica.darToken(f.getIdEmpresa());
-		 Call_WS_APIENCUENTRA cen = new Call_WS_APIENCUENTRA();
+		 Call_WS_APIENCUENTRA wms = new Call_WS_APIENCUENTRA();
 		 
-		 Map<Integer, String> integraciones = cen.darIntegraciones(token);
+		 Map<Integer, String> integraciones = wms.darIntegraciones(token);
 		 
 		 String cambioEstado = integraciones.get(3) != null ? integraciones.get(3) : "0";
 		 
 		 int diasBusqueda = 7;	
-		 Map<String, String> pedidosEncuentra = cen.PedidosID(token, diasBusqueda, "");		
-		 List<DataIDDescripcion> depositosDestino =cen.DarDatosPutOrders(token, 2);
+		 Map<String, String> pedidosEncuentra =  wms.PedidosID(token, diasBusqueda, "");		
+		 List<DataIDDescripcion> depositosDestino =wms.DarDatosPutOrders(token, 2);
 		 
 		 Map<Integer, String> mailsDepositos = new HashMap<>();
 		 Map<String, Integer> mapDepositos = new HashMap<>();
 		 for(DataIDDescripcion d: depositosDestino) 
 		 {
+			
+			 
 			 mailsDepositos.put(d.getId(), d.getDescripcionB());
 			 mapDepositos.put(d.getDescripcion(), d.getId());
 		 }
@@ -66,10 +68,10 @@ public class ClienteStdFenicio
 		 for(marketPlace mp : mps) {
 			 Map<Integer, CanalMarketPlace> canales = mp.getCanales();			 
 			 List<CanalMarketPlace> canalesL = new ArrayList<> (canales.values());
-			 
+
 			 for (CanalMarketPlace canal : canalesL) 
 			 {
-				 Map<String, Integer> deposCanal = cen.darDepositosEcommerce(token, canal.getId());
+				 Map<String, Integer> deposCanal = wms.darDepositosEcommerce(token, canal.getId());
 				 int idDepositoEcommerce =  deposCanal.get("id_de_Deposito_Ecommerce");
 				 int idDepositoCentral = deposCanal.get("id_de_Deposito_Principal");
 				 			 
@@ -112,11 +114,88 @@ public class ClienteStdFenicio
 
 					 Clientes clien = p.getCliente().transformar(p.getCliente(), mp.getIdEmpresa());
 					 clien.setIdPedido(p.getIdPedido()+"");
-	 				 clien.save();
-					 
+					 clien.save();
+
+
+
+					 if(mp instanceof Fenicio) {						 
+						 Ordenes ovf = ((Fenicio)mp).OrdenVentaFenicio(p.getIdPedido(), mp.getIdEmpresa(), canal.getId());
+						 try
+						 {
+							 boolean found = false;
+							 if(!p.getSucursalPick().equals(""))
+							 {
+								 //es pickup
+								 p.setShippingType(new DataIDDescripcion(2, ""));
+								 int idDepositoEnvio = Integer.parseInt(p.getSucursalPick());
+								 idDepositoEnvio = Integer.parseInt(p.getSucursalPick());
+
+								 p.setIdDepositoEnvio(idDepositoEnvio);
+								 found=true;
+							 }
+							 else 
+							 {
+								 p.setShippingType(new DataIDDescripcion(1, ""));
+								 for (DataIDDescripcion d : depositosDestino) 
+								 {
+									 if(d.getDescripcion().equals(p.getEmpresaEnvio()))
+									 {
+										 p.setIdDepositoEnvio(d.getId());
+										 found=true;
+										 break;
+									 }
+								 }
+							 }
+							 if(!found)
+							 {
+								 
+								 p.setShippingType(new DataIDDescripcion(1, ""));
+								 for (DataIDDescripcion d : depositosDestino) 
+								 {
+									 if(p.getEmpresaEnvio().contains(d.getDescripcion())) // viene "encargo" y yo tengo "encargo 24HS"
+									 {
+										 p.setIdDepositoEnvio(d.getId());
+										 found=true;
+										 break;
+									 }
+								 }
+								 
+								 if(!found)
+								 {
+									 p.setShippingType(new DataIDDescripcion(1, ""));
+									 System.out.println("No encontre "+p.getEmpresaEnvio());
+									 p.setIdDepositoEnvio(0);
+								 }
+								 
+								
+								
+
+							 }
+						 }
+						 catch (Exception e) 
+						 {
+							 p.setShippingType(new DataIDDescripcion(1, ""));
+							 e.printStackTrace();
+							 p.setIdDepositoEnvio(0);
+						 }
+					 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 					 int contador = 0;
 					 System.out.println(p.getIdPedido());
-					 
+
 					 for (EncuentraPedidoArticulo a : p.getArticulosPedido()) 
 					 {
 						 try
@@ -134,7 +213,7 @@ public class ClienteStdFenicio
 							 else {
 								 sku = a.getArticulo();
 							 }
-							 
+
 							 a.setArticulo(sku);
 							 articulos.put(sku, sku);
 							 a.setOrigen(1);
@@ -145,13 +224,14 @@ public class ClienteStdFenicio
 							 //aca hay que agregar a la lista de lo que se manda por mail.
 							 System.out.println("no se pudo mapear el SKU " +a.getSKUFenicio());
 						 }
-							 
+
 						 contador++;
+
 					 }
-				 	
+
 				 }
 				 
-				 List<DataIDDescripcion> listaOK = cen.SaveOrders(token, pedidos);
+				 List<DataIDDescripcion> listaOK = wms.SaveOrders(token, pedidos);
 				 
 				 List<EncuentraPedido> pedidos2 = new ArrayList<>();
 				 List<jsonEstadoMP> estadosMP = new ArrayList<>();
@@ -189,68 +269,7 @@ public class ClienteStdFenicio
 							 articulos.put(a.getArticulo(), a.getArticulo());
 						 }
 						 
-						 if(mp instanceof Fenicio) {						 
-							 Ordenes ovf = ((Fenicio)mp).OrdenVentaFenicio(p.getIdPedido(), mp.getIdEmpresa(), canal.getId());
-								 
-							 try
-							 {
-								 boolean found = false;
-								 if(ovf.getOrigen().equals("MERCADOLIBRE"))
-								 {
-									 p.setShippingType(new DataIDDescripcion(1, ""));
-									 p.setIdDepositoEnvio(60);
-									found=true;
-									
-								 }
-								 else if(!p.getSucursalPick().equals(""))
-								 {
-									 //es pickup
-									 p.setShippingType(new DataIDDescripcion(2, ""));
-									 int idDepositoEnvio = Integer.parseInt(p.getSucursalPick());
-									 idDepositoEnvio = Integer.parseInt(p.getSucursalPick());
-									 	
-									 p.setIdDepositoEnvio(idDepositoEnvio);
-									 found=true;
-								 }
-								 else
-								 {
-									 p.setShippingType(new DataIDDescripcion(1, ""));
-									for (DataIDDescripcion d : depositosDestino) 
-									 {
-										if(d.getDescripcion().equals(p.getEmpresaEnvio()))
-										{
-											p.setIdDepositoEnvio(d.getId());
-											found=true;
-											break;
-										}
-									 }
-								 }
-								 if(!found)
-								 {
-									 if(ovf.getEntrega().getServicioEntrega()!=null  && ovf.getEntrega().getServicioEntrega().getNombre().equals("Retiro Sucursal Agencia Central"))
-									 {
-										 p.setShippingType(new DataIDDescripcion(1, ""));
-										 p.setIdDepositoEnvio(50);
-									 }
-									 
-									 
-									 
-									 else
-									 {
-										 p.setShippingType(new DataIDDescripcion(1, ""));
-										 System.out.println("No encontre "+p.getEmpresaEnvio());
-										 p.setIdDepositoEnvio(0);
-									 }
-									 
-								 }
-							 }
-							 catch (Exception e) 
-							 {
-								 p.setShippingType(new DataIDDescripcion(1, ""));
-								 e.printStackTrace();
-								 p.setIdDepositoEnvio(0);
-							 }
-						 }
+						 
 					 }
 				 
 			 	
@@ -294,19 +313,19 @@ public class ClienteStdFenicio
 						}
 				 }
 				 
-				 cen.putStk(token,stockVssD);
+				 wms.putStk(token,stockVssD);
 				 			 
 				 
-				 List<DepositoStock> stock = cen.darDepositos(arts, token,canal.getId());
+				 List<DepositoStock> stock = wms.darDepositos(arts, token,canal.getId());
 				 
 				 
 				 
 				 System.out.println("");
 
 				 OrderDerivator od = new OrderDerivator();
-				 pedidos = od.derivar(pedidos, cen, token, stock);
+				 pedidos = od.derivar(pedidos, wms, token, stock);
 				 
-				 List<DataIDDescripcion> guardadas = cen.SaveOrdersArticulosReq(token, pedidos,canal.getId());
+				 List<DataIDDescripcion> guardadas = wms.SaveOrdersArticulosReq(token, pedidos,canal.getId());
 				 
 				 ImpresionesPDF_API ip = new ImpresionesPDF_API(mp.getIdEmpresa());
 				 Map<Integer, List<EncuentraPedido>> pedidosTiendas = new HashMap<>();
@@ -319,7 +338,7 @@ public class ClienteStdFenicio
 					 {
 						 p.setShippingType(new DataIDDescripcion(3, ""));
 					 }
-					 cen.updateDestinoPedido(token, p, p.getIdDepositoEnvio(), p.getMontoEnvio());
+					 wms.updateDestinoPedido(token, p, p.getIdDepositoEnvio(), p.getMontoEnvio());
 					 
 					 /************orden de venta************/
 					 p.getOrden().save("", mp.getIdEmpresa());
@@ -472,10 +491,10 @@ public class ClienteStdFenicio
 					 
 					 if(mp instanceof Fenicio) {
 						 
-						 Map<String, String> pedidosDespachados = cen.PedidosID(token, 30, "4");
+						 Map<String, String> pedidosDespachados = wms.PedidosID(token, 30, "4");
 						 List<DataIDDescripcion> entregados = ((Fenicio)mp).tackPedidosDespachados(pedidosDespachados, canal.getId());
 						 if(!entregados.isEmpty()) {
-							 cen.updateOrdersStatus(token,entregados);
+							 wms.updateOrdersStatus(token,entregados);
 						 } 
 					 }
 					 

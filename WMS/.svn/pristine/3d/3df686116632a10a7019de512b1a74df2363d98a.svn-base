@@ -1,8 +1,0 @@
-[genuitec-file-id="wc1-563"],[genuitec-lp-path="/encuentra/webApps/gentelella-master/gentelella-master/vendors/nprogress/support/extras.css"],[genuitec-lp-enabled=false]{
-  /* for codelive */
-}
-
-/* Make the entire page show a busy cursor */
-.nprogress-busy body {
-  cursor: wait;
-}

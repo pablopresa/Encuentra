@@ -77,7 +77,7 @@ public class Login
      };
 	
 	
-	public String doLogin()
+	public String doLogin(String urlBase)
 	{
 		try
 		{
@@ -89,7 +89,7 @@ public class Login
 					MediaType mediaType = MediaType.parse("application/json");
 					RequestBody body = RequestBody.create(mediaType, "{\r\n    \"CompanyDB\": \""+this.compania+"\",\r\n    \"UserName\": \""+this.usuario+"\",\r\n    \"Password\": \""+this.password+"\"\r\n}");
 					Request request = new Request.Builder()
-					  .url("https://190.64.140.140:50000//b1s/v1/Login")
+					  .url( urlBase+"Login")
 					  .method("POST", body)
 					  .addHeader("Content-Type", "application/json")
 					  .build();

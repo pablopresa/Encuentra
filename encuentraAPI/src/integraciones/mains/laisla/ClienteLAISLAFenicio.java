@@ -59,6 +59,7 @@ public class ClienteLAISLAFenicio
 		 int idDepositoEcommerce =  158;//Integer.parseInt(parametros.get(5));
 		 int idDepositoCentral = Integer.parseInt(parametros.get(4));
 		 int diasBusqueda = 6;
+		  Map<String, String> pedidosEncuentra = cen.PedidosID(token, diasBusqueda, "");
 
 		 
 		 List<String> dirtySKUs = new ArrayList<>();
@@ -67,8 +68,7 @@ public class ClienteLAISLAFenicio
 		 {
 			 List<Ordenes> pedidosFenicio = f.getPedidosAPI(canal.getId(),diasBusqueda);
 			 List<EncuentraPedido> pedidosALL = f.getPedidos(canal.getId(),"procesando",diasBusqueda, null, null);
-			 Map<String, String> pedidosEncuentra = cen.PedidosID(token, diasBusqueda, "");
-			 List<EncuentraPedido> pedidos = new ArrayList<>();
+															 List<EncuentraPedido> pedidos = new ArrayList<>();
 			 for (EncuentraPedido p : pedidosALL) 
 			 {
 				 if(!pedidosEncuentra.containsKey(p.getIdPedido()+""))
