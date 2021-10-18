@@ -201,6 +201,10 @@ public class _EncuentraEventoTarea extends Action
 			}
 			
 			ultimoIndex=x; */
+			if (uLog.getIdEmpresa()==5) {
+				voy.getObservacionDescripcion();
+			}
+			
 			session.setAttribute("repoArt", repos);
 			session.setAttribute("idTarea", Integer.parseInt(tar));
 			session.setAttribute("idMain", Integer.parseInt(mai));

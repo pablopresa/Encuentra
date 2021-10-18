@@ -44,7 +44,13 @@
 			
 			<c:if test="${paramDetalle}">
 				<div class="field" align="left">
-					<h4><strong style="margin-left: 10px;" id="lblArtDesc"></strong></h4>
+					<span><strong style="margin-left: 10px;" id="lblArtDesc"></strong></span>
+					
+					<c:if test="${uLogeado.idEmpresa==5}">
+						<span><strong style="margin-left: 10px; font-size: 15pt;  color: #35d0f3" id="lblArtJust"></strong></span>
+						<span style="margin-left: 10px; font-size: 10pt" id="lblArtNC"></span>
+					</c:if>
+					
 					<img  id="imagenArt" alt='' src='' style='width: 280px;'>
 					<h4>Codigo de ubicacion:<strong style="margin-left: 10px;" id="lblCodigo"></strong></h4>
 					<h4>Destino:<strong style="margin-left: 10px;" id="lblDestino"></strong></h4>
@@ -154,7 +160,7 @@
 	console.log(p);
 	console.log("destino qty:"+ p.destinosQty);
 	*/
-	
+	var idEmpresa= [${uLogeado.idEmpresa}];
 	var articulos = [${arregloArticulos}];
 	var articulosPosicion = [${arregloDestinos}];
 	var arregloDestinosQty = [${arregloDestinosQty}];
@@ -211,8 +217,40 @@
 						codDestino = articulo_destino.posSort;
 						thisArticulo = articulo_destino;
 						try {
+							
+							if(idEmpresa == 5){
+								var justificacion = articulo_destino.justificacion;
+								var observacion = "";
+								var noEncontrado="";
+								var descripcionGeneral = justificacion.split("*");	
+								if(descripcionGeneral.length > 1) {
+									justificacion = descripcionGeneral[0];
+									observacion = descripcionGeneral[1];
+									var descNoEncontrado = descripcionGeneral[1].split("--");
+									if (descNoEncontrado.length > 1) {
+										observacion = descNoEncontrado[0];
+										noEncontrado= descNoEncontrado[1];
+									}
+								} else {
+									var descNoEncontrado = descripcionGeneral[0].split("--");
+									if (descNoEncontrado.length > 1) {
+										justificacion=descNoEncontrado[0];
+										noEncontrado=descNoEncontrado[1];
+									}
+								}
+								document.getElementById("lblArtDesc").innerHTML = justificacion;
+								document.getElementById("lblArtJust").innerHTML = observacion;
+								document.getElementById("lblArtNC").innerHTML = noEncontrado;
+							
+							} 
+							
 							document.getElementById("lblCodigo").innerHTML = articulo_destino.posSort;
+							if(idEmpresa != 5){
 							document.getElementById("lblArtDesc").innerHTML = articulo_destino.articulo+"<br/>"+articulo_destino.justificacion;
+							}
+							//document.getElementById("lblArtJust").innerHTML = articulo_destino.articulo+"<br/>"+articulo_destino.observacion;
+							//document.getElementById("lblArtNC").innerHTML = articulo_destino.articulo+"<br/>"+articulo_destino.noEncontrado;
+
 							
 							document.getElementById("imagenArt").src = articulo_destino.imagen;
 							

@@ -40,6 +40,7 @@
 				<div class="field" align="left">
 					<h4><strong style="margin-left: 10px;" id="lblDesc"></strong></h4>
 					<h4><strong style="margin-left: 10px;" id="lblArtDesc"></strong></h4>
+					
 					<img  id="imagenArt" alt='' src='' style='width: 280px;'>
 					
 					<h4>Destino:<strong style="margin-left: 10px;" id="lblDestino"></strong></h4>
@@ -112,7 +113,6 @@
 
 
 	<script type="text/javascript">
-	  
 	var clasificador = ${clasificador_json};
 	var thisArticulo;
 	var paramVerificacion = ${paramVerificacion}
@@ -169,8 +169,7 @@
 				{
 					try {
 						var articulo_destino = primerDestino(objeto_destinos);
-						thisArticulo = articulo_destino;						
-						
+						thisArticulo = articulo_destino;									
 						document.getElementById("imagenArt").src = articulo_destino.imagen;
 						document.getElementById("lblArtDesc").innerHTML = articulo_destino.articulo+"<br/>"+articulo_destino.justificacion;
 						document.getElementById("lblEmpaque").innerHTML = articulo_destino.empaque;

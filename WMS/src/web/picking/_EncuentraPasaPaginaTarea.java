@@ -68,6 +68,9 @@ public class _EncuentraPasaPaginaTarea extends Action {
 
 		List<DataLineaRepo> noNcontrados = (List<DataLineaRepo>) session.getAttribute("noNcontrados");
 		DataLineaRepo voy = (DataLineaRepo) session.getAttribute("voy");
+		if(uLog.getIdEmpresa() ==5 ) {
+			voy.getObservacionDescripcion();
+		}
 		int cauntasVan = (Integer) session.getAttribute("cuantasVoy");
 		int unidad = (Integer) session.getAttribute("unidad");
 		int idPicking = (Integer) session.getAttribute("idPicking");
@@ -523,6 +526,9 @@ public class _EncuentraPasaPaginaTarea extends Action {
 					int porcentaje = ((cauntasVan) * 100) / (lista.size() - 1);
 					Logica.encuentraUpdateAvanceTarea(idTarea, porcentaje, cauntasVan, idEmpresa);
 					voy = lista.get(cauntasVan);
+					if(uLog.getIdEmpresa()==5) {
+						voy.getObservacionDescripcion();
+					}
 					session.setAttribute("voy", voy);
 					if (voy.getDescripcion().equalsIgnoreCase("Bulto")) {
 						List<String> bultos = logicaB.bultosValidosEnOjo(voy.getIdArticulo(), voy.getCubi(), idEmpresa, voy.getContenido());

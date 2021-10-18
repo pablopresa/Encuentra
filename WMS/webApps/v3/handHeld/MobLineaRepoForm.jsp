@@ -104,9 +104,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<c:if test="${voy.cantDeVenta > 1}">
 									<p style="font-size: 8pt; color: #54A800"><strong><c:out value="${voy.justificacion}"></c:out></strong></p>
 								</c:if>
-							<c:if test="${voy.cantDeVenta <= 1}">
+								<c:if test="${voy.cantDeVenta <= 1}">
 									<p style="font-size: 8pt;"><c:out value="${voy.justificacion}"></c:out></p>
-								</c:if>  
+								</c:if>
+								<c:if test="${uLogeado.idEmpresa==5 && voy.observacion != null}">
+									<span style="font-size: 16px; color: #35d0f3"><strong><c:out value="${voy.observacion}"></c:out></strong></span>
+								</c:if>
+								<c:if test="${uLogeado.idEmpresa==5 && voy.noEncontrado != null}">
+									<p style="font-size: 8pt;"><c:out value="${voy.noEncontrado}"></c:out></p>
+								</c:if>    
 							</c:if>
 						</td>
 						

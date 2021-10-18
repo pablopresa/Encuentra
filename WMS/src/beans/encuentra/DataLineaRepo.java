@@ -1,5 +1,6 @@
 package beans.encuentra;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DataLineaRepo implements Comparable, Cloneable 
@@ -40,10 +41,60 @@ public class DataLineaRepo implements Comparable, Cloneable
 	private int packing;
 	private int qPedido;
 	private int cantDeVenta;
+	private String observacion = null;
+	private String noEncontrado = null;
+	
+	
+	public void getObservacionDescripcion() { // Separo la descripcion y la observacion por * , si no tiene observacion retorno null
+		String[] descripcionGeneral = justificacion.split("\\*");	
+		if(descripcionGeneral.length > 1) {
+			this.setJustificacion(descripcionGeneral[0]);
+			this.setObservacion(descripcionGeneral[1]);
+			String[] descNoEncontrado = descripcionGeneral[1].split("\\--");
+			if (descNoEncontrado.length > 1) {
+				this.setObservacion(descNoEncontrado[0]);
+				this.setNoEncontrado(descNoEncontrado[1]);
+			}
+		} else {
+			String[] descNoEncontrado = descripcionGeneral[0].split("\\--");
+			if (descNoEncontrado.length > 1) {
+				this.setJustificacion(descNoEncontrado[0]);
+				this.setNoEncontrado(descNoEncontrado[1]);
+			}
+		}
+	}
 	
 	
 	
 	
+	public String getNoEncontrado() {
+		return noEncontrado;
+	}
+
+
+
+
+	public void setNoEncontrado(String noEncontrado) {
+		this.noEncontrado = noEncontrado;
+	}
+
+
+
+
+	public String getObservacion() {
+		return observacion;
+	}
+
+
+
+
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+
+
+
+
 	public int getCantDeVenta() {
 		return cantDeVenta;
 	}
