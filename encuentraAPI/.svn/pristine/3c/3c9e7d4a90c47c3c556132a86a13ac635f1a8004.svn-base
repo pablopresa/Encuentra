@@ -1,0 +1,116 @@
+package clienteLaIsla;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import beans.encuentra.Cliente;
+
+public class Pruebas_Odoo {
+
+	public static void main(String[] args) {
+		ClienteOdoo_LaIsla cli = new ClienteOdoo_LaIsla();
+		//int session = cli.abrirSession();
+		//10464
+	//System.out.println(session);
+		//int uid = cli.devolverUID();
+		Cliente cliente = new Cliente();
+		cliente.setDocumentoNro("46502620");
+		//mdeo 91 - encuentraTR 158
+		ArticuloCantidadEncuentra ace2 = new ArticuloCantidadEncuentra(1, 180, "VX18PA02KA34", cliente);
+		
+		List<ArticuloCantidadEncuentra> arts = new ArrayList<ArticuloCantidadEncuentra>();
+		//arts.add(ace1);
+		arts.add(ace2);
+		//arts.add(ace3);
+		
+		// int idEncuentraTR = 158;
+		// int idSession = 13424;
+		
+		PedidoAlbaran pa = new PedidoAlbaran(arts, 242);
+/*
+		List<Integer> idsAlbaranes =  cli.crearAlbaranInterno(pa);
+		for (Integer integer : idsAlbaranes) {
+			System.out.println(integer);
+			EstadoAlbaranes ea = cli.verEstadoAlbaranesFiltrados(1, 579243);
+			System.out.println(ea.getId() + "\n");
+			System.out.println(ea.getState());
+		}
+		
+		//cli.revertirTransferencia(579214);
+		List<EstadoAlbaranes> estados = cli.verEstadoAlbaranes(idsAlbaranes);
+		for(EstadoAlbaranes e : estados) {
+			System.out.println(e.getId() + "\n");
+			System.out.println(e.getState());
+		}
+		
+		*/
+		//579148
+		/*for (Integer idAlbaran : idsAlbaranes) {			
+			cli.transferir_aTransito_nuevo(idAlbaran);
+			cli.recibirAlbaran(idAlbaran);
+			//cli.transferirPicking(579152);
+		}*/
+		
+		//cli.formasDePago(12);
+		
+		//cli.revertirTransferencia(579204);
+		//cli.transferir_aTransito_nuevo(579191);
+		
+		/*
+		cli.obtenerNumeroTicket(idCliente, 10460);
+		int idCliente = cli.buscarClientePorCI("46502620", uid);
+		*/
+		
+		//175 id pago
+		
+		/*ArrayList<Integer> idsAlbaranes = new ArrayList<Integer>();
+		idsAlbaranes.add(579131);*/
+		
+		//cli.transferirPicking(579191);
+		
+		//cli.recibirAlbaran(579193);
+		//cli.transferirPicking(579191);
+		
+		//10459
+		/*OrdenVenta ov = new OrdenVenta();
+		ov.setImportePago(5590.0);
+		ov.setCliCedula("46502620");
+		OrdenVentaLinea ovl1 = new OrdenVentaLinea();
+		ovl1.setIdArticulo("VX18PA02KA34");
+		ovl1.setCantidad(1);
+		ovl1.setPrecio(5590.0);
+		List<OrdenVentaLinea> ovls = new ArrayList<OrdenVentaLinea>();
+		ovls.add(ovl1);
+		ov.setOrdenVentaLineas(ovls);
+		ov.setFormaPago("178");
+		
+		List<Integer> formasPago = new ArrayList<Integer>();
+		formasPago.add(178);
+		
+		//List<FormaPago> fps = cli.formasDePago(formasPago);
+		int uid = cli.devolverUID();
+		int idCliente = cli.buscarClientePorCI("46502620", uid);
+		int y = 9;
+		//cli.obtenerNumeroTicket(idCliente, 10463);
+		//cli.obtenerVendedorEncuentra();
+		//cli.realizarTransferencia2(579144);
+		int as = 0;
+		cli.facturarPedido(ov, 10464);
+		int yh = 4;*/
+		/*List<StockDeposito> stkArt = cli.obtenerStockArticulos();
+		for (StockDeposito sd : stkArt) {
+			System.out.println(sd.getIdArticulo() + " " + sd.getStock() + " " + sd.getIdDeposito());
+		}*/
+		/*List<Integer> ids = new ArrayList<Integer>();
+		ids.add(579192);
+		cli.cancelarAlbaran(ids);*/
+		
+		List<EstadoAlbaranes> es = cli.albaranesListosParaRecibir();
+		for(EstadoAlbaranes e : es) {
+			System.out.println("id: " + e.getId());
+			System.out.println("estado: " + e.getState());
+			System.out.println("-----------------");
+		}
+	}
+
+}

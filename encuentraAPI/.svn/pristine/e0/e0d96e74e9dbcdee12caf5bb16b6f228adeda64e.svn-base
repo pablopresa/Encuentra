@@ -1,0 +1,32 @@
+package aTest;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import com.itextpdf.text.pdf.ArrayBasedStringTokenizer;
+
+import beans.encuentra.EncuentraPedido;
+import marketPlaceIntegrations.CanalMarketPlace;
+import marketPlaceIntegrations.Fenicio.FenicioBAS;
+
+public class ClienteBASFenicio 
+{
+ 
+	public static void main(String[] args) 
+	{
+		FenicioBAS f = new FenicioBAS();
+		
+		 Hashtable<Integer, CanalMarketPlace> canales = f.getCanales();
+		 
+		 List<CanalMarketPlace> canalesL = new ArrayList<CanalMarketPlace> (canales.values());
+		 
+		 for (CanalMarketPlace canal : canalesL) 
+		 {
+			 List<EncuentraPedido> pedidos = f.getPedidos(canal.getId());
+		}
+		 
+		 
+	}
+	
+}

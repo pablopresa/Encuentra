@@ -1,0 +1,14 @@
+package marketPlaceIntegrations.Fenicio;
+
+public class FenicioForus extends Fenicio{
+
+	public FenicioForus() {
+		this.idEmpresa = 2;
+		setCanales(this.idEmpresa);
+		this.canales = null;
+		this.etiquetaEnvios = false;
+		this.MovStocks = false;
+		this.ordenes = false;
+		this.matrizDisponibilidad = false;
+	}
+}

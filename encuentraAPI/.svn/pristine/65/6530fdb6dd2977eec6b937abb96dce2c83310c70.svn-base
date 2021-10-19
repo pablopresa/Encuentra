@@ -1,0 +1,91 @@
+package marketPlaceIntegrations.orderDerivation;
+
+import java.util.Hashtable;
+
+import dataTypes.DataIDDescripcion;
+
+public class Deposito implements Comparable
+{
+	private int orden,idDeposito,idCluster;
+	private Hashtable<String,Integer> stocks;
+	private boolean pickup,preparaPedidosP, preparaPedidosD; //P=para entregar en pickup - D para entregar a courier
+	
+	
+	
+	public int getOrden() {
+		return orden;
+	}
+	public void setOrden(int orden) {
+		this.orden = orden;
+	}
+	public int getIdCluster() {
+		return idCluster;
+	}
+	public void setIdCluster(int idCluster) {
+		this.idCluster = idCluster;
+	}
+	public boolean isPickup() {
+		return pickup;
+	}
+	public void setPickup(boolean pickup) {
+		this.pickup = pickup;
+	}
+	public boolean isPreparaPedidosP() {
+		return preparaPedidosP;
+	}
+	public void setPreparaPedidosP(boolean preparaPedidosP) {
+		this.preparaPedidosP = preparaPedidosP;
+	}
+	public boolean isPreparaPedidosD() {
+		return preparaPedidosD;
+	}
+	public void setPreparaPedidosD(boolean preparaPedidosD) {
+		this.preparaPedidosD = preparaPedidosD;
+	}
+	public int getIdDeposito() {
+		return idDeposito;
+	}
+	public void setIdDeposito(int idDeposito) {
+		this.idDeposito = idDeposito;
+	}
+	public Hashtable<String, Integer> getStocks() {
+		return stocks;
+	}
+	public void setStocks(Hashtable<String, Integer> stocks) {
+		this.stocks = stocks;
+	}
+	public Deposito(int orden, int idDeposito, int idCluster, boolean pickup, boolean preparaPedidosP,
+			boolean preparaPedidosD) {
+		this.orden = orden;
+		this.idDeposito = idDeposito;
+		this.idCluster = idCluster;
+		this.pickup = pickup;
+		this.preparaPedidosP = preparaPedidosP;
+		this.preparaPedidosD = preparaPedidosD;
+	}
+	
+	
+	@Override
+	public int compareTo(Object o) 
+	{
+		Deposito dl = (Deposito)o;        
+		  	
+		if(dl.getOrden()==this.getOrden())
+		{
+			return 0;
+		}
+	    else if(dl.getOrden()>this.getOrden())
+       	{
+       		return 1;
+       	}
+      	else
+       	{
+      		return -1;
+       	}
+	
+	}
+	
+	
+	
+	
+}

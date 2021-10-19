@@ -1,0 +1,6 @@
+txt=C\:/Program Files/apache-tomcat-7.0.64/webapps/encuentraAPI/txt/
+zip=C\:/Program Files/apache-tomcat-7.0.64/webapps/encuentraAPI/zip/
+pdf=C\:/Program Files/apache-tomcat-7.0.64/webapps/encuentraAPI/pdf/
+xlsx=C\:/Program Files/apache-tomcat-7.0.64/webapps/encuentraAPI/xlsx/
+img=F\:/Anexos/
+HTTP_pdf=http\://encuentra.200.com.uy/encuentraAPI/pdf

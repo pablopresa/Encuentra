@@ -1,0 +1,744 @@
+package clienteLaIsla;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+import org.json.JSONObject;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.sun.xml.wss.saml.internal.saml11.jaxb10.X509DataType.X509Certificate;
+
+import dataTypes.DataIDDescripcion;
+import dataTypes.StockDeposito;
+
+public class Pruebas {
+	final String url = "https://laisla.quanam.com",
+            db = "laisla",
+      username = "ws_encuentra",
+      password = "1234";
+	
+	public static void main(String[] args) {
+		Pruebas pruebas = new Pruebas();
+		int uid = pruebas.devolverUID();
+		try {
+			
+			/*	
+		 	List<Double> ids = new ArrayList<Double>();
+			ids.add(133.0);
+			ids.add(180.0);
+			ids.add(127.0);
+			List<String> codigos = new ArrayList<String>();
+			codigos.add("");
+		*/
+			ArticuloCantidadEncuentra ace1 = new ArticuloCantidadEncuentra(2, 180, "001005TAN-0060");
+			ArticuloCantidadEncuentra ace2 = new ArticuloCantidadEncuentra(2, 127, "M556A16ENTM");
+			ArticuloCantidadEncuentra ace3 = new ArticuloCantidadEncuentra(50, 0, "LANDVO04NCE14");
+			List<ArticuloCantidadEncuentra> artca = new ArrayList<ArticuloCantidadEncuentra>();
+			artca.add(ace1);
+			artca.add(ace2);
+			artca.add(ace3);
+			/*System.out.println(pruebas.obtenerAlmacenes());
+			System.out.println(pruebas.obtenerCategorias());
+			System.out.println(pruebas.obtenerMarcas());*/
+			//System.out.println(pruebas.obtenerTalles());
+			//System.out.println(pruebas.obtenerColores());
+			//System.out.println(pruebas.obtenerTemporadas());
+			//pruebas.obtenerProductos();
+			//pruebas.obtenerGeneros2();
+			//pruebas.buscarStockArticulo(artca);
+			pruebas.obtenerStockArticulos();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public int devolverUID() {
+		final XmlRpcClient client = new XmlRpcClient();
+		final XmlRpcClientConfigImpl common_config = new XmlRpcClientConfigImpl();
+		int uid = -1;
+		try {
+			
+			// Create a trust manager that does not validate certificate chains
+				TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+	               @Override
+				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+	                   return null;
+	               }
+	               public void checkClientTrusted(X509Certificate[] certs, String authType) {
+	               }
+	               public void checkServerTrusted(X509Certificate[] certs, String authType) {
+	               }
+					@Override
+					public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
+							throws CertificateException {
+						// TODO Auto-generated method stub
+						
+					}
+					@Override
+					public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+							throws CertificateException {
+						// TODO Auto-generated method stub
+						
+					}
+				}
+				};
+
+				// Install the all-trusting trust manager
+				SSLContext sc = SSLContext.getInstance("SSL");
+				sc.init(null, trustAllCerts, new java.security.SecureRandom());
+				HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+				// 	Create all-trusting host name verifier
+				HostnameVerifier allHostsValid = new HostnameVerifier() {
+					@Override
+					public boolean verify(String hostname, SSLSession session) {
+						return true;
+					}
+				};
+
+				// Install the all-trusting host verifier
+				HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);  
+			
+			
+			common_config.setServerURL(
+				    new URL(String.format("%s/xmlrpc/2/common",url)));
+			
+			uid = (int)client.execute(
+				    common_config, "authenticate", Arrays.asList(
+				    		db, username, password, Collections.emptyList()));
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return uid;
+	}
+	
+	public boolean callMethods(int uid) throws XmlRpcException, MalformedURLException {
+		boolean retorno = false;
+		final String url = "https://laisla.quanam.com",
+	              db = "laisla",
+	        username = "usr_encuentra",
+	        password = "1234";
+		List<String> miLista = new ArrayList<String>(Arrays.asList("read"));
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		retorno = (boolean) models.execute("execute_kw", Arrays.asList(
+		    db, uid, password,
+		    "res.partner", "check_access_rights",
+		    miLista,
+		    new HashMap() {{ put("raise_exception", false); }}
+		));
+		System.out.println(retorno);
+		return retorno;
+		}
+	
+	public String obtenerGeneros() throws Exception {
+		int uid = devolverUID();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+	 @SuppressWarnings("unchecked")
+		final List<Object> arts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "product.template", "search_read",
+			    Collections.emptyList(),
+			    new HashMap() {{
+			        put("fields", Arrays.asList("sexo"));  //      "attribute_line_ids"
+			        //put("limit", 1);
+			    }}
+			)));
+	 
+	 	Gson gson = new Gson();
+		String generosJson = gson.toJson(arts);
+		System.out.println(generosJson);
+		
+		List<DatosGenericos> datos = gson.fromJson(generosJson, new TypeToken<List<DatosGenericos>>(){}.getType());
+		List<String> generosAgregados = new ArrayList<String>();
+		List<DatosGenericos> datosDevolver = new ArrayList<DatosGenericos>();
+		for (DatosGenericos dg : datos) {
+			if(!dg.getSexo().equalsIgnoreCase("null") && !dg.getSexo().equalsIgnoreCase("false") && !generosAgregados.contains(dg.getSexo())) {
+				generosAgregados.add(dg.getSexo());
+				dg.setName(dg.getSexo());
+				datosDevolver.add(dg);
+			}
+		}
+		return gson.toJson(datosDevolver);
+	}
+	
+	public void obtenerGeneros2() throws Exception {
+		int uid = devolverUID();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+	 @SuppressWarnings("unchecked")
+		final Map<String, Map<String, Object>> arts = (Map<String, Map<String, Object>>)models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "product.product", "fields_get",
+			    Arrays.asList("sexo"),
+			    new HashMap() {{
+			    	put("attributes", Arrays.asList("selection"));
+			    }}
+
+			));
+	 
+	 	Gson gson = new Gson();
+	 	String json = gson.toJson(arts.values());
+	 	
+	 	List<DataIDDescripcion> generos = new ArrayList<DataIDDescripcion>(); 
+	}
+	
+	
+	public String obtenerCategorias() throws Exception {
+		int uid = devolverUID();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+	 @SuppressWarnings("unchecked")
+	final List<Object> arts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "product.category", "search_read",
+			    Collections.emptyList(),
+			    new HashMap() {{
+			        put("fields", Arrays.asList("name"));
+			    }}
+			)));		
+	 
+	 	Gson gson = new Gson();
+		String categoriasJson = gson.toJson(arts);
+		System.out.println(categoriasJson);
+		
+		return categoriasJson;
+	}
+
+	public String obtenerMarcas() throws Exception {
+		int uid = devolverUID();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+	 @SuppressWarnings("unchecked")
+	final List<Object> arts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "product.marca", "search_read",
+			    Collections.emptyList(),
+			    new HashMap() {{
+			        put("fields", Arrays.asList("name"));
+			    }}
+			)));		
+
+	 	Gson gson = new Gson();
+		String marcasJson = gson.toJson(arts);
+		System.out.println(marcasJson);
+		
+		return marcasJson;
+	}
+	
+	public String obtenerTemporadas() throws Exception {
+		int uid = devolverUID();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+	 @SuppressWarnings("unchecked")
+	final List<Object> arts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "product.temporada", "search_read",
+			    Collections.emptyList(),
+			    new HashMap() {{
+			        put("fields", Arrays.asList("name"));
+			    }}
+			)));		
+	 
+
+	 	Gson gson = new Gson();
+		String temporadasJson = gson.toJson(arts);
+		
+		return temporadasJson;
+	}
+
+	public String obtenerAlmacenes() throws Exception {
+		int uid = devolverUID();
+		//List<Almacen> almacenes = new ArrayList<Almacen>();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+	 @SuppressWarnings("unchecked")
+	final List<Object> arts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "stock.location", "search_read",
+			    Arrays.asList(Arrays.asList(
+			            Arrays.asList("usage", "=", "internal"))),
+			    new HashMap() {{
+			        put("fields", Arrays.asList("name"));
+			    }}
+			)));		
+	 
+	 Gson gson = new Gson();
+		String almacenesJson = gson.toJson(arts);
+		System.out.println(almacenesJson);
+		return almacenesJson;
+	}
+	
+	public String obtenerTalles() throws Exception {
+		int uid = devolverUID();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+	 @SuppressWarnings("unchecked")
+	final List<Object> arts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "product.attribute.value", "search_read",
+			    Collections.emptyList(),
+			    new HashMap() {{
+			        put("fields", Arrays.asList("name", "attribute_id"));
+			    }}
+			)));		
+	 
+
+	 	Gson gson = new Gson();
+		String tallesJson = gson.toJson(arts);
+		System.out.println(tallesJson);
+		List<DatosGenericos> datos = gson.fromJson(tallesJson, new TypeToken<List<DatosGenericos>>(){}.getType());
+		List<DatosGenericos> datosDevolver = new ArrayList<DatosGenericos>();
+		for (DatosGenericos dg : datos) {
+			String atb = gson.toJson(dg.getAttribute_id());
+			System.out.println(atb);
+			if(atb.contains("\"2\",\"Talles Vestimenta\"") || atb.contains("\"3\",\"Talles Calzado\"")) {
+				datosDevolver.add(dg);
+			}
+		}
+		return gson.toJson(datosDevolver);
+	}
+	
+	public String obtenerColores() throws Exception {
+		int uid = devolverUID();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+	 @SuppressWarnings("unchecked")
+	final List<Object> arts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "product.attribute.value", "search_read",
+			    Collections.emptyList(),
+			    new HashMap() {{
+			        put("fields", Arrays.asList("name", "attribute_id"));
+			    }}
+			)));		
+	 
+
+	 	Gson gson = new Gson();
+		String coloresJson = gson.toJson(arts);
+		List<DatosGenericos> datos = gson.fromJson(coloresJson, new TypeToken<List<DatosGenericos>>(){}.getType());
+		List<DatosGenericos> datosDevolver = new ArrayList<DatosGenericos>();
+		for (DatosGenericos dg : datos) {
+			String atb = gson.toJson(dg.getAttribute_id());
+			System.out.println(atb);
+			if(atb.contains("\"1\",\"Colores\"")) {
+				datosDevolver.add(dg);
+			}
+		}
+		return gson.toJson(datosDevolver);
+	}
+	
+	public String obtenerProductos() throws Exception {  
+		int uid = devolverUID();
+		List<Articulo_Odoo> articulos = new ArrayList<Articulo_Odoo>();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		//
+	 @SuppressWarnings("unchecked")
+	final List<Object> arts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+			    db, uid, password,
+			    "product.product", "search_read",
+			    Collections.emptyList(),
+			    new HashMap() {{
+			        put("fields", Arrays.asList("name", "sexo", "temporada", "ean13", "marca", "categoria", "default_code", "talle_proveedor", "color_proveedor", "seller_ids"));  //      "attribute_line_ids"
+			        
+			    }}
+			)));		
+
+	 
+	 	List<Articulo_Odoo> datos = darDatos(arts);
+	 	Gson gson = new Gson();
+		//String articulosJson = gson.toJson(arts);
+		//System.out.println(articulosJson);
+		//List<Articulo_Odoo> datos = gson.fromJson(articulosJson, new TypeToken<List<Articulo_Odoo>>(){}.getType());
+		List<Articulo_Encuentra> datosDevolver = new ArrayList<Articulo_Encuentra>();
+		for (Articulo_Odoo art : datos) {
+			int marca = 0;
+			int seller_ids = 0;
+			int categoria = 0;
+			int temporada = 0;
+			String ean13 = "";
+			String name = "";
+			String talle_proveedor = "";
+			String sexo = "";
+			String color_proveedor = "";
+			String default_code = "";
+			if(art.getMarca().getClass() != Boolean.class) {
+				ArrayList<Object> marcaB = (ArrayList<Object>) art.getMarca();
+				if(marcaB.size() > 0) {
+					marca = (int)((double) marcaB.get(0));
+				}
+			}
+			if(art.getSeller_ids().getClass() != Boolean.class) {
+				ArrayList<Object> seller = (ArrayList<Object>) art.getSeller_ids();
+				if(seller.size() > 0) {
+				seller_ids = (int)((double) seller.get(0));
+				}
+			}
+			if(art.getCategoria().getClass() != Boolean.class) {
+				ArrayList<Object> cat = (ArrayList<Object>) art.getCategoria();
+				if(cat.size() > 0) {
+				categoria = (int)((double) cat.get(0));
+				}
+			}
+			if(art.getTemporada().getClass() != Boolean.class) {
+				ArrayList<Object>  temp = (ArrayList<Object>) art.getTemporada();
+				if(temp.size() > 0) {
+				temporada = (int)((double) temp.get(0));
+				}
+			}
+			if(art.getEan13().getClass() == String.class) {
+				ean13 = (String) art.getEan13();
+			}
+			if(art.getName().getClass() == String.class) {
+				name = (String) art.getName();
+			}
+			if(art.getTalle_proveedor().getClass() == String.class) {
+				talle_proveedor = (String) art.getTalle_proveedor();
+			}
+			if(art.getSexo().getClass() == String.class) {
+				sexo = (String) art.getSexo();
+			}
+			if(art.getColor_proveedor().getClass() == String.class) {
+				color_proveedor = (String) art.getColor_proveedor();
+			}
+			if(art.getDefault_code().getClass() == String.class) {
+				default_code = (String) art.getDefault_code();
+			}
+			
+			Articulo_Encuentra ae = new Articulo_Encuentra(name, sexo, ean13, default_code, talle_proveedor, color_proveedor, marca, categoria, temporada, seller_ids);
+			datosDevolver.add(ae);
+		}
+		return gson.toJson(datosDevolver);
+	}
+	
+	
+	private List<Articulo_Odoo> darDatos(List<Object> arts) 
+	{
+		List<Articulo_Odoo> retorno = new ArrayList<Articulo_Odoo>();
+		Gson gson = new Gson();
+	 	for (Object o : arts) 
+	 	{
+	 		try
+	 		{
+	 			HashMap<String, Arrays> coso = (HashMap<String, Arrays>)o;
+	 			
+	 			
+	 			JSONObject  jotason = new JSONObject(coso);
+	 			Articulo_Odoo aodo = null;
+	 			//System.out.println(jotason);
+	 			try
+	 			{
+	 				aodo = gson.fromJson(jotason.toString(),Articulo_Odoo.class);
+	 			}
+	 			catch (Exception e) 
+	 			{
+	 				//System.out.println(e.getMessage());
+	 				Articulo_Odoo_1 aodo1 = gson.fromJson(jotason.toString(),Articulo_Odoo_1.class);
+	 				aodo = new Articulo_Odoo(aodo1);
+
+		 			//System.out.println("#################### "+gson.toJson(aodo1));
+				}
+	 			retorno.add(aodo);
+	 			
+	 			
+	 		}
+	 		catch (Exception e) 
+	 		{
+				e.printStackTrace();
+			}
+	 		
+	 		
+		}
+	 	
+	 	return retorno;
+	}
+	
+	
+	
+
+	public void buscarStockArticulo(List<ArticuloCantidadEncuentra> articulos) throws Exception {  //HashMap<String, List<String>>
+		int uid = devolverUID();
+		HashMap<String, List<String>> stock = new HashMap<String, List<String>>();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+
+		List<ArticuloCantidadEncuentra> artCantE = new ArrayList<ArticuloCantidadEncuentra>();
+		Hashtable<String, Double> articulosLocationQty = new Hashtable<String, Double>();
+
+		Gson gson = new Gson();
+		
+		for (ArticuloCantidadEncuentra artCE : articulos) {
+			List<Object> stockArts = new ArrayList<Object>();
+			if (artCE.getIdDeposito() > 0) { 
+			stockArts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+				    db, uid, password,
+				    "stock.quant", "search_read",
+				    Arrays.asList(Arrays.asList(
+				            Arrays.asList("location_id", "=", artCE.getIdDeposito()),
+		            		Arrays.asList("product_id", "=", artCE.getIdArticulo()))),
+				    new HashMap() {{
+				    	put("fields", Arrays.asList("product_id", "qty", "location_id"));
+				    }}
+				)));
+			} else {
+
+				stockArts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+					    db, uid, password,
+					    "stock.quant", "search_read",
+					    Arrays.asList(Arrays.asList(
+			            		Arrays.asList("product_id", "=", artCE.getIdArticulo()))),
+					    
+					    new HashMap() {{
+					    	
+					    	put("fields", Arrays.asList("product_id", "qty", "location_id"));
+					    }}
+					)));
+			}
+			CrearArchivo ca = new CrearArchivo();
+			
+			String json = gson.toJson(stockArts);
+			System.out.println(json);
+			List<ArticuloCantidadOdoo> artCant = new ArrayList<ArticuloCantidadOdoo>();
+			artCant = gson.fromJson(json, new TypeToken<List<ArticuloCantidadOdoo>>(){}.getType());
+			
+			
+			for (ArticuloCantidadOdoo ac : artCant) {
+				if((double)(ac.getQty()) >= artCE.getCantidad()) {
+					String desc = ac.getProduct_id().toString();
+					String[] parts = desc.split(", ");
+					String[] parts2 = parts[1].split("]");
+					String idArticulo = parts2[0].substring(1,parts2[0].length());
+					String parts3[] = ac.getLocation_id().toString().split(",");
+					String idDeposito = parts3[0].substring(1, parts3[0].length());
+					
+					String clave = idArticulo+"#Enc#"+idDeposito;
+					
+					if(articulosLocationQty.containsKey(clave)) {
+						double qty = articulosLocationQty.get(clave);
+						articulosLocationQty.replace(clave, qty, qty += Double.parseDouble(ac.getQty().toString()));
+					} else {
+						articulosLocationQty.put(clave, Double.parseDouble(ac.getQty().toString()));
+					}
+				}
+				}
+		}
+		
+		
+		List<String> claves = new ArrayList<>(Collections.list(articulosLocationQty.keys()));
+		for (String cla : claves) {
+			String[] parts = cla.split("#Enc#");
+			ArticuloCantidadEncuentra ace = new ArticuloCantidadEncuentra(articulosLocationQty.get(cla), Integer.parseInt(parts[1]), parts[0]);
+			System.out.println(gson.toJson(ace));
+			artCantE.add(ace);
+		}
+	}
+
+	
+	public List<StockDeposito> obtenerStockArticulos() throws Exception {  //HashMap<String, List<String>>
+		int uid = devolverUID();
+		Hashtable<String, List<String>> stock = new Hashtable<String, List<String>>();
+		
+		final XmlRpcClient models = new XmlRpcClient() {{
+		    setConfig(new XmlRpcClientConfigImpl() {{
+		        setServerURL(new URL(String.format("%s/xmlrpc/2/object", url)));
+		    }});
+		}};
+		
+
+		List<StockDeposito> artCantE = new ArrayList<StockDeposito>();
+		Hashtable<String, Double> articulosLocationQty = new Hashtable<String, Double>();
+
+		Gson gson = new Gson();
+		
+		final List ids = Arrays.asList((Object[])models.execute(
+			    "execute_kw", Arrays.asList(
+			        db, uid, password,
+			        "stock.location", "search",
+			        Arrays.asList(Arrays.asList(
+			        		Arrays.asList("usage", "=", "internal"))),
+			        new HashMap() {{ }})));
+		
+			 final List<Object> stockArts = Arrays.asList((Object[])models.execute("execute_kw", Arrays.asList(
+				    db, uid, password,
+				    "stock.quant", "search_read",
+				    Arrays.asList(Arrays.asList(
+				            Arrays.asList("location_id", "in", ids))),
+				    new HashMap() {{
+				    	put("fields", Arrays.asList("product_id", "qty", "location_id"));
+				    }}
+				)));
+			
+			CrearArchivo ca = new CrearArchivo();
+			
+			String json = gson.toJson(stockArts);
+			System.out.println(json);
+			List<ArticuloCantidadOdoo> artCant = new ArrayList<ArticuloCantidadOdoo>();
+			artCant = gson.fromJson(json, new TypeToken<List<ArticuloCantidadOdoo>>(){}.getType());
+			
+			
+			for (ArticuloCantidadOdoo ac : artCant) {
+				if((Double)ac.getQty() > 0) {
+					String desc = ac.getProduct_id().toString();
+					String[] parts = desc.split(", ");
+					String[] parts2 = parts[1].split("]");
+					String idArticulo = validarIdArticuloIsla(parts2[0].substring(1,parts2[0].length()));
+					String parts3[] = ac.getLocation_id().toString().split(",");
+					String idDeposito = parts3[0].substring(1, parts3[0].length());
+					
+					String clave = idArticulo+"#Enc#"+idDeposito;
+					
+					if(articulosLocationQty.containsKey(clave)) {
+						double qty = articulosLocationQty.get(clave);
+						articulosLocationQty.replace(clave, qty, qty += Double.parseDouble(ac.getQty().toString()));
+					} else {
+						articulosLocationQty.put(clave, Double.parseDouble(ac.getQty().toString()));
+					}
+				}
+				
+				}
+		
+		
+		
+		List<String> claves = new ArrayList<>(Collections.list(articulosLocationQty.keys()));
+		for (String cla : claves) {
+			String[] parts = cla.split("#Enc#");
+			int deposito = (int)Double.parseDouble(parts[1]);
+			StockDeposito ace = new StockDeposito(deposito+"", parts[0], articulosLocationQty.get(cla));
+			System.out.println(gson.toJson(ace));
+			artCantE.add(ace);
+		}
+		return artCantE;
+	}
+	
+	
+	public String validarIdArticuloIsla(String idArticulo) {
+		String resultado = idArticulo;
+		if(idArticulo.contains("\"")) {
+			idArticulo = idArticulo.replace("\"", "\\\"");
+		}
+		if(idArticulo.contains("'")) {
+			idArticulo = idArticulo.replace("'", "\\\'");
+		}
+		return idArticulo;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public String obtenerDatos(String nombreMetodo) throws Exception {
+		
+		String[] nombresMetodos = {"almacenes", "categorias","marcas",
+				"talles","colores","temporadas","generos","productos", 
+				"stockProductos"};
+		
+		switch (nombreMetodo) {
+		case "almacenes":
+			return obtenerAlmacenes();
+			
+		case "categorias":
+			return obtenerCategorias();
+
+		case "marcas":
+			return obtenerMarcas();
+
+		case "talles":
+			return obtenerTalles();
+
+		case "colores":
+			return obtenerColores();
+
+		case "temporadas":
+			return obtenerTemporadas();
+
+		case "productos":
+			return obtenerProductos();
+
+		case "generos":
+			return obtenerGeneros();
+
+		default:
+			return "";
+		}
+	}
+	
+}

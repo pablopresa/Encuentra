@@ -1,0 +1,577 @@
+package marketPlaceIntegrations.Fenicio;
+
+import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Enumeration;
+
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.AbstractHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+
+import com.google.gson.Gson;
+import com.itextpdf.text.DocumentException;
+import com.mashape.unirest.http.Unirest;
+
+import beans.Fecha;
+
+import dataTypes.DataIDDescripcion;
+import beans.encuentra.Compras;
+import beans.encuentra.EncuentraPedido;
+import beans.encuentra.Pedido;
+import beans.encuentra.EncuentraPedidoArticulo;
+import beans.encuentra.EncuentraPedidoArticuloReq;
+import beans.encuentra.Items;
+import marketPlaceIntegrations.UpdateStateResponse;
+import marketPlaceIntegrations.marketPlace;
+import marketPlaceIntegrations.marketPlaceInterface;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+
+public class Fenicio extends marketPlace{
+	
+	//CONSTRUCTOR
+	public Fenicio() {
+		this.setIdMarketPlace(1);
+	}
+	
+	//MAPEA ESTADOS DE WS A ESTADOS FENICIO
+	public String statusMapper(String status) {
+		String estado = "";
+		try {
+			switch (status) {
+			case "preparado":
+				estado = "Listo para enviar";
+				break;
+			case "listoretirar":
+				estado = "Listo para retirar";
+				break;
+			case "despachado":
+				estado = "En camino";
+				break;
+			case "entregado":
+				estado = "Pedido entregado";
+				break;	
+
+			default:
+				estado = status;
+				break;
+			}
+		} catch (Exception e) {
+			return status;
+		}
+		return estado;
+	}
+	
+	//MAPEA ESTADOS DE ENCUENTRA AL ESTADO CORRESPONDIENTE DE FENICIO
+	public String statusMapperEncuentra_Fenicio(int status) {
+		String estado = "";
+		try {
+			switch (status) {
+			case 1:
+				estado = "preparando";
+				break;
+			case 2:
+				estado = "preparando";
+				break;
+			case 3:
+				estado = "preparado";
+				break;
+			case 5:
+				estado = "listoretirar";
+				break;
+			case 4:
+				estado = "despachado";
+				break;
+			case 6:
+				estado = "entregado";
+				break;	
+
+			default:
+				estado = "";
+				break;
+			}
+		} catch (Exception e) {
+			return "";
+		}
+		return estado;
+	}
+	
+	//PREPARA EL JSON QUE SE DEBE ENVIAR PARA CAMBIO DE ESTADO
+	public String JSONUpdateState (Long idPedido, String idEcommerce, String track, int estado) {
+		String json = "";
+			json=
+					 "     { "+
+					 "        \"id\":\""+idEcommerce+"\", "+
+					 "        \"estado\":\""+statusMapperEncuentra_Fenicio(estado)+"\", "+
+					 "     } "
+					 ;
+		
+		return json;
+	}
+	
+	//CAMBIO DE ESTADO
+	public List<UpdateStateResponse> UpdateState(String json,int canal)
+	{
+		ColectionUpdateState salida = new ColectionUpdateState();
+		try {
+			String URLbase = this.canales.get(canal).getHost();
+			
+			String funcion = "set/compras";
+			String retorno = this.callPostOKHttp(URLbase+funcion, canal, json);
+			Gson gson = new Gson();
+			salida = gson.fromJson(retorno, ColectionUpdateState.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		return salida.getCompras();
+	}
+	
+	//SINCRO PEDIDOS
+	public void sincroFenicio() {
+		Enumeration<Integer> canales = this.canales.keys();
+		while (canales.hasMoreElements()) {
+			int idCanal=canales.nextElement();
+			getPedidos(idCanal);
+		}
+	}
+	
+	//GET PEDIDOS
+	public List<EncuentraPedido> getPedidos(int canal) 
+	{					
+		int pag=1;
+        int cantidadPasadas = 20;
+        Fecha fechaQuery = new Fecha(-10, 0, 0);
+                     
+        Fecha fechaActual = new Fecha();
+        
+        List<EncuentraPedido>  pedidosR = new ArrayList<EncuentraPedido>();
+        
+        List <Compras> pedidosALL = new ArrayList<Compras>();
+        
+        boolean pri = true;
+        while (cantidadPasadas>=0) 
+        {
+         
+        	
+        	  String URLbase = this.getCanales().get(canal).getHost();
+               String funcion = "get/compras/"+pag+"/100/"+fechaQuery.darFechaAnio_Mes_Dia()+"/procesando/";
+               
+               String retorno = this.callPostOKHttp(URLbase+funcion, canal, null);
+               
+               System.out.println(retorno);
+               Gson gson = new Gson();
+               Pedido pedido =gson.fromJson(retorno,Pedido.class);
+           
+               if(pri)
+               {
+                     cantidadPasadas = (Integer.parseInt(pedido.getTotal())/100);
+                     System.out.println(pedido.getTotal()+ " son "+cantidadPasadas +" Pasadas");
+                     pri = false;
+               }
+               
+               System.out.println("quedan "+cantidadPasadas+" pasadas");
+               
+                     for (Compras c : pedido.getCompras()) 
+                     {
+                            pedidosALL.add(c);
+                     }                                
+                                  
+               cantidadPasadas--;
+               pag++;
+        }
+                                                      
+        
+        int current = 1;
+        System.out.println(pedidosALL.size()); 
+        for (Compras c : pedidosALL) 
+        {
+        	System.out.println("\r \r \r iteracion numero "+current +" de "+pedidosALL.size() );
+        	if(c.getCompra().getItems().size()!=0)
+        	{                    
+                     
+        		System.out.println(c.getCompra().getId());
+                EncuentraPedido p = new EncuentraPedido();
+                p.setDescripcion(c.getCliente().getNombre()+" "+c.getCliente().getApellido());
+                            
+                int cantidad=0;
+                Double descuento=0.0;
+                            
+                p.setTicketNumber("");
+                p.setEstado(c.getCompra().getEstado());
+                p.setUrlEtiqueta(c.getEtiqueta());
+                
+                List<EncuentraPedidoArticulo> pedidos = new ArrayList<EncuentraPedidoArticulo>();
+                     
+                p.setIdPedido(Long.parseLong(c.getCompra().getId()));
+                p.setIdFenicio(c.getCompra().getIdVenta());
+                Double importeTotal = 0.0; 
+                Double importetotalOV = 0.0;
+                            
+                if(Double.parseDouble(c.getCompra().getMontoEnvio())==Double.parseDouble(c.getCompra().getImporte()))
+                {
+                	importetotalOV = Double.parseDouble(c.getCompra().getMontoEnvio());
+                }
+                else
+                {
+                	importetotalOV = Double.parseDouble(c.getCompra().getImporte());
+                }
+                 
+                Double costoEnvio = 0.0;
+                            
+                costoEnvio = Double.parseDouble(c.getCompra().getMontoEnvio());
+                StringBuilder sb = new StringBuilder();
+                for (Items it : c.getCompra().getItems()) 
+                {
+                	Double importe = Double.parseDouble(it.getImporte());
+                	int cantidadItem = Integer.parseInt(it.getCant()); 
+                                  
+                	cantidad+=cantidadItem;
+                	EncuentraPedidoArticulo art = new EncuentraPedidoArticulo();
+                                                                                 
+                	art.setArticulo(it.getSku());
+                	art.setCantidad(cantidadItem);
+                	art.setProcesada(0);
+                	pedidos.add(art);
+                	importeTotal+=importe;
+                }
+                            
+                p.setCantidad(cantidad);
+                p.setDescuento(descuento);
+                p.setArticulosPedido(pedidos);
+                p.setSucursalPick(c.getCompra().getSucursal());
+                p.setArticulosPedidoReq(new ArrayList<EncuentraPedidoArticuloReq>());
+                p.setFormaPago(c.getCompra().getMetodoPago());
+                
+                Double porcDescuento = (descuento*100)/importeTotal;
+                if(descuento==0 && importeTotal==0)
+                {
+                	porcDescuento=0.0;
+                }
+                try
+                {
+                    p.setCanalAnaloga(Integer.parseInt(c.getCompra().getIdCanal()));
+                }
+                catch (Exception e) 
+                {
+                	p.setCanalAnaloga(0);
+                }
+                            
+                            
+                p.setUrlEtiqueta("");
+                p.setFecha(c.getCompra().getFecha());
+                p.setPrecio(importetotalOV);
+                                                                          
+                p.setCliente(c.getCliente()); 
+                pedidosR.add(p);
+                
+                           
+        	}
+               
+        }
+               
+              
+        
+        return pedidosR;
+
+		
+	}
+	
+
+	//GET ETIQUETAS
+	public String getEtiqueta(int id, int canal,int idEmpresa){
+		String url = this.canales.get(canal).getHost();
+		String funcion2 = "/get/etiqueta?idCompra="+id+"";
+		String retorno2 = callWSGET(url, funcion2,canal);
+		return retorno2;
+	}
+	
+	
+	
+	
+	//POST
+	private String callWSPOST_ParamJSON(String URLbase, String funcion, String jotason, int idCanal)
+	{
+		String usu = this.canales.get(idCanal).getUser();
+		String pass = this.canales.get(idCanal).getPass();
+		
+		String retorno = "";
+		HttpClient httpClient = new DefaultHttpClient();
+		 ((AbstractHttpClient) httpClient).getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
+				 new UsernamePasswordCredentials(usu,pass));
+	    try 
+		{
+	    	System.out.println("llamando a "+URLbase+funcion);
+	    	System.out.println("Parametros JSON "+jotason);
+	    	System.out.println("Respuesta");
+	    	HttpPost httpPostRequest = new HttpPost(URLbase+funcion);
+	    	
+	    	StringEntity params =new StringEntity(jotason);
+	    	httpPostRequest.setHeader("Content-type", "application/x-www-form-urlencoded");
+	    	
+	    	//httpPostRequest.setEntity(params);
+	    	
+	    	ArrayList<NameValuePair> postParameters;
+	    	postParameters = new ArrayList<NameValuePair>();
+	        postParameters.add(new BasicNameValuePair("compras", jotason));
+	        
+
+	        httpPostRequest.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));
+	    	
+	    	
+		  	HttpResponse httpResponse = httpClient.execute(httpPostRequest);
+		  	int code=httpResponse.getStatusLine().getStatusCode();
+		  	HttpEntity entity = httpResponse.getEntity();
+		  	
+		  	byte[] buffer = new byte[1024];
+		    
+		  	if (entity != null) 
+		  	{
+		        InputStream inputStream = entity.getContent();
+		        try 
+		        {
+		          int bytesRead = 0;
+		          BufferedInputStream bis = new BufferedInputStream(inputStream);
+		          byte[] contents = new byte[1024];
+		          String strFileContents=""; 
+		          while((bytesRead = bis.read(contents)) != -1) 
+		          { 
+		              strFileContents += new String(contents, 0, bytesRead);              
+		          }
+		          System.out.println(strFileContents);
+		          return strFileContents;
+		          
+		          
+		        }
+		        catch (RuntimeException runtimeException) 
+		        {
+		          // In case of an unexpected exception you may want to abort
+		          // the HTTP request in order to shut down the underlying
+		          // connection immediately.
+		          httpPostRequest.abort();
+		          runtimeException.printStackTrace();
+		        }
+		        finally 
+		        {
+		          // Closing the input stream will trigger connection release
+		          try 
+		          {
+		            inputStream.close();
+		          } 
+		          catch (Exception ignore) 
+		          {
+		        	  
+		          }
+		        }
+		      }
+		    } 
+	    	catch (ClientProtocolException e) 
+		    {
+		      e.printStackTrace();
+		    }
+	    	catch (IOException e) 
+	    	{
+		      // thrown by entity.getContent();
+		      e.printStackTrace();
+		    }
+	    	finally 
+	    	{
+		      httpClient.getConnectionManager().shutdown();
+		    }
+		return retorno;
+		
+	}
+	
+	//GET CLIENT
+	private static HttpClient getHttpClient(String u, String p) 
+	{
+
+	    try {
+	        //SSLContext sslContext = SSLContext.getInstance("SSL");
+
+	       
+	        //SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+	        HttpClientBuilder construct = HttpClientBuilder.create();//.setSSLSocketFactory(socketFactory); 
+	        
+	        CredentialsProvider provider = new BasicCredentialsProvider();
+			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(u, p);
+			provider.setCredentials(AuthScope.ANY, credentials);
+			
+			construct.setDefaultCredentialsProvider(provider);
+			
+
+	        HttpClient httpClient = construct.build();
+
+	        return httpClient;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return HttpClientBuilder.create().build();
+	    }
+	}
+	
+	
+	//post unirest
+	public String callPostOKHttp(String urlFuncion, int canal, String json)
+	{
+		try
+		{
+			Unirest.setTimeouts(0, 0);
+			
+			String usu = this.canales.get(canal).getUser();
+			String pass = this.canales.get(canal).getPass();
+
+	       
+	        String credencial = usu+ ":" + pass;
+	        String base64 = new String(Base64.getEncoder().encode(credencial.getBytes()));
+	        
+	        
+	        OkHttpClient client = new OkHttpClient().newBuilder()
+	        		  .build();
+	        MediaType mediaType = MediaType.parse("text/plain");
+	        String cuerpo = "";
+	        RequestBody body = null;
+	        if(json != null) {
+	        	body = new FormBody.Builder()
+	                    .add("compras", json)
+	                    .build();
+	        }
+	        else {
+	        	body = RequestBody.create(mediaType, cuerpo);
+	        }
+	        		
+	        		
+	        		Request request = new Request.Builder()
+	        		  .url(urlFuncion)
+	        		  .method("POST", body)
+	        		  .addHeader("Authorization", "Basic "+base64)
+	        		  .addHeader("Cookie", "_FNID=vk4tmp9ibqnuta0uvc7erlpa90")
+	        		  .build();
+	        		Response response = client.newCall(request).execute();
+	        
+	        		
+	        		int bytesRead = 0;
+			          BufferedInputStream bis = new BufferedInputStream(response.body().byteStream());
+			          byte[] contents = new byte[1024];
+			          String strFileContents=""; 
+			          while((bytesRead = bis.read(contents)) != -1) 
+			          { 
+			              strFileContents += new String(contents, 0, bytesRead);              
+			          }
+			          System.out.println(strFileContents);
+			          response.close();
+			          return strFileContents;
+			
+		}
+		catch (Exception e) 
+		{
+			return "";
+		}
+		
+	}
+	
+	
+	
+	//GET
+	public String callWSGET(String URLbase, String funcion, int canal)
+	{
+		String usu = this.canales.get(canal).getUser();
+		String pass = this.canales.get(canal).getPass();
+		
+		String retorno = "";
+		//HttpClient httpClient = new DefaultHttpClient();
+		
+		HttpClient httpClient = getHttpClient(usu, pass);
+		
+	    //((AbstractHttpClient) httpClient).getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),new UsernamePasswordCredentials(usu,pass));//"std_comuy", "STD#Tck_%$774$3"));
+	    try 
+		{
+	    	HttpGet httpGetRequest = new HttpGet(URLbase+funcion);
+	    	
+		  	HttpResponse httpResponse = httpClient.execute(httpGetRequest);
+		  	HttpEntity entity = httpResponse.getEntity();
+		  	
+		  	byte[] buffer = new byte[1024];
+		    
+		  	if (entity != null) 
+		  	{
+		        InputStream inputStream = entity.getContent();
+		        try 
+		        {
+		          int bytesRead = 0;
+		          BufferedInputStream bis = new BufferedInputStream(inputStream);
+		          byte[] contents = new byte[1024];
+		          String strFileContents=""; 
+		          while((bytesRead = bis.read(contents)) != -1) 
+		          { 
+		              strFileContents += new String(contents, 0, bytesRead);              
+		          }
+
+		          return strFileContents;
+		          
+		        }
+		        catch (RuntimeException runtimeException) 
+		        {
+		          // In case of an unexpected exception you may want to abort
+		          // the HTTP request in order to shut down the underlying
+		          // connection immediately.
+		          httpGetRequest.abort();
+		          runtimeException.printStackTrace();
+		        }
+		        finally 
+		        {
+		          // Closing the input stream will trigger connection release
+		          try 
+		          {
+		            inputStream.close();
+		          } 
+		          catch (Exception ignore) 
+		          {
+		        	  
+		          }
+		        }
+		      }
+		    } 
+	    	catch (ClientProtocolException e) 
+		    {
+		      e.printStackTrace();
+		    }
+	    	catch (IOException e) 
+	    	{
+		      // thrown by entity.getContent();
+		      e.printStackTrace();
+		    }
+	    	finally 
+	    	{
+		      httpClient.getConnectionManager().shutdown();
+		    }
+		return retorno;
+		
+	}
+	
+}

@@ -1,0 +1,50 @@
+package beans.encuentra;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jsonObjects.JSONProveedor;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OrdenesLineas {
+
+	private int nroLineaOrden;
+	private String idArticulo;
+	private int cantidad;
+	
+	
+	
+	
+	
+	
+	
+	public int getNroLineaOrden() {
+		return nroLineaOrden;
+	}
+	public void setNroLineaOrden(int nroLineaOrden) {
+		this.nroLineaOrden = nroLineaOrden;
+	}
+	public String getIdArticulo() {
+		return idArticulo;
+	}
+	public void setIdArticulo(String idArticulo) {
+		this.idArticulo = idArticulo;
+	}
+	public int getCantidad() {
+		return cantidad;
+	}
+	public void setCantidad(int cantidad) {
+		this.cantidad = cantidad;
+	}
+	
+	
+
+}

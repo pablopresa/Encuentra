@@ -1,0 +1,205 @@
+package ws;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import json_objects.RetornoPedido;
+import json_objects.Shipping;
+import logica.Logica;
+import logica.LogicaAPI;
+import logica.Util;
+import persistencia._EncuentraConexion;
+
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.google.gson.Gson;
+
+import Couriers.Call_WS_UES;
+import beans.Usuario;
+import beans.encuentra.ArrayOfArticulos;
+import beans.encuentra.ArrayOfMasters;
+import beans.encuentra.ArrayOfOrders;
+import beans.encuentra.Articulo;
+import beans.encuentra.Maestros;
+import beans.encuentra.Movimiento;
+
+import beans.encuentra.MovimientosC;
+import beans.encuentra.Ordenes;
+import clienteDISTRICAD.Call_WS_DISTRICAD;
+import clienteMIRTRANS.Call_WS_MIRTRANS;
+import clienteMIRTRANS.despachoMIRTRANS;
+import dataTypes.DataDescDescripcion;
+
+
+@Path("/Couriers")
+public class Couriers 
+{
+	
+	@POST
+	@Path("/MirtransShipping")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String MirtransShipping(String data,@QueryParam ("token") String a) throws IOException
+	{
+	   
+		System.out.println(data);
+		
+		String json = "";
+		despachoMIRTRANS despacho = null;
+		try
+		{
+			Usuario u = LogicaAPI.loginEncuentraAPI2(a);
+			
+			if (u.getNick() == null) 
+			{
+				System.out.println("access_token invalido");
+				json = "access_token invalido";
+			}
+			else
+			{		
+				Gson gson = new Gson();
+				Shipping shipp = gson.fromJson(data, Shipping.class);				
+				
+				if(shipp==null)
+				{
+					System.out.println("No se ha recibido ningun envio");
+					json = "No se ha recibido ningun envio";
+				}
+				else
+				{
+					Call_WS_MIRTRANS call = new Call_WS_MIRTRANS();
+					despacho = call.altaEnvio(shipp.getCliente(), shipp.getCredenciales());
+					json = gson.toJson(despacho);
+				}
+			}
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+			return json;
+	   }
+	
+	@POST
+	@Path("/DistricadShipping")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String DistricadShipping(String data,@QueryParam ("token") String a) throws IOException
+	{
+
+		System.out.println(data);
+		
+		String json = "";
+		try
+		{
+			Usuario u = LogicaAPI.loginEncuentraAPI2(a);
+			
+			if (u.getNick() == null) 
+			{
+				System.out.println("access_token invalido");
+				json = "access_token invalido";
+			}
+			else
+			{		
+				Gson gson = new Gson();
+				Shipping shipp = gson.fromJson(data, Shipping.class);				
+				
+				if(shipp==null)
+				{
+					System.out.println("No se ha recibido ningun envio");
+					json = "No se ha recibido ningun envio";
+				}
+				else
+				{
+					Call_WS_DISTRICAD call = new Call_WS_DISTRICAD();
+					DataDescDescripcion despacho = call.setEnvio(shipp.getCliente(), shipp.getCredenciales());
+					json = gson.toJson(despacho);
+				}
+			}
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+			return json;
+		
+	}
+		
+	@POST
+	@Path("/UESShipping")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String UESShipping(String data,@QueryParam ("token") String a,@QueryParam ("fecha") String fecha,
+			@QueryParam ("hora") String hora) throws IOException
+	{
+		Util ul = new Util();
+		data = ul.removerTildes(data);
+		System.out.println(data);
+		
+		String json = "";
+		try
+		{
+			Usuario u = LogicaAPI.loginEncuentraAPI2(a);
+			
+			if (u.getNick() == null) 
+			{
+				System.out.println("access_token invalido");
+				json = "access_token invalido";
+			}
+			else
+			{
+				Gson gson = new Gson();
+				Shipping shipp = gson.fromJson(data, Shipping.class);				
+				
+				if(shipp==null)
+				{
+					System.out.println("No se ha recibido ningun envio");
+					json = "No se ha recibido ningun envio";
+				}
+				else
+				{
+					Call_WS_UES call = new Call_WS_UES();
+					
+					DataDescDescripcion despacho = call.generarEtiqueta(shipp.getCredenciales().getIdCliente(), shipp.getCredenciales().getToken(), shipp.getCredenciales().getTipoEnvio() , 
+							shipp.getCliente().getNombre() + " "+shipp.getCliente().getApellido(), shipp.getCliente().getCalle() , shipp.getCliente().getNroPuerta() , 
+							shipp.getCliente().getNroApto() , shipp.getCliente().getLocalidad() ,shipp.getCliente().getDepartamento() , shipp.getCliente().getTelefono(), shipp.getCliente().getEmail(), shipp.getCliente().getObs() , shipp.getCredenciales().getPedido(), shipp.getCliente().getLatitud(), shipp.getCliente().getLongitud());
+					
+					
+					
+					json = gson.toJson(despacho);
+				}
+			}
+				
+				
+			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+			return json;
+		
+	}
+	
+}

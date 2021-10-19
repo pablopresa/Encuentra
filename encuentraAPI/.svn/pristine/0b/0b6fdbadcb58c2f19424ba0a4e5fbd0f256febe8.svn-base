@@ -1,0 +1,6 @@
+puerto=3306
+bd=encuentra_api_pruebas
+usuario=root
+password=@200SRL
+servidor=169.57.133.41
+prefijoURL=jdbc\:mysql\://
