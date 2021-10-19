@@ -1,0 +1,32 @@
+package clienteLaIsla;
+
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import clienteAPIEncuentra.Call_WS_APIENCUENTRA;
+import dataTypes.DataIDDescripcion;
+import logica.LogicaAPI;
+
+public class Tests {
+
+	String[] nombresMetodos = {"almacenes", "categorias","marcas",
+			"talles","colores","temporadas","generos","productos",
+			"stockProductos"};
+	
+	public static void main(String[] args) {
+		Call_WS_APIENCUENTRA cwa = new Call_WS_APIENCUENTRA();
+		SincroLaIsla sci = new SincroLaIsla();
+		LogicaAPI logica = new LogicaAPI();
+		String token = logica.darToken(6,66666);
+		
+		List<DataIDDescripcion> dids = sci.obtenerDatosGenericos("productos");
+		//List<DTO_Articulo> dids = sci.obtenerDatosArticulos();
+		//List<StockDeposito> dids = sci.obtenerStockArticulos();
+		Gson gson = new Gson();
+		String resultado = gson.toJson(dids);
+		CrearArchivo ca = new CrearArchivo();
+		ca.imprimirJson(resultado);
+	}
+
+}

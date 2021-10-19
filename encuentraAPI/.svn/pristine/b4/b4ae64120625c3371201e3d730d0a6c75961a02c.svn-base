@@ -1,0 +1,210 @@
+package persistencia;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import beans.api.pedidoFactura;
+import dataTypes.DataDescDescripcion;
+import dataTypes.DataIDDescripcion;
+import helper.PropertiesHelper;
+import helper.PropertiesHelperAPI;
+import logica.Util;
+
+
+
+public class MSSQL_API 
+{
+	private static Connection con = null;
+	
+	
+	
+	
+	public static void closeFullConnection(Connection con,ResultSet rs,Statement s) throws SQLException{
+		rs.close();
+		s.close();
+		con.close();
+	}
+	
+	public static List <DataDescDescripcion> darIdDescripcionSAP(String consulta) 
+	{	
+		List <DataDescDescripcion> retorno = new ArrayList<DataDescDescripcion>();
+				
+		// Create a variable for the connection string.
+		String connectionUrl="jdbc:sqlserver://10.108.0.8:1433;databaseName=STADIUM_DEV2;";
+        try {
+        	
+            // Establish the connection.
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            con = DriverManager.getConnection(connectionUrl,"sa","sqlstadium");
+            
+            //
+            	
+        		
+	  		 Statement s = con.createStatement();
+	  		
+	  		 
+	  		 	  		 
+	  		 ResultSet rs = s.executeQuery (consulta);
+	  		 
+	  		 
+	  		 while (rs.next())
+	  		   {   
+	  			 DataDescDescripcion d = new DataDescDescripcion(rs.getString(1), rs.getString(2));
+	  			 retorno.add(d);
+	  			  
+	  					
+	  		   }
+	  		
+	  	
+	  		closeFullConnection(con, rs, s);
+          
+      }
+      // Handle any errors that may have occurred.
+      catch (Exception e) {
+          e.printStackTrace();
+      }
+     
+      return retorno;
+      
+	}
+	
+	
+	private static void darConexion(int idEmpresa)
+	{
+		PropertiesHelperAPI pH = null;
+		switch (idEmpresa) 
+		{
+			case 1:
+				pH = new PropertiesHelperAPI("SQLSTADIUM");
+			break;
+			case 2:
+				pH = new PropertiesHelperAPI("SQLFORUS");
+				break;
+			case 4:
+				pH = new PropertiesHelperAPI("SQLELREY");
+			break;
+
+			default:
+			break;
+		}
+		
+		try 
+		{
+			pH.loadProperties();
+			
+			String usuario = pH.getValue("u");
+			String pass = pH.getValue("p");
+			String connectionUrl = pH.getValue("connectionUrl");
+			connectionUrl+=" sendStringParametersAsUnicode=false;";
+					        
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			con = DriverManager.getConnection(connectionUrl,usuario,pass);
+			
+		} catch (Exception e) 
+			        {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	public static List <DataIDDescripcion> darIDDescripcion(String consulta, int idEmpresa) 
+	{	
+		List <DataIDDescripcion> retorno = new ArrayList<DataIDDescripcion>();
+				
+		
+        try {
+        	
+            // Establish the connection.
+            darConexion(idEmpresa);
+            
+            //
+            	
+        		
+	  		 Statement s = con.createStatement();
+	  		
+	  		 
+	  		 	  		 
+	  		 ResultSet rs = s.executeQuery (consulta);
+	  		 
+	  		 
+	  		 while (rs.next())
+	  		   {   
+	  			 DataIDDescripcion d = new DataIDDescripcion(rs.getInt(1), rs.getString(2));
+	  			 try
+	  			 {
+	  				 d.setDescripcionB(rs.getString(4));
+	  			 }
+	  			 catch (Exception e) 
+	  			 {
+					
+	  			 }
+	  			try
+	  			 {
+	  				 d.setIdB(rs.getInt(3));
+	  			 }
+	  			 catch (Exception e) 
+	  			 {
+					
+	  			 }
+	  			 retorno.add(d);
+	  			  
+	  					
+	  		   }
+	  		
+	  	
+	  		closeFullConnection(con, rs, s);
+          
+      }
+      // Handle any errors that may have occurred.
+      catch (Exception e) {
+          e.printStackTrace();
+      }
+     
+      return retorno;
+      
+	}
+	
+	public static Hashtable<Integer,pedidoFactura> darFacturasVisual(String consulta, Hashtable<Integer,pedidoFactura> pedidos) 
+	{	
+				
+		// Create a variable for the connection string.
+		String connectionUrl="jdbc:sqlserver://200.40.45.126:1433;databaseName=VsReyEntreteDoc;";
+        try {
+        	
+            // Establish the connection.
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            con = DriverManager.getConnection(connectionUrl,"encuentra","sqlencuentra");
+            
+            Statement s = con.createStatement();
+	  		ResultSet rs = s.executeQuery (consulta);
+	  		 
+	  		 
+	  		 while (rs.next())
+	  		   {   
+	  			try {
+	  				//String base64 = rs.getString(2);
+	  				 byte[] base64b = rs.getBytes(2);
+		  			 String pdf = "";
+		  			 pdf = Util.bytesToPdf(base64b, "VCO"+rs.getInt(1));
+		  			 pedidos.get(rs.getInt(1)).setPdf(pdf);	
+				} catch (Exception e) {e.printStackTrace();}
+	  			 			
+	  		   }		
+	  		 
+	  		closeFullConnection(con, rs, s);          
+      }
+      // Handle any errors that may have occurred.
+      catch (Exception e) {
+          e.printStackTrace();
+      }
+     
+      return pedidos;
+      
+	}
+	
+
+}

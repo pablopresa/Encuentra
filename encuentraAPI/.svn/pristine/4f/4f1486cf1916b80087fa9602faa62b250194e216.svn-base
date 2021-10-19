@@ -1,0 +1,183 @@
+package aTest;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import com.itextpdf.text.pdf.ArrayBasedStringTokenizer;
+
+import beans.encuentra.Cliente;
+import beans.encuentra.Clientes;
+import beans.encuentra.EncuentraPedido;
+import beans.encuentra.EncuentraPedidoArticulo;
+import beans.encuentra.EncuentraPedidoArticuloReq;
+import clienteAPIEncuentra.Call_WS_APIENCUENTRA;
+import clienteVisualObject.OrdenVenta;
+import clienteVisualObject.OrdenVentaLinea;
+import dataTypes.DataIDDescripcion;
+import logica.LogicaAPI;
+import marketPlaceIntegrations.CanalMarketPlace;
+import marketPlaceIntegrations.Fenicio.FenicioBAS;
+
+public class ClienteBASFenicio 
+{
+ 
+	public static void main(String[] args) 
+	{
+		FenicioBAS f = new FenicioBAS();
+		
+		 Hashtable<Integer, CanalMarketPlace> canales = f.getCanales();
+		 
+		 List<CanalMarketPlace> canalesL = new ArrayList<CanalMarketPlace> (canales.values());
+		 Call_WS_APIENCUENTRA cen = new Call_WS_APIENCUENTRA();
+		 LogicaAPI logica = new LogicaAPI();
+		 String token = logica.darToken(f.getIdEmpresa());
+		 
+		 Hashtable<Integer, String> parametros = cen.darParametros(token);
+		 
+		 
+		 
+		 int idDepoOrigen = Integer.parseInt(parametros.get(4));
+		
+		 
+		 List<Cliente> clientes = new ArrayList<Cliente>();
+		 
+		 
+		 for (CanalMarketPlace canal : canalesL) 
+		 {
+			 List<EncuentraPedido> pedidos = f.getPedidos(canal.getId());
+			 
+			 for (EncuentraPedido p : pedidos) 
+			 {
+				 p.setCanalAnaloga(canal.getId());
+				 p.setCanalMercadoLibre(new DataIDDescripcion(canal.getId(),canal.getNombre()));
+				 p.setIdPedidoSTR(p.getIdPedido()+"");
+				 if(p.getSucursalPick().equals(""))
+				 {
+					 p.setIdDepositoEnvio(0);
+				 }
+				 else
+				 {
+					 try
+					 {
+						 p.setIdDepositoEnvio(Integer.parseInt(p.getSucursalPick()));
+					 }
+					 catch (Exception e) 
+					 {
+						 p.setIdDepositoEnvio(0);
+					 }
+					 
+				 }
+				 p.getCliente().setIdPedido(p.getIdPedido()+"");
+				 clientes.add(p.getCliente());
+				
+				for (EncuentraPedidoArticulo ar : p.getArticulosPedido()) 
+				{
+					String articulo=ar.getArticulo().substring(1, ar.getArticulo().length());
+					if(ar.getArticulo().startsWith("0"))
+					{
+						
+						ar.setArticulo(articulo);
+						ar.setOrigen(idDepoOrigen);
+						
+					}
+					
+					EncuentraPedidoArticuloReq are = new EncuentraPedidoArticuloReq();
+					are.setArticulo(articulo);
+					are.setCantReq(ar.getCantidad());
+					are.setDeposito(idDepoOrigen);
+					
+					
+					p.getArticulosPedidoReq().add(are);
+					
+					
+				}
+				
+				
+				for (OrdenVentaLinea ar : p.getOrden().getOrdenVentaLineas()) 
+				{
+					String articulo=ar.getIdArticulo().substring(1, ar.getIdArticulo().length());
+					if(ar.getIdArticulo().startsWith("0"))
+					{
+						
+						ar.setIdArticulo(articulo);
+						
+						
+					}
+					
+					
+					
+				}
+				
+				
+				
+				
+				
+			 }
+			 
+			 
+			
+			 
+			 /*
+			 cen.SaveCustomers(token, clientes);
+			 cen.SaveOrders(token, pedidos);
+			 cen.SaveOrdersArticulosReq(token, pedidos);
+			 
+			 */
+			 List<DataIDDescripcion> depositosDestino =cen.DarDatosPutOrders(token, 2);
+			 for (EncuentraPedido p : pedidos) 
+			 {
+				 try
+				 {
+					 boolean found = false;
+					 if(!p.getSucursalPick().equals(""))
+					 {
+						 //es pickup
+						 p.setIdDepositoEnvio(Integer.parseInt(p.getSucursalPick()));
+						 found=true;
+					 }
+					 else
+					 {
+						 
+						 
+						 
+						 for (DataIDDescripcion d : depositosDestino) 
+						 {
+							if(d.getDescripcion().equals(p.getEmpresaEnvio()))
+							{
+								p.setIdDepositoEnvio(d.getId());
+								found=true;
+								break;
+							}
+						 }
+					 }
+					 
+					 if(!found)
+					 {
+						 System.out.println("No encontre "+p.getEmpresaEnvio());
+						 p.setIdDepositoEnvio(0);
+					 }
+					 
+					 
+					 
+					 
+					 cen.updateDestinoPedido(token, p, p.getIdDepositoEnvio(), p.getMontoEnvio());
+				 }
+				 catch (Exception e) 
+				 {
+					 e.printStackTrace();
+					 cen.updateDestinoPedido(token, p, 0, p.getMontoEnvio());
+				 }
+				 
+			 }
+			 
+			 
+		}
+		 
+		 
+		 
+		 
+	}
+	
+}
+

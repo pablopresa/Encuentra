@@ -1,0 +1,120 @@
+package org.tempuri.VSServicioWeb.SWWms;
+
+public class SWWmsSoapProxy implements org.tempuri.VSServicioWeb.SWWms.SWWmsSoap {
+  private String _endpoint = null;
+  private org.tempuri.VSServicioWeb.SWWms.SWWmsSoap sWWmsSoap = null;
+  
+  public SWWmsSoapProxy() {
+    _initSWWmsSoapProxy();
+  }
+  
+  public SWWmsSoapProxy(String endpoint) {
+    _endpoint = endpoint;
+    _initSWWmsSoapProxy();
+  }
+  
+  private void _initSWWmsSoapProxy() {
+    try {
+      sWWmsSoap = (new org.tempuri.VSServicioWeb.SWWms.SWWmsLocator()).getSWWmsSoap();
+      if (sWWmsSoap != null) {
+        if (_endpoint != null)
+          ((javax.xml.rpc.Stub)sWWmsSoap)._setProperty("javax.xml.rpc.service.endpoint.address", _endpoint);
+        else
+          _endpoint = (String)((javax.xml.rpc.Stub)sWWmsSoap)._getProperty("javax.xml.rpc.service.endpoint.address");
+      }
+      
+    }
+    catch (javax.xml.rpc.ServiceException serviceException) {}
+  }
+  
+  public String getEndpoint() {
+    return _endpoint;
+  }
+  
+  public void setEndpoint(String endpoint) {
+    _endpoint = endpoint;
+    if (sWWmsSoap != null)
+      ((javax.xml.rpc.Stub)sWWmsSoap)._setProperty("javax.xml.rpc.service.endpoint.address", _endpoint);
+    
+  }
+  
+  public org.tempuri.VSServicioWeb.SWWms.SWWmsSoap getSWWmsSoap() {
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap;
+  }
+  
+  public boolean grabarArtBarra(javax.xml.rpc.holders.StringHolder mensaje, short idTienda, long nroEmpresa, java.lang.String idArticulo, java.lang.String nroBarra, boolean eliminar) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.grabarArtBarra(mensaje, idTienda, nroEmpresa, idArticulo, nroBarra, eliminar);
+  }
+  
+  public int grabarAjusteStock(javax.xml.rpc.holders.StringHolder mensaje, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, int idDeposito, java.util.Calendar fecha, java.lang.String hora, java.lang.String comentario, java.lang.String tipoAjuste, int idRazonDocumento, java.lang.String xmlDetalle) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.grabarAjusteStock(mensaje, nroUsuario, idEquipo, idTienda, nroEmpresa, idDeposito, fecha, hora, comentario, tipoAjuste, idRazonDocumento, xmlDetalle);
+  }
+  
+  public int grabarTransferencia(javax.xml.rpc.holders.StringHolder mensaje, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, short idDepOrigen, java.util.Calendar fecha, java.lang.String hora, java.lang.String comentario, short idDepDestino, int idRazonDocumento, java.lang.String xmlDetalle) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.grabarTransferencia(mensaje, nroUsuario, idEquipo, idTienda, nroEmpresa, idDepOrigen, fecha, hora, comentario, idDepDestino, idRazonDocumento, xmlDetalle);
+  }
+  
+  public boolean confirmarTransferencia(javax.xml.rpc.holders.StringHolder mensaje, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, short idDepOrigen, short idDepDestino, int numeroDoc, java.lang.String xmlDetalle) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.confirmarTransferencia(mensaje, nroUsuario, idEquipo, idTienda, nroEmpresa, idDepOrigen, idDepDestino, numeroDoc, xmlDetalle);
+  }
+  
+  public boolean confirmarTransferenciaTienda(javax.xml.rpc.holders.StringHolder mensaje, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, short idDepOrigen, short idDepDestino, int numeroDoc, java.lang.String xmlDetalle) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.confirmarTransferenciaTienda(mensaje, nroUsuario, idEquipo, idTienda, nroEmpresa, idDepOrigen, idDepDestino, numeroDoc, xmlDetalle);
+  }
+  
+  public boolean entregaPrepararyTerminar(javax.xml.rpc.holders.StringHolder mensError, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, short idDepEnt, int numeroDoc, boolean generarNuevaConDif, java.lang.String xmlDetalle, javax.xml.rpc.holders.IntHolder nroEntregaPorDif) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.entregaPrepararyTerminar(mensError, nroUsuario, idEquipo, idTienda, nroEmpresa, idDepEnt, numeroDoc, generarNuevaConDif, xmlDetalle, nroEntregaPorDif);
+  }
+  
+  public short entregaConsEstado(javax.xml.rpc.holders.StringHolder mensError, short idTienda, long nroEmpresa, short idDeposito, int numeroDoc, javax.xml.rpc.holders.StringHolder descEstado) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.entregaConsEstado(mensError, idTienda, nroEmpresa, idDeposito, numeroDoc, descEstado);
+  }
+  
+  public boolean entregaDescartar(javax.xml.rpc.holders.StringHolder mensError, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, short idDeposito, int numeroDoc) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.entregaDescartar(mensError, nroUsuario, idEquipo, idTienda, nroEmpresa, idDeposito, numeroDoc);
+  }
+  
+  public boolean entregaPreparar(javax.xml.rpc.holders.StringHolder mensError, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, short idDepEnt, int numeroDoc, boolean generarNuevaConDif, java.lang.String xmlDetalle, javax.xml.rpc.holders.IntHolder nroEntregaPorDif) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.entregaPreparar(mensError, nroUsuario, idEquipo, idTienda, nroEmpresa, idDepEnt, numeroDoc, generarNuevaConDif, xmlDetalle, nroEntregaPorDif);
+  }
+  
+  public boolean entregaTerminar(javax.xml.rpc.holders.StringHolder mensError, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, short idDepEnt, int numeroDoc) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.entregaTerminar(mensError, nroUsuario, idEquipo, idTienda, nroEmpresa, idDepEnt, numeroDoc);
+  }
+  
+  public java.lang.String grabarEntrega(javax.xml.rpc.holders.StringHolder mensError, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, short idDepOrigen, java.lang.String comentario, short idMotivo, long nroCliente, boolean separarPorDepEnt, java.util.Calendar fecPrometida, short idTransporte, java.lang.String xmlDetalle) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.grabarEntrega(mensError, nroUsuario, idEquipo, idTienda, nroEmpresa, idDepOrigen, comentario, idMotivo, nroCliente, separarPorDepEnt, fecPrometida, idTransporte, xmlDetalle);
+  }
+  
+  public int grabarRecepcion(javax.xml.rpc.holders.StringHolder mensaje, long nroUsuario, short idEquipo, short idTienda, long nroEmpresa, java.lang.String tipoAfecta, short idDepOrden, int numeroDoc, short idDepRecepcion, java.util.Calendar fechaRec, java.lang.String horaRec, java.lang.String comentario, long nroProveedor, java.lang.String serieRemito, int nroRemito, java.lang.String xmlDetalle) throws java.rmi.RemoteException{
+    if (sWWmsSoap == null)
+      _initSWWmsSoapProxy();
+    return sWWmsSoap.grabarRecepcion(mensaje, nroUsuario, idEquipo, idTienda, nroEmpresa, tipoAfecta, idDepOrden, numeroDoc, idDepRecepcion, fechaRec, horaRec, comentario, nroProveedor, serieRemito, nroRemito, xmlDetalle);
+  }
+  
+  
+}

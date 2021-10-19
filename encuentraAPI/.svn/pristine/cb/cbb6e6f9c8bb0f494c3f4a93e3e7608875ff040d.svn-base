@@ -1,0 +1,25 @@
+package json_objects;
+
+public class Shipping {
+
+	private Credenciales credenciales;
+	private Cliente cliente;
+	
+	public Credenciales getCredenciales() {
+		return credenciales;
+	}
+	public void setCredenciales(Credenciales credenciales) {
+		this.credenciales = credenciales;
+	}
+	public Cliente getCliente() {
+		return cliente;
+	}
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+	
+	public Shipping(){
+		
+	}
+	
+}

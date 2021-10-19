@@ -141,9 +141,9 @@ public class MercadoLibre extends marketPlace{
 		        Set<Long> keys = carritos.keySet();
 				for(Long key: keys) {
 				
-					List<Result> pmls = carritos.get(key);
+					List<Result> pmls = carritos.get(key+"");
 					Result pml = carritos.get(key).get(0);
-					System.out.println(pedidosIn.get(key));					
+					System.out.println(pedidosIn.get(key+""));					
 					String envio="";
 					if(pml.getId()== new Long("4108860379"))
 					{

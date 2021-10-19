@@ -1,0 +1,370 @@
+package integraciones.erp.ascher;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import beans.api.json.SendMail;
+import beans.datatypes.DTO_Articulo;
+import beans.datatypes.DataDescDescripcion;
+import beans.datatypes.DataIDDescripcion;
+import beans.datatypes.DataIDDescripcionList;
+import beans.datatypes.StockDeposito;
+import beans.encuentra.ArticuloRepoFromLoad;
+import beans.encuentra.ArticuloReposicion;
+import beans.encuentra.DepositoMayorista;
+import integraciones.erp.odoo.laIsla.SincroLaIsla;
+import integraciones.erp.visualStore.objetos.OrdenVenta;
+import integraciones.erp.visualStore.objetos.OrdenVentaLinea;
+import integraciones.wms.Call_WS_APIENCUENTRA;
+import logica.LogicaAPI;
+
+public class ClientePPG
+{
+ public static void main(String[] args) 
+ {
+	 	
+	 
+	 	
+	 	ClientePPGAux cli = new ClientePPGAux();
+	 	int idEmpresa = 5;
+	 	
+	 	
+	 	List<DataIDDescripcionList> listaFamiliasSubFamilias = cli.darFamilias();
+	 	
+	 	List<DataIDDescripcion> listaFamilias = new ArrayList<DataIDDescripcion>();
+	 	List<DataIDDescripcion> listaSubFamilias = new ArrayList<DataIDDescripcion>();
+	 	
+	 	for (DataIDDescripcionList ddl : listaFamiliasSubFamilias) 
+	 	{
+	 		listaFamilias.add(new DataIDDescripcion(ddl.getId(), ddl.getDescripcion()));
+	 		for (DataIDDescripcion dd : ddl.getLista()) 
+	 		{
+				listaSubFamilias.add(dd);
+			}
+		}
+	 	
+	 	String[] nombresMetodos = {"categorias","marcas","temporadas","generos","productos"};
+	 	//String[] nombresMetodos = {"ordenes"};
+	 	
+		
+		Call_WS_APIENCUENTRA cwa = new Call_WS_APIENCUENTRA();
+		LogicaAPI logica = new LogicaAPI();
+		List<DataIDDescripcion> datos = null;
+		List<DTO_Articulo> datosArt = null;
+		
+		String token = logica.darToken(5,5000);
+		for (String tabla : nombresMetodos) 
+		{
+			switch (tabla) {
+				case "categorias"://familias
+					
+					cwa.putMaestros(token, listaFamilias, "art_categoria");
+					break;
+
+				case "marcas":
+					datos = cli.darMarcas();
+					cwa.putMaestros(token, datos, "art_marca");
+					break;
+
+				
+				case "temporadas"://zafras
+					datos = cli.darCategorias();
+					cwa.putMaestros(token, datos, "art_temporadas");
+					break;
+
+				case "generos"://subfamilias
+					
+					cwa.putMaestros(token, listaSubFamilias, "art_genero");
+					break;
+			
+				case "productos":
+					try {
+						 
+						datosArt = cli.darArticulos();
+						cwa.putArticulos(token, datosArt);
+						List<StockDeposito> stock = new ArrayList<StockDeposito>();
+						for (DTO_Articulo a : datosArt) 
+						{
+							StockDeposito s = new StockDeposito("5",a.getIdArticulo(),a.getStock());
+							stock.add(s);
+						}
+						
+						cwa.putStk(token, stock);
+						
+					} catch (Exception e) {}
+					break;
+				case "ordenes":
+					DataDeposOrdenes depositos_ordenes = cli.darOrdenes();
+				 	int lineas_en_art = 0;
+				 	int lineas_en_reng = 0;
+					
+					
+					for (SDTPedidoEncuentra d : depositos_ordenes.getCabezales()) 
+				 	{
+				 		
+				 		if(d.getNro()==209659)
+				 		{
+				 			System.out.println("");
+				 		}
+				 		/*********ojo*********/
+
+				 		List<DataIDDescripcion> lista = new ArrayList<DataIDDescripcion>();
+				 		List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon> listaR = depositos_ordenes.getRenglones().get(d.getNro());
+				 		for (SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon a : listaR) 
+				 		{
+				 			lineas_en_reng++;
+				 			DataIDDescripcion did = new DataIDDescripcion();
+				 			did.setId(a.getId());
+				 			did.setIdB((int) Math.round(a.getCantidad()));
+							lista.add(did);
+						}
+				 		
+				 		
+					}
+				 	cwa.putDeposM(token, depositos_ordenes.getDepositos());
+				 	
+				 	
+				 	
+				 	Hashtable<Integer, String> parametrosE =cwa.darParametros(token);
+				 	int depositoCentral = Integer.parseInt(parametrosE.get(4));
+				 	
+				 	Hashtable<Integer, ArticuloRepoFromLoad> pickingDestinos = new Hashtable<Integer, ArticuloRepoFromLoad>();
+				 	Hashtable<Integer, Integer> depositos = new Hashtable<Integer, Integer>();
+				 	Hashtable<String, DataIDDescripcion> articulosEnOrden = new Hashtable<String, DataIDDescripcion>();
+				 	for (ArticuloReposicion a : depositos_ordenes.getArticulos()) 
+				 	{
+				 		lineas_en_art++;
+				 		depositos.put(a.getDestino(),a.getDestino());
+				 		if(articulosEnOrden.get(a.getSolicitud()+"-"+a.getArticulo())==null)
+				 		{
+				 			DataIDDescripcion d = new  DataIDDescripcion();
+						 	
+					 		d.setDescripcion(a.getArticulo());
+					 		d.setId(a.getVenta());
+					 		d.setIdLong(a.getSeccion());
+					 		d.setIdB(a.getSolicitud());
+					 		d.setDescripcionB(a.getNombreRegla());
+					 		
+					 		if(pickingDestinos.get(a.getSucursal())==null)
+							{
+								List<DataIDDescripcion> articulosCantidad = new ArrayList<DataIDDescripcion>();
+								articulosCantidad.add(d);
+								ArticuloRepoFromLoad ar = new ArticuloRepoFromLoad(a.getSucursal(), true, 5, depositoCentral, 3, articulosCantidad);
+								
+								pickingDestinos.put(a.getSucursal(),ar);
+							}
+					 		else
+					 		{
+					 			ArticuloRepoFromLoad ar = pickingDestinos.get(a.getSucursal());
+					 			ar.getArticulosCantidad().add(d);
+								pickingDestinos.put(a.getSucursal(),ar);
+					 		}
+					 		
+					 		articulosEnOrden.put(a.getSolicitud()+"-"+a.getArticulo(), d);
+					 		
+					 		
+					 		
+				 		}
+				 		else
+				 		{
+				 			DataIDDescripcion d = articulosEnOrden.get(a.getSolicitud()+"-"+a.getArticulo());
+				 			System.out.println(a.getArticulo() +" ya estaba");
+				 			int cant_ant = d.getId();
+					 		
+					 		d.setId(cant_ant+a.getVenta());
+					 		
+					 		if(!d.getDescripcionB().equals(a.getNombreRegla()))
+					 		{
+					 			String descripcion = d.getDescripcionB()+ "("+cant_ant+")"+ " - "+ a.getNombreRegla() +"("+a.getVenta()+")";
+					 			d.setDescripcionB(descripcion);
+					 			
+					 			
+					 		}
+				 			
+					 		ArticuloRepoFromLoad ar = pickingDestinos.get(a.getSucursal());
+				 			
+					 		for (DataIDDescripcion ac : ar.getArticulosCantidad()) 
+					 		{
+					 			if(ac.getDescripcion().equals(d.getDescripcion()))
+					 			{
+					 				ac.setId(d.getId());
+					 			}
+					 				
+							}
+					 		
+							
+					 		pickingDestinos.put(a.getSucursal(),ar);
+				 			
+							articulosEnOrden.put(a.getSolicitud()+"-"+a.getArticulo(), d);
+				 			
+				 		}
+				 		
+				 		
+				 		
+				 		
+					}
+				 	
+				 	
+				 	if(lineas_en_art==lineas_en_reng)
+				 	{
+				 		/*********ojo*********/
+				 		//cli.confirmarOrden(d.getNro(), d.getSerie(), d.getTipoDeDocumento(), lista);
+				 		//cli.accionOrden(d.getNro() , d.getSerie(), "RECIBIDO", (short)0, d.getTipoDeDocumento());
+				 		System.out.println("coincides ");
+				 	}
+				 	else
+				 	{
+				 		System.out.println("no coincide");
+				 		SendMail mail = darMailError();
+				 		SendMail [] mails = {mail};
+				 		LogicaAPI.PutMailSpooler(mails, 5);
+				 	}
+				 	
+				 	
+				 	
+				 	List<ArticuloRepoFromLoad> lista2 = new ArrayList<ArticuloRepoFromLoad>(pickingDestinos.values());
+				 	List <DataIDDescripcion> respuesta = cwa.savePickingOrder(token,lista2);
+				 	
+				 	for (DataIDDescripcion r : respuesta) 
+				 	{
+				 		
+				 		for (SDTPedidoEncuentra d : depositos_ordenes.getCabezales()) 
+					 	{
+					 	
+				 			if(d.getNro()==r.getId())
+				 			{
+				 				if(r.getDescripcion().equals("OK"))
+				 				{
+				 					List<DataIDDescripcion> lista = new ArrayList<DataIDDescripcion>();
+							 		List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon> listaR = depositos_ordenes.getRenglones().get(d.getNro());
+							 		for (SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon a : listaR) 
+							 		{
+							 			lineas_en_reng++;
+							 			DataIDDescripcion did = new DataIDDescripcion();
+							 			did.setId(a.getId());
+							 			did.setIdB((int) Math.round(a.getCantidad()));
+										lista.add(did);
+									}
+							 		
+							 		System.out.println("Confirmaria OK la orden "+d.getNro());
+							 		cli.accionOrden(d.getNro() , d.getSerie(), "RECIBIDO", (short)0, d.getTipoDeDocumento());
+							 		cli.confirmarOrden(d.getNro(), d.getSerie(), d.getTipoDeDocumento(), lista);
+							 		
+				 				}
+				 				else
+				 				{
+				 					System.out.println("no entra el pedido "+d.getNro());
+							 		SendMail mail = darMailError();
+							 		mail.setId(d.getNro()+"");
+							 		SendMail [] mails = {mail};
+							 		LogicaAPI.PutMailSpooler(mails, 5);
+				 				}
+				 			}
+				 		}
+					}
+				 	
+				 	
+				 	
+				 	
+				break;
+			}
+		}
+ }
+
+ 
+ 
+
+ 	private static SendMail darMailError() 
+ 	{
+ 		return new SendMail("SINCPPG", "gmonzon@200.com.uy", "error en sincro PPG ", "", "gmonzon@200.com.uy",null);
+ 		
+ 	}
+
+
+
+
+	public String accionOrden(int idPedido, String serie, String accion, short cantBultos,String tipoDoc) 
+	{
+			 	
+		AccionesEncuentra  serviceC = new AccionesEncuentra();
+		AccionesEncuentraSoapPort portC = serviceC.getAccionesEncuentraSoapPort();
+		AccionesEncuentraExecute careC = new AccionesEncuentraExecute();
+		SDTAccionEncuentra accE = new SDTAccionEncuentra();
+		accE.setSerie(serie);
+		accE.setNro(idPedido);
+		accE.setAccion(accion);
+		accE.setCantidadBultos(cantBultos);
+		accE.setTipoDeDocumento(tipoDoc);
+		
+		careC.setConssdtaccionencuentra(accE);
+		
+		
+		AccionesEncuentraExecuteResponse respC =  portC.execute(careC);
+		
+		String msj = respC.getConssdtaccionencuentra().getRespuestaMsg();
+		System.out.println(idPedido+" mensaje "+msj);
+			 	
+		return msj;
+			 	
+	}
+ 
+
+ 	public String confirmarOrden(int idPedido, String serie, String tipoDoc, List<DataIDDescripcion> lista) 
+	{
+		
+			 	
+		CargaPreparacionPedidoEncuentra  serviceC = new CargaPreparacionPedidoEncuentra();
+		CargaPreparacionPedidoEncuentraSoapPort portC = serviceC.getCargaPreparacionPedidoEncuentraSoapPort();
+		CargaPreparacionPedidoEncuentraExecute careC = new CargaPreparacionPedidoEncuentraExecute();
+		SDTCabezalPreparacionPedidoEncuentra accE = new SDTCabezalPreparacionPedidoEncuentra();
+		accE.setSerie(serie);
+		accE.setNro(idPedido);
+		accE.setTipoDeDocumento(tipoDoc);
+		
+		ArrayOfSDTRenglonesPreparacionPedidoEncuentraSDTRenglonPreparacionPedidoEncuentra arreglo = new ArrayOfSDTRenglonesPreparacionPedidoEncuentraSDTRenglonPreparacionPedidoEncuentra();
+		 
+		 arreglo.getSDTRenglonesPreparacionPedidoEncuentraSDTRenglonPreparacionPedidoEncuentra();
+		
+		
+		for (DataIDDescripcion di : lista) 
+		{
+			try
+			{
+				SDTRenglonesPreparacionPedidoEncuentraSDTRenglonPreparacionPedidoEncuentra r = new SDTRenglonesPreparacionPedidoEncuentraSDTRenglonPreparacionPedidoEncuentra();
+				
+				
+				r.setId((short)di.getId());
+				r.setCantidad(Double.parseDouble(di.getIdB()+""));
+				
+				arreglo.sdtRenglonesPreparacionPedidoEncuentraSDTRenglonPreparacionPedidoEncuentra.add(r);
+			}
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
+			
+		}
+		
+		
+		careC.setConssdtcabezalpreparacionpedidoencuentra(accE);
+		careC.setConssdtrenglonespreparacionpedidoencuentra(arreglo);
+		
+		
+		
+		
+		CargaPreparacionPedidoEncuentraExecuteResponse respC =  portC.execute(careC);
+		
+		String msj = respC.getConssdtcabezalpreparacionpedidoencuentra().getRespuestaMsg();
+		 
+			 
+		 
+			 	
+			 	
+		return msj;
+			 	
+	}
+ 
+}

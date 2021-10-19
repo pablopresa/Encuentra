@@ -1,4 +1,23 @@
+<<<<<<< HEAD
 /beans/
 /logica/
 /persistencia/
 /web/
+=======
+/logica/
+/properties/
+/web/
+/webservices/
+/persistencia/
+/aTest/
+/beans/
+/cliente_rest_Invoke/
+/clientesVisual_Store/
+/dataTypes/
+/eCommerce_jsonObjectsII/
+/forus/
+/helper/
+/jsonObjects/
+/main/
+/models/
+>>>>>>> 0e3b5830f6f4fc1ad17abd581948c0ab6ae60655

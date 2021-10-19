@@ -1,0 +1,105 @@
+package beans.api.json;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Shipping {
+
+	private Credenciales credenciales;
+	private Cliente cliente;
+	private Cliente Sender;
+	private int cantidadPaquetes, grandes,xGrandes,medianos, chicos,tipoShipping;
+	private String nombreRemite, mailNotificacion;
+	private String peso,volumen;
+	
+	
+	
+	public Credenciales getCredenciales() {
+		return credenciales;
+	}
+	public void setCredenciales(Credenciales credenciales) {
+		this.credenciales = credenciales;
+	}
+	public Cliente getCliente() {
+		return cliente;
+	}
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+	
+	public int getCantidadPaquetes() {
+		return cantidadPaquetes;
+	}
+	public void setCantidadPaquetes(int cantidadPaquetes) {
+		this.cantidadPaquetes = cantidadPaquetes;
+	}
+	public int getGrandes() {
+		return grandes;
+	}
+	public void setGrandes(int grandes) {
+		this.grandes = grandes;
+	}
+	public int getMedianos() {
+		return medianos;
+	}
+	public void setMedianos(int medianos) {
+		this.medianos = medianos;
+	}
+	
+	public int getChicos() {
+		return chicos;
+	}
+	public void setChicos(int chicos) {
+		this.chicos = chicos;
+	}
+	public Shipping(){
+		
+	}
+	
+	
+	public int getxGrandes() {
+		return xGrandes;
+	}
+	public void setxGrandes(int xGrandes) {
+		this.xGrandes = xGrandes;
+	}
+	public String getNombreRemite() {
+		return nombreRemite;
+	}
+	public void setNombreRemite(String nombreRemite) {
+		this.nombreRemite = nombreRemite;
+	}
+	public int getTipoShipping() {
+		return tipoShipping;
+	}
+	public void setTipoShipping(int tipoShipping) {
+		this.tipoShipping = tipoShipping;
+	}
+	public Cliente getSender() {
+		return Sender;
+	}
+	public void setSender(Cliente sender) {
+		Sender = sender;
+	}
+	public String getMailNotificacion() {
+		return mailNotificacion;
+	}
+	public void setMailNotificacion(String mailNotificacion) {
+		this.mailNotificacion = mailNotificacion;
+	}
+	public String getPeso() {
+		return peso;
+	}
+	public void setPeso(String peso) {
+		this.peso = peso;
+	}
+	public String getVolumen() {
+		return volumen;
+	}
+	public void setVolumen(String volumen) {
+		this.volumen = volumen;
+	}
+	
+	
+	
+}
