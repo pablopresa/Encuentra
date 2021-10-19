@@ -42,12 +42,12 @@ public class ClienteBASFenicio
 		 int idDepoOrigen = Integer.parseInt(parametros.get(4));
 		 
 		 List<Cliente> clientes = new ArrayList<>();
-		 int diasBusqueda = 6;
+		 int diasBusqueda = 20;
 		 
 		 for (CanalMarketPlace canal : canalesL) 
 		 {
 			 List<Ordenes> pedidosFenicio = f.getPedidosAPI(canal.getId(),diasBusqueda);
-			 List<EncuentraPedido> pedidosALL = f.getPedidos(canal.getId(),"",diasBusqueda, null, null);
+			 List<EncuentraPedido> pedidosALL = f.getPedidos(canal.getId(),"procesando",diasBusqueda, null, null);
 			 
 			 Map<String, Ordenes> ordenesF = new Hashtable<>();
 			 
@@ -78,7 +78,7 @@ public class ClienteBASFenicio
 			 
 			 for (EncuentraPedido p : pedidos) 
 			 {
-				 if(p.getIdPedido().equals(new Long("268793")))
+				 if(p.getIdPedido().equals(new Long("270850")))
 	        		{
 	        			System.out.println("F");
 	        		}
