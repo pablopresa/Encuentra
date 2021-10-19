@@ -1,0 +1,139 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+       <jsp:include page="/v3/util/menu.jsp"></jsp:include>
+            	<div class="row">
+                	<div class="col-md-12">
+                    	<h3>Conteos&nbsp;<i class="fa fa-angle-double-right" aria-hidden="true"></i>&nbsp;Lista de articulos contados</h3>   
+                        <h6> </h6>
+                    </div>
+                </div>              
+                 <!-- /. ROW  -->
+                <hr />
+                <div class="row">
+                <div class="col-md-12">
+                	<c:if test="${menError!=null}">
+                	<h5><strong>Mensaje:</strong></h5>
+                    <div class="alert alert-info">
+                    	<strong style="color: red"> ${menError}"</strong>            
+                    </div>
+                    </c:if>
+                    <!-- Advanced Tables -->
+                    <div class="card">                
+                    <div class="card-header">
+                    		<h5>
+                             Lista de articulos 
+                           </h5> 
+                        </div>
+                        <div class="card-body">
+							<div class="table-responsive">
+									<table class="display table nowrap table-striped table-hover dataTable" id="encuentra-default">
+	                                    <thead>
+	                                        <tr>
+	                                          	<th class="text-center">Articulo</th>
+											   	<th class="text-center">Descripcion</th>
+												<th class="text-center">Stock</th>
+												<th class="text-center">Conteo</th>
+												<th class="text-center">Usuario</th>
+												<th class="text-center">Fecha-Hora</th>
+												<th class="text-center">Ubicacion</th>
+											</tr>
+	                                    </thead>
+	                                    <tbody>
+											<c:forEach var="a" items="${articulosConteo}">
+												<tr >
+													<td class="text-center">${a.articulo}</td>
+													<td class="text-center">${a.descripcion}</td>
+													<c:if test="${a.stock!=a.cantidadContada}">
+													<td class="text-center" style="background-color:#ffcccc">${a.stock}</td>
+													<td class="text-center" style="background-color:#ffcccc">${a.cantidadContada}</td>
+													</c:if>
+													<c:if test="${a.stock==a.cantidadContada}">
+													<td class="text-center">${a.stock}</td>
+													<td class="text-center">${a.cantidadContada}</td>
+													</c:if>
+													<td class="text-center">${a.usuarioCuenta.descripcion}</td>
+													<td class="text-center">${a.fechaContada}</td>
+													<td class="text-center">${a.idOjo}</td>
+												</tr>
+											</c:forEach>
+										</tbody>
+										
+	                                </table>
+	                               
+								</div>
+	                          </div>
+                            
+                        </div>                    
+                      
+                    <!--End Advanced Tables -->
+                </div>
+            </div>
+                <!-- /. ROW  -->
+           
+		<script type="text/javascript">
+		
+		
+			function subm()
+			{
+				document.getElementById("altaNuevo").submit();
+			}
+			
+			function editCant(idSincro,idArticulo,origen,destino)
+			{
+				
+				var valuer = document.getElementById(idSincro+'-'+idArticulo+'-'+origen+'-'+destino).value
+				
+				var req = '<%=basePath%>/EditValueLineaRepo.do?borrar=0&idSincro='+idSincro+'&articulo='+idArticulo+'&origenID='+origen+'&destinoID='+destino+'&cant='+valuer;
+				SendAjaxPost(req)
+				//window.location.assign(req);
+			}
+		
+			
+			function deleteLinea(idSincro,idArticulo,origen,destino)
+			{
+				 if(confirm("Seguro?"))
+				 {
+					 var req = '<%=basePath%>/EditValueLineaRepo.do?borrar=1&idSincro='+idSincro+'&articulo='+idArticulo+'&origenID='+origen+'&destinoID='+destino+'&cant='+0;
+					 window.location.assign(req);
+				 }
+				
+				
+				
+			}
+			
+			
+		
+			function SendAjaxPost(request) 
+			{
+			    var xmlhttp = new XMLHttpRequest();
+			    //xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			    xmlhttp.onreadystatechange = function() {
+			        if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
+			           if (xmlhttp.status == 200) 
+			           {
+			              
+			               
+			           }
+			           else if (xmlhttp.status == 400) {
+			              alert('There was an error 400');
+			           }
+			           else {
+			               alert('Error en la actualización, cierre y abra el programa');
+			           }
+			        }
+			    };
+
+			    
+			    xmlhttp.open("POST", request, true);
+			    xmlhttp.send();
+			    req='';
+			}
+		</script>        
+		<jsp:include page="/v3/util/footer.jsp"></jsp:include>
