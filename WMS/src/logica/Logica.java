@@ -5524,7 +5524,7 @@ public class Logica
 		{
 		cone = econ.getConnection();
 		
-		return econ.darListaDataIdDescripcion("select idDeposito, Nombre from depositos where idEmpresa="+idEmpresa+" AND login=1;");
+		return econ.darListaDataIdDescripcion("select idDeposito, Nombre from depositos where idEmpresa="+idEmpresa+" order by Nombre;");
 		} 
 		catch (Exception e) 
 		{

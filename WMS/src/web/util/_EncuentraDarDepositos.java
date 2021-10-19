@@ -40,7 +40,7 @@ public class _EncuentraDarDepositos extends Action
 			
 			
 			
-			List<DataIDDescripcion>depositos = Logica.encuentraDarDepositos(idEmpresa);
+			List<DataIDDescripcion>depositos = Logica.encuentraDarDepositosConLogin(idEmpresa);
 			
 			
 			session.setAttribute("depositos", depositos);

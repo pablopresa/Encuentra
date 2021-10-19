@@ -75,7 +75,7 @@ public class _EncuentraControlUsuarios extends Action
 			request.setAttribute("p2", u.getPass());			
 			request.setAttribute("upd", true);
 			List<DataIDDescripcion> tipos = Logica.encuentraDarTiposUsuarios(idEmpresa);
-			List<DataIDDescripcion> depositos = Logica.encuentraDarDepositos(idEmpresa);
+			List<DataIDDescripcion> depositos = Logica.encuentraDarDepositosConLogin(idEmpresa);
 			session.setAttribute("tiposU", tipos);
 			session.setAttribute("depositoU", depositos);
 			return mapping.findForward("update");

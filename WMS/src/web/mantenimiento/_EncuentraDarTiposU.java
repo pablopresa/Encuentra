@@ -36,7 +36,7 @@ public class _EncuentraDarTiposU extends Action
 		}
 		
 		List<DataIDDescripcion> tipos = Logica.encuentraDarTiposUsuarios(idEmpresa);
-		List<DataIDDescripcion> deposito = Logica.encuentraDarDepositos(idEmpresa);
+		List<DataIDDescripcion> deposito = Logica.encuentraDarDepositosConLogin(idEmpresa);
 		deposito.remove(0);
 		List<DataIDDescripcion> grupos = Logica.darListaDataIdDescripcion("seg_grupos", idEmpresa);
 		grupos.remove(0);

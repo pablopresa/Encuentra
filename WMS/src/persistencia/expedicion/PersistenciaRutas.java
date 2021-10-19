@@ -177,5 +177,107 @@ public class PersistenciaRutas
 		
 	}
 	
+	
+	public void ABMDeposRuta(int idRuta, List<Integer> listaDepos, int idEmpresa,boolean ordenar) {
+		
+		String consulta = "";
+		
+		if(ordenar) {
+			for(int i = 0; i < listaDepos.size(); i++){
+				int Orden = i+1;
+				consulta += " UPDATE ruta_depositos r SET Orden = "+ Orden +" WHERE idRuta = "+ idRuta +" AND idDeposito = "+ listaDepos.get(i) +" AND r.idEmpresa = "+ idEmpresa +";";
+			}
+		}else {
+			consulta = "DELETE FROM ruta_depositos r WHERE r.idRuta = "+ idRuta +" AND r.idEmpresa = "+ idEmpresa +";";
+			
+			if(listaDepos.size() != 0) {
+				consulta += " INSERT INTO ruta_depositos (idRuta, idDeposito, Orden, idEmpresa) VALUES ";
+				
+				for(int i = 0; i < listaDepos.size(); i++){
+					int Orden = i+1;
+					consulta += " ("+ idRuta +", "+ listaDepos.get(i) +", "+ Orden +", "+ idEmpresa +")";
+					
+					if(i < listaDepos.size() - 1) {
+						consulta += ",";
+					}
+				}
+				consulta += ";";
+			}	
+		}
+		
+		boolean pude = false;	
+		PreparedStatement pstmt = null;
+		try {
+ 			pstmt = con.getConnection().prepareStatement("SET GLOBAL max_allowed_packet=1073741824; "+consulta);
+			pstmt.executeUpdate();
+			pude = true;
+			con.desconectar(null,pstmt,null);
+
+		} catch (Exception e )
+		{
+			pude = false;
+			System.out.println("persistiendo: "+consulta);
+			System.out.println("error");
+			e.printStackTrace();
+			try {
+				con.desconectar(null,pstmt,null);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+	}
+
+
+//	public List<RutaDeposito> darDeposRuta(int idEmpresa, int idRuta) {
+//		
+//		String qidruta="";
+//		if(idRuta!=0)
+//		{
+//			qidruta= " AND R.idRuta="+idRuta;
+//		}
+//		String consulta = "SELECT R.idRuta,R.Descripcion, IFNULL(RD.idDeposito,0),RD.Orden,D.Nombre \r\n"
+//				+ "FROM rutas R LEFT OUTER JOIN ruta_depositos RD ON RD.idRuta = R.idRuta AND RD.idEmpresa = R.idEmpresa \r\n"
+//				+ "LEFT OUTER JOIN depositos D ON D.idDeposito = RD.idDeposito AND D.IdEmpresa = RD.idEmpresa \r\n"
+//				+ "WHERE R.idEmpresa="+idEmpresa+" \r\n"
+//				+ qidruta
+//				+ "ORDER BY R.idRuta, RD.idDeposito";
+//
+//
+//		try (Statement s = con.getConnection().createStatement();)
+//		{
+//			ResultSet rs = s.executeQuery(consulta);
+//			Hashtable<Integer, Ruta> rutasHT = new Hashtable<Integer, Ruta>();
+//			while (rs.next()) 
+//			{
+//				int idRutaR = rs.getInt(1);
+//				
+//				if(!rutasHT.containsKey(idRutaR))
+//				{
+//					rutasHT.put(idRutaR, new Ruta(idRutaR,rs.getString(2)));
+//				}
+//					
+//				
+//				if(rs.getInt(3)!=0)
+//				{
+//					rutasHT.get(idRutaR).getDepositos().add(new RutaDeposito(rs.getInt(3), rs.getInt(4), rs.getString(5)));
+//				}
+//				
+//				
+//				
+//				
+//			}
+//			List <Ruta> lista = new ArrayList<>(rutasHT.values());
+//			con.desconectar(rs,null, s);
+//			return lista;
+//		}
+//		catch (Exception e) 
+//		{		
+//			e.printStackTrace();
+//			return new ArrayList<Ruta>();
+//		}
+//		
+//	}
+	
 
 }

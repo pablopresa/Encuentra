@@ -18,6 +18,7 @@ import org.apache.struts.action.ActionMapping;
 import beans.Usuario;
 import beans.encuentra.DepositoAdmin;
 import beans.encuentra.Ruta;
+import dataTypes.DataIDDescripcion;
 
 public class DarRutasABM extends Action 
 {
@@ -59,7 +60,7 @@ public class DarRutasABM extends Action
 		if(para.equals("-1"))
 		{
 			borrar=true;
-		}
+		}else if(para.equals("5") || para.equals("6")) {}
 		
 		rutaN.ABM(idEmpresa,borrar);
 		
@@ -67,9 +68,11 @@ public class DarRutasABM extends Action
 		
 		
 		FactoryLogica  Logica = new FactoryLogica();
+		Logica Log = new Logica();
+		List<DataIDDescripcion> depositosAll = Log.encuentraDarDepositos(idEmpresa);
 		rutas = Logica.darRutas(idEmpresa, 0);
 		
-	
+		
 		
 		
 		
@@ -79,6 +82,7 @@ public class DarRutasABM extends Action
 		
 		session.setAttribute("paraR", "0");
 		session.setAttribute("rutas", rutas);
+		session.setAttribute("deposAll", depositosAll);
 		
 		return mapping.findForward("ok");
 	

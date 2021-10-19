@@ -43,7 +43,12 @@ public class Ruta
 		pr.ABM(this.getIdRuta(),this.getDescripcion(),idEmpresa,borrar);
 	}
 	
-	
+	public void ABMDepos(int idRuta, List<Integer> listaDepos, int idEmpresa,boolean ordenar)
+	{
+		
+		PersistenciaRutas pr = new PersistenciaRutas();
+		pr.ABMDeposRuta(this.getIdRuta(), listaDepos, idEmpresa, ordenar);
+	}
 	
 
 }

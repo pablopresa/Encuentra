@@ -91,7 +91,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 												
 												<td><c:out value="${r.idRuta}"></c:out></td>
 												<td><div align="center"><c:out value="${r.descripcion}"></c:out></div></td>
-												<td><div align="center"><a href="<%=basePath%>darRutasDepos.do?id=${r.idRuta}" type="button" class="btn btn-icon btn-rounded btn-secondary"><i class="feather icon-sliders"></i></a></div></td>
+												<td>
+													<div align="center">
+														<a href="<%=basePath%>darRutasDepos.do?id=${r.idRuta}&paraQuien=5" type="button" class="btn btn-icon btn-rounded btn-secondary"><i class="feather icon-eye"></i></a>
+														<a href="<%=basePath%>editarRutasDepos.do?id=${r.idRuta}&paraQuien=6" type="button" class="btn btn-icon btn-rounded btn-secondary"><i class="feather icon-sliders"></i></a>
+													</div>
+												</td>
 												<td><div align="center"><a href="<%=basePath%>darRutas.do?paraQuien=3&id=${r.idRuta}" type="button" class="btn btn-icon btn-rounded btn-primary"><i class="feather icon-copy"> </i></a> </div></td>
 												<td><div align="center"><a href="<%=basePath%>darRutas.do?paraQuien=4&id=${r.idRuta}" type="button" class="btn btn-icon btn-rounded btn-warning"><i class="feather icon-edit"> </i></a> </div></td>
 												<td><div align="center"><a href="#"

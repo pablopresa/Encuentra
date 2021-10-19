@@ -589,6 +589,15 @@
 	  		<forward name="ok" path="/v3/expedicion/listaRutas.jsp"/>
 	  	</action>
 	  	
+	  	<action path="/darRutasDepos" type="web.expedicion.DarRutasABM">
+	  		<forward name="ok" path="/v3/expedicion/listaOrdenDepoRuta.jsp"/>
+	  	</action>
+	  	
+	  	<action path="/editarRutasDepos" type="web.expedicion.DarRutasABM">
+	  		<forward name="ok" path="/v3/expedicion/editarDepoRuta.jsp"/>
+	  	</action>
+	  	
+	  	
 	  	<action path="/darDepositosE" type="web.mantenimiento._EncuentraDarDeposCambio">
 	  		<forward name="ok" path="/v3/mantenimiento/cambiarDeposito.jsp"/>
 	  		<forward name="mob" path="/v3/handHeld/MobCambiarDeposito.jsp"/>
