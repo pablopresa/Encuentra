@@ -1,6 +1,0 @@
-<div class='input-group date' data-datetimepicker data-genuitec-lp-enabled="false" data-genuitec-file-id="wc1-207" data-genuitec-path="/encuentra/webApps/gentelella-master/gentelella-master/vendors/bootstrap-datetimepicker/test/screen-capture/t4.html">
-                    <span class="input-group-addon" data-click-target>
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                    <input type='text' class="form-control" />
-                </div>
