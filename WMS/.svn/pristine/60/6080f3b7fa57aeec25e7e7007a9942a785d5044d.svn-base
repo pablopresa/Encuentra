@@ -1,0 +1,128 @@
+package webservices;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import com.google.gson.Gson;
+import com.itextpdf.text.DocumentException;
+
+import beans.Usuario;
+import beans.encuentra.ContenedorListaClientes;
+import beans.encuentra.ContenedorListaPedidos;
+import beans.encuentra.IPrint;
+import beans.endpoints.wsResponse;
+import cliente_rest_Invoke.Call_WS_analoga;
+import dataTypes.DataArticuloEcommerceVerifR;
+import dataTypes.DataIDDescripcion;
+import eCommerce_jsonObjectsII.Cliente;
+import eCommerce_jsonObjectsII.EncuentraPedido;
+import eCommerce_jsonObjectsII.EncuentraPedidoArticulo;
+import eCommerce_jsonObjectsII.Items;
+import logica.Logica;
+import logica.Utilidades;
+
+
+
+
+@Path("/Synchronizer")
+public class Synchronizer 
+{
+	@POST
+	@Path("/putCategorys")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String putCategorys(String data,@QueryParam ("token") String a) throws IOException
+	{
+		Logica l = new Logica();	
+		Gson gson = new Gson();
+		wsResponse response = new wsResponse();
+		response.setCode("200");
+		response.setDescription("ok");
+		String json = "";		
+		
+		try {
+			Usuario u = l.loginEncuentraAPI2(a);
+			
+			if(u!=null && u.getIdEmpresa()!=0) {
+				int idEmpresa = u.getIdEmpresa();						
+				
+				//DESERIALIZO EL STRING 'DATA' A UN OBJETO
+				//EJ
+				//DataArticuloEcommerceVerifR ecommerce = gson.fromJson(data, DataArticuloEcommerceVerifR.class);
+				/*
+				 * .
+				 * .
+				 * .*/
+			}
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			response.setCode("500");
+			response.setDescription("Sucedio un error");
+		}
+		
+		json = gson.toJson(response);
+		
+		return json;
+	}	
+	
+	@POST
+	@Path("/putBrands")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String putBrand(String data,@QueryParam ("token") String a) throws IOException
+	{
+		return "";
+	}
+	
+	@POST
+	@Path("/putColors")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String putColors(String data,@QueryParam ("token") String a) throws IOException
+	{
+		return "";
+	}
+	
+	@POST
+	@Path("/putGenders")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String putGenders(String data,@QueryParam ("token") String a) throws IOException
+	{
+		return "";
+	}
+	
+	@POST
+	@Path("/putSeasons")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String putSeasons(String data,@QueryParam ("token") String a) throws IOException
+	{
+		return "";
+	}
+	
+	@POST
+	@Path("/putItems")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String putItems(String data,@QueryParam ("token") String a) throws IOException
+	{
+		//ingresar articulos
+		// art_descripcion
+		//barras
+		return "";
+	}
+
+}

@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="esl.js"></script>
+        <script src="config.js"></script>
+        <script src="lib/jquery.min.js"></script>
+    <script>"undefined"==typeof CODE_LIVE&&(!function(e){var t={nonSecure:"50866",secure:"50875"},c={nonSecure:"http://",secure:"https://"},r={nonSecure:"127.0.0.1",secure:"gapdebug.local.genuitec.com"},n="https:"===window.location.protocol?"secure":"nonSecure";script=e.createElement("script"),script.type="text/javascript",script.async=!0,script.src=c[n]+r[n]+":"+t[n]+"/codelive-assets/bundle.js",e.getElementsByTagName("head")[0].appendChild(script)}(document),CODE_LIVE=!0);</script></head>
+    <body data-genuitec-lp-enabled="false" data-genuitec-file-id="wc1-332" data-genuitec-path="/encuentra/webApps/gentelella-master/gentelella-master/vendors/echarts/test/graph-grid.html">
+        <style data-genuitec-lp-enabled="false" data-genuitec-file-id="wc1-332" data-genuitec-path="/encuentra/webApps/gentelella-master/gentelella-master/vendors/echarts/test/graph-grid.html">
+            html, body, #main {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+        </style>
+        <div id="main"></div>
+        <script>
+
+            require([
+                'echarts',
+                'echarts/component/grid',
+                'echarts/chart/graph',
+                'echarts/component/title',
+                'echarts/component/legend',
+                'echarts/component/tooltip',
+                'echarts/component/toolbox',
+                'echarts/component/dataZoomInside',
+                'zrender/vml/vml',
+
+                'theme/vintage'
+            ], function (echarts) {
+
+                var chart = echarts.init(document.getElementById('main'), 'vintage');
+
+
+                var axisData = ['周一','周二','周三','周四','周五','周六','周日'];
+                var data = axisData.map(function (item, i) {
+                    return Math.round(Math.random() * 1000 * (i + 1));
+                });
+                var links = data.map(function (item, i) {
+                    return {
+                        source: i,
+                        target: i + 1
+                    };
+                });
+                links.pop();
+                var option = {
+                    tooltip: {},
+                    xAxis: {
+                        type : 'category',
+                        boundaryGap : false,
+                        data : axisData
+                    },
+                    yAxis: {
+                        type : 'value'
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: false
+                            }
+                        }
+                    },
+                    dataZoom: {
+                        type: 'inside'
+                    },
+                    series: [
+                        {
+                            type: 'graph',
+                            layout: 'none',
+                            coordinateSystem: 'cartesian2d',
+                            symbolSize: 40,
+                            label: {
+                                normal: {
+                                    show: true
+                                }
+                            },
+                            edgeSymbol: ['circle', 'arrow'],
+                            edgeSymbolSize: [4, 10],
+                            data: data,
+                            links: links
+                        }
+                    ]
+                };
+
+                chart.setOption(option);
+            });
+        </script>
+    </body>
+</html>

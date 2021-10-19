@@ -1,0 +1,194 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+
+        <jsp:include page="/v3/util/menu.jsp"></jsp:include>
+		<link rel="stylesheet" href="<%=basePath%>v2/assets/select/chosen.css">
+		  <style type="text/css" media="all">
+		    /* fix rtl for demo */
+		    .chosen-rtl .chosen-drop { left: -9000px; }
+		  </style>
+        <!-- /. NAV SIDE  -->
+		
+            	<div class="row">
+                	<div class="col-md-12">
+                    	<h3>Conteos&nbsp;<i class="fa fa-angle-double-right" aria-hidden="true"></i>&nbsp;Lista de Conteos</h3>   
+                        <h6>Puede filtrar y seleccionar los que quiera </h6>
+                    </div>
+                </div>              
+                 <!-- /. ROW  -->
+                <hr />
+                <div class="row">
+                <div class="col-md-12">
+                	<c:if test="${menError!=null}">
+                	<h5><strong>Mensaje:</strong></h5>
+                    <div class="alert alert-info">
+                    	<strong style="color: red"> ${menError}"</strong>            
+                    </div>
+                    </c:if>
+                    <!-- Advanced Tables -->
+                    <div class="card">
+                    <div class="card-header">
+                    		<h5>Filtros para aplicar en la lista</h5>                             
+                        </div>
+                        <div class="card-body">
+                        	<form class="form-horizontal" role="form"  action="<%=basePath%>/DarConteoStore.do">
+                            	<div class="row">
+                            		<script type="text/javascript" src="<%=basePath%>v2/assets/Picker/assets/bootstrap.js"></script>
+									<script src="<%=basePath%>v2/assets/Picker/assets/moment-with-locales.js"></script>
+									<script src="<%=basePath%>v2/assets/Picker/assets/daterangepicker.js"></script>
+									<!-- fin scripts y css de picker -->
+									<div class="col-sm-6 col-lg-4">
+										<div class="form-group">
+											<label class="col-md-4 control-label" for="fini">Fecha:&nbsp;</label>
+											<div class="col-md-8">
+												<input class="form-control" type="text" name="fini" id="fini"/>
+											</div>
+											<script type="text/javascript">
+												$(function() 
+												{
+													 document.getElementById('fini').value = 'Sin Rango';
+													  $('input[name="fini"]').on('apply.daterangepicker', function(ev, picker) {
+													      $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+													  });
+													  $('input[name="fini"]').on('cancel.daterangepicker', function(ev, picker) {
+													      $(this).val('Sin Rango');
+													  });
+													  $('input[name="fini"]').daterangepicker({
+													      autoUpdateInput: false,
+													      locale: {
+													        "applyLabel": "Aplicar",
+													        "cancelLabel": "Sin Rango",
+													        "fromLabel": "Desde",
+													        "toLabel": "Hasta",
+													        "customRangeLabel": "Custom",
+													        "daysOfWeek": [
+													            "Do",
+													            "Lu",
+													            "Ma",
+													            "Mi",
+													            "Ju",
+													            "Vi",
+													            "Sa"
+													        ],
+													        "monthNames": [
+													            "Enero",
+													            "Febrero",
+													            "Marzo",
+													            "Abril",
+													            "Mayo",
+													            "Junio",
+													            "Julio",
+													            "Agosto",
+													            "Septiembre",
+													            "Octubre",
+													            "Noviembre",
+													            "Diciembre"
+													        ],
+													        "firstDay": 1
+													      }
+													  });
+													});
+		   								            document.getElementById("fini").value = "${rango}"; 
+										        </script>
+										    </div>
+										</div>
+	                            		<div class="col-sm-6 col-lg-4">
+									        <div class="form-group">
+									          <label class="col-md-4 control-label" for="deposito">Deposito:&nbsp;</label>
+									          <div class="col-md-8">
+									            <input type="text" class="form-control" name="deposito" value="${uLogeado.deposito}" readonly="readonly">
+											  </div>
+									        </div>
+									    </div>
+										<div class="col-sm-6 col-lg-4">
+										<div class="form-group">
+										<link href="<%=basePath%>v2/assets/css/bootstrap-switch.css" rel="stylesheet" />
+										<script type="text/javascript" src="<%=basePath%>/v2/assets/js/switch/bootstrap-switch.js"></script>
+										  <label class="col-md-4 control-label" for="art" class="col-md-4 control-label">Mostrar Terminados:&nbsp;</label>
+								          <div class="col-md-8">
+								          		<input type="checkbox" name="agrpTienda">
+										  </div>										
+										</div>
+									</div>
+	                            				   
+	                            		<div class="col-sm-6 col-lg-4">
+											<div class="form-group">
+												<div style="width: 1px; height: 1px; visibility: hidden;"><input type="text" name="central" value="${central}"> </div>
+												<div class="col-md-8">
+											  		<input type="submit" name="Submit"  class="btn btn-info" value="Filtrar" />
+											  	</div>											
+											</div>
+										</div>
+									</div>
+								  	<script src="<%=basePath%>v2/assets/select/chosen.jquery.js" type="text/javascript"></script>
+										<script type="text/javascript">
+									    var config = {
+									      '.chosen-select'           : {},
+									      '.chosen-select-deselect'  : {allow_single_deselect:true},
+									      '.chosen-select-no-single' : {disable_search_threshold:10},
+									      '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+									      '.chosen-select-width'     : {width:"95%"}
+									    }
+									    for (var selector in config) {
+									      $(selector).chosen(config[selector]);
+									    }
+									  </script>
+								</form>
+							</div>
+							</div>
+							<div class="card">
+                    		<div class="card-header">
+                    			<h5>
+	                             Lista de articulos a controlar, Marque los que desea
+	                             <br/>
+	                             Son :${totalSKU} articulos
+	                             <br/>
+	                             Son :${total} unidades
+	                            </h5> 
+	                        </div>
+                        <div class="card-body">
+							<div class="table-responsive">
+								
+	                            	<table class="table table-striped table-bordered table-hover" id="encuentra-default">
+	                                    <thead>
+	                                        <tr>
+	                                         	<th>Fecha</th>
+												<th>Descripcion</th>
+												<th>Articulos</th>
+												<th>Unidades</th>
+												<th>Ver Detalle</th>
+											</tr>
+	                                    </thead>
+	                                    <tbody>
+											<c:forEach var="c" items="${conteosTienda}">
+												<tr class="gradeD">
+													<td>${c.fecha}</td>
+													<td>${c.descripcion}</td>
+													<td>${c.totalArticulos}</td>
+													<td>${c.totalUnidades}</td>
+													<td><a href="<%=basePath%>verDetalleConteo.do?idConteo=${c.idConteo}">Ver Detalle</a> </td>
+												</tr>
+											</c:forEach>
+										</tbody>
+								    </table>
+	                           </div>
+	                        </div>
+                            
+                        </div>
+                    
+             
+                      
+                    <!--End Advanced Tables -->
+                </div>
+            </div>
+                <!-- /. ROW  -->
+        
+		 <c:set var="switching" value="yes" scope="request"/>
+		<jsp:include page="/v3/util/footer.jsp"></jsp:include>

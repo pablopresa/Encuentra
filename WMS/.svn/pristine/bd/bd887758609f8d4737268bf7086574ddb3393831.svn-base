@@ -1,0 +1,567 @@
+package eCommerce_jsonObjectsII;
+
+import java.sql.Connection;
+import java.util.List;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import logica.Logica;
+import dataTypes.DataIDDescripcion;
+
+import persistencia._EncuentraConexion;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EncuentraPedido 
+{
+	private int cantidad, cerrado, ml, idDepositoEnvio;
+	private String descripcion, estado,urlEtiqueta, sucursalPick, formaPago,fecha;
+	private Double descuento,precio, montoEnvio;;
+	private List <EncuentraPedidoArticulo> articulosPedido;
+	private List <EncuentraPedidoArticuloReq> articulosPedidoReq;
+	private DataIDDescripcion canalMercadoLibre;
+	private int canalAnaloga;
+	private String personaRetira;
+	private Long idPedido;
+	private String idPedidoSTR;
+	private String idEcommerce;
+	private String ticketNumber;
+	private String trackingNumber;
+	private String subpedido;
+	
+	Logica Logica = new Logica();
+	
+	
+	public String getIdEcommerce() {
+		return idEcommerce;
+	}
+	public void setIdEcommerce(String idEcommerce) {
+		this.idEcommerce = idEcommerce;
+	}
+	public String getIdPedidoSTR() {
+		return idPedidoSTR;
+	}
+	public void setIdPedidoSTR(String idPedidoSTR) {
+		this.idPedidoSTR = idPedidoSTR;
+	}
+	public String getPersonaRetira() {
+		return personaRetira;
+	}
+	public void setPersonaRetira(String personaRetira) {
+		this.personaRetira = personaRetira;
+	}
+	public int getCanalAnaloga() {
+		return canalAnaloga;
+	}
+	public void setCanalAnaloga(int canalAnaloga) {
+		this.canalAnaloga = canalAnaloga;
+	}
+	public DataIDDescripcion getCanalMercadoLibre() {
+		return canalMercadoLibre;
+	}
+	public void setCanalMercadoLibre(DataIDDescripcion canalMercadoLibre) {
+		this.canalMercadoLibre = canalMercadoLibre;
+	}
+	public int getMl() {
+		return ml;
+	}
+	public void setMl(int ml) {
+		this.ml = ml;
+	}
+	public String getSucursalPick() {
+		return sucursalPick;
+	}
+	public void setSucursalPick(String sucursalPick) {
+		this.sucursalPick = sucursalPick;
+	}
+	public Double getDescuento() {
+		return descuento;
+	}
+	public void setDescuento(Double descuento) {
+		this.descuento = descuento;
+	}
+	public List<EncuentraPedidoArticulo> getArticulosPedido() {
+		return articulosPedido;
+	}
+	public void setArticulosPedido(List<EncuentraPedidoArticulo> articulosPedido) {
+		this.articulosPedido = articulosPedido;
+	}
+	public List<EncuentraPedidoArticuloReq> getArticulosPedidoReq() {
+		return articulosPedidoReq;
+	}
+	public void setArticulosPedidoReq(
+			List<EncuentraPedidoArticuloReq> articulosPedidoReq) {
+		this.articulosPedidoReq = articulosPedidoReq;
+	}
+	public Long getIdPedido() {
+		return idPedido;
+	}
+	public void setIdPedido(Long idPedido) {
+		this.idPedido = idPedido;
+	}
+	public int getCantidad() {
+		return cantidad;
+	}
+	public void setCantidad(int cantidad) {
+		this.cantidad = cantidad;
+	}
+	public int getCerrado() {
+		return cerrado;
+	}
+	public void setCerrado(int cerrado) {
+		this.cerrado = cerrado;
+	}
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	public String getEstado() {
+		return estado;
+	}
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+	public String getUrlEtiqueta() {
+		return urlEtiqueta;
+	}
+	public void setUrlEtiqueta(String urlEtiqueta) {
+		this.urlEtiqueta = urlEtiqueta;
+	}
+	public EncuentraPedido() {
+	}
+	
+	
+	
+	public String getFormaPago() {
+		return formaPago;
+	}
+	public void setFormaPago(String formaPago) {
+		this.formaPago = formaPago;
+	}
+	
+	
+	
+	
+	
+	public Double getPrecio() {
+		return precio;
+	}
+	public void setPrecio(Double precio) {
+		this.precio = precio;
+	}
+	public Double getMontoEnvio() {
+		return montoEnvio;
+	}
+	public void setMontoEnvio(Double montoEnvio) {
+		this.montoEnvio = montoEnvio;
+	}
+	public boolean save(int idEmpresa) 
+	{
+		
+		boolean retorno = false;
+		try 
+		{
+			int idCanal = 0;
+			
+			try
+			{
+				idCanal = this.getCanalMercadoLibre().getId();
+			}
+			catch (Exception e) 
+			{
+				idCanal = this.getCanalAnaloga();
+			}
+			
+			String fe = "";
+			
+			if(this.getFecha()==null)
+			{
+				fe = "CURRENT_TIMESTAMP()";
+			}
+			else
+			{
+				fe = "'"+this.getFecha()+"'";
+			}
+			retorno = Logica.persistir("INSERT INTO `ecommerce_pedido` (`idPedido`, `descripcion`, `UnidadesTotal`, `EstadoEcommerce`, `cerrado`, `URLetiqueta`, `FormaPago`,idCanalML,idFenicio,stamptime,ticketNumber,idEmpresa,facturado,subpedido) "
+					+ "VALUES ('"+this.getIdPedido()+"', '"+this.getDescripcion().replace("'", "")+"', '"+this.getCantidad()+"', '"+this.getEstado()+"', '0', '"+this.getUrlEtiqueta()+"', '"+this.getFormaPago()+"',"+idCanal+",'"+this.getIdFenicio()+"',"+fe+",'"+this.getTicketNumber()+"',"+idEmpresa+","+this.precio+",'"+this.getSubpedido()+"');");
+			
+			if(retorno)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("INSERT INTO `articulos` (`idArticulo`, `Descripcion`, `IdTipo`,`idEmpresa`) VALUES ('"+this.getIdPedido()+"', '"+this.getDescripcion().replace("'", "")+"', 2,"+idEmpresa+")"
+						+ " on duplicate key update  Descripcion = CONCAT(Descripcion ,' ','"+this.getDescripcion().replace("'", "")+"');");
+				
+				for (EncuentraPedidoArticulo art : this.getArticulosPedido()) 
+				{
+					if(art.getVariacion()==null)
+					{
+						art.setVariacion("");
+					}
+					sb.append("INSERT INTO `ecommerce_pedido_articulos` (`idPedido`, `idArticulo`, `cantidadPedido`, `idEmpresa`,`NotaArticulo`) VALUES ('"+this.getIdPedido()+"', '"+art.getArticulo()+"', '"+art.getCantidad()+"',"+idEmpresa+",'"+art.getVariacion()+"') on duplicate key update  NotaArticulo = CONCAT(NotaArticulo ,' ','"+art.getVariacion()+"') , `cantidadPedido`=`cantidadPedido`+'"+art.getCantidad()+"';");
+					sb.append("INSERT INTO `articulos` (`idArticulo`, `Descripcion`, `IdTipo`,`idEmpresa`) VALUES ('"+this.getIdPedido()+"_"+art.getArticulo()+"', '"+this.getDescripcion().replace("'", "")+"', 2,"+idEmpresa+") on duplicate key update Descripcion ='"+this.getDescripcion().replace("'", "")+"';");
+				}
+				retorno = Logica.persistir(sb.toString());
+			}
+			else
+			{
+				System.out.println("pedido duplicado "+this.getIdPedido());
+			}
+		
+		
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			
+			return false;
+		}
+		
+		return retorno;
+		
+		
+		
+	}
+	
+	public boolean update(int idEmpresa) 
+	{
+		
+		boolean retorno = false;
+		try 
+		{
+			int idCanal = 0;
+			
+			try
+			{
+				idCanal = this.getCanalMercadoLibre().getId();
+			}
+			catch (Exception e) 
+			{
+				idCanal = this.getCanalAnaloga();
+			}
+			
+			
+			retorno = Logica.persistir("update ecommerce_pedido set UnidadesTotal ='"+this.getCantidad()+"' where idEmpresa = "+idEmpresa+" AND idpedido =" +this.getIdPedido());	
+			
+			for (EncuentraPedidoArticulo art : this.getArticulosPedido()) 
+			{
+				Logica.persistir("INSERT INTO `ecommerce_pedido_articulos` (`idPedido`, `idArticulo`, `cantidadPedido`,idEmpresa) VALUES ('"+this.getIdPedido()+"', '"+art.getArticulo()+"', '"+art.getCantidad()+"',"+idEmpresa+");");
+			}
+				
+			
+		
+		
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			
+			return false;
+		}
+		
+		return retorno;
+		
+		
+		
+	}
+	
+	
+	public int getIdDepositoEnvio() {
+		return idDepositoEnvio;
+	}
+	public void setIdDepositoEnvio(int idDepositoEnvio) {
+		this.idDepositoEnvio = idDepositoEnvio;
+	}
+	public boolean updateEtiqueta(int destino, int idEmpresa) 
+	{
+		boolean retorno = false;
+		try 
+		{
+			
+			Logica.persistir("UPDATE `ecommerce_pedido` SET `URLetiqueta`='"+this.getUrlEtiqueta()+"' WHERE idEmpresa="+idEmpresa+" AND `idPedido`="+this.getIdPedido()+";");
+			if(destino==0)
+			{
+				
+			}
+			else
+			{
+				updateDestino(destino,"",idEmpresa,0.0);
+				Logica.persistir("update ecommerce_pedido_destino set manual = 1 where  idEmpresa="+idEmpresa+" AND  idPedido="+this.getIdPedido());
+				Logica.persistir("update ecommerce_pedido_articulos_req set procesarEnPickup = 0 where idEmpresa="+idEmpresa+" AND idPedido="+this.getIdPedido());
+			}
+			
+			
+		
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			
+			return false;
+		}
+		
+		return retorno;
+		
+		
+		
+	}
+	public boolean updateDestino(int destino, String track, int idEmpresa,double costoEnvio) 
+	{
+		boolean retorno = false;
+		
+		try 
+		{
+			retorno= Logica.persistir("insert into ecommerce_pedido_destino (idPedido,idDestino,tracking,idEmpresa,CostoEnvio) values "
+					+ "("+this.getIdPedido()+","+destino+",'"+track+"',"+idEmpresa+","+costoEnvio+") "
+							+ "on duplicate key update idDestino = "+destino+", tracking='"+track+"',CostoEnvio="+costoEnvio);		
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			
+			return false;
+		}
+		
+		return retorno;
+		
+		
+		
+	}
+	
+	public boolean updateLabelShipping(int idDepositoDestino, String trackString, String url, int manual, int idEmpresa,boolean cancelarPickup, int usuario) 
+	{
+		boolean retorno = false;		
+		try 
+		{
+			_EncuentraConexion econ = new _EncuentraConexion();
+			Connection cone;
+			cone = econ.getConnection();
+			String consulta = "select * from ecommerce_pedido_destino where  idPedido = "+this.getIdPedido()+" and Cerrado = 1 and idEmpresa="+idEmpresa;			
+			if(!econ.hayReg(consulta))//es decir que no hay registros cerrados
+			{
+				retorno = true;
+			}			  
+		} 
+		catch (Exception e) 
+		{
+			return false;
+		}		
+		if(retorno)
+		{
+			try 
+			{				
+				String insert = "";	
+				insert = "INSERT INTO `ecommerce_pedido_destino` ( `idPedido`, `idDestino`,`tracking`,`manual`, `idEmpresa`) VALUES "
+						+ "('"+this.getIdPedido()+"', ' "+idDepositoDestino+"', '"+trackString+"', "+manual+", "+idEmpresa+") "
+								+ "on duplicate key update  `idDestino`="+idDepositoDestino+", `tracking`='"+trackString+"';";
+				
+				insert += "UPDATE `ecommerce_pedido` SET `URLetiqueta`='"+url+"' WHERE idEmpresa="+idEmpresa+
+						" AND `idPedido`="+this.getIdPedido()+"; ";
+				
+				if(cancelarPickup) {
+					insert += "update ecommerce_pedido_articulos_req set procesarEnPickup = 0 where idEmpresa="+idEmpresa+
+							" AND idPedido="+this.getIdPedido()+"; ";	
+				}
+				if(manual==1) {
+					String msj = "Modificacion de entrega: destino("+idDepositoDestino+") - tracking("+trackString+") - etiqueta("+url+")";
+					Logica.logPedido(this.getIdPedido(), usuario, 0, msj, 0, idEmpresa);
+				}
+				
+				if(!url.equals(""))
+					Logica.updateEcommerceEstado(this.getIdPedido(), 3, idEmpresa, usuario);
+							
+				
+				Logica.persistir(insert);
+				System.out.println("insert:"+insert);			
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				return false;
+			}
+		}
+		
+		
+		return retorno;
+		
+	}
+	
+	public boolean updateML(int idEmpresa) 
+	{
+		boolean retorno = false;
+		try 
+		{
+			Logica.persistir("UPDATE `ecommerce_pedido` SET `ML`=1 WHERE idEmpresa="+idEmpresa+" AND `idPedido`="+this.getIdPedido()+";");
+			
+		
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			
+			return false;
+		}
+		
+		return retorno;
+		
+		
+		
+	}
+	public boolean updateShipping(int idDepositoDestino, String trackString, String mailCliente, int idEmpresa) 
+	{
+		boolean retorno = false;
+		
+		try 
+		{
+			_EncuentraConexion econ = new _EncuentraConexion();
+			Connection cone;
+			cone = econ.getConnection();
+
+			String consulta = "select * from ecommerce_pedido_destino where idEmpresa="+idEmpresa+" and  idPedido = "+this.getIdPedido()+" and Cerrado = 1";
+			
+			if(!econ.hayReg(consulta))//es decir que no hay registros cerrados
+			{
+				retorno = true;
+			}
+			  
+		} 
+		catch (Exception e) 
+		{
+			return false;
+		}
+		
+		if(retorno)
+		{
+			try 
+			{
+				
+				String insert = "";
+				
+				
+				if(trackString==null)
+				{
+					insert="INSERT INTO `ecommerce_pedido_destino` (`idPedido`, `idDestino`,`mailCliente`, idEmpresa) VALUES ('"+this.getIdPedido()+"', '"+idDepositoDestino+"','"+mailCliente+"',"+idEmpresa+") on duplicate key update  `idDestino`="+idDepositoDestino+", `mailCliente`='"+mailCliente+"' ;";
+				}
+				else
+				{
+					insert="INSERT INTO `ecommerce_pedido_destino` (`idPedido`, `idDestino`,`tracking`,`mailCliente`, idEmpresa) VALUES ('"+this.getIdPedido()+"', '"+idDepositoDestino+"','"+trackString+"','"+mailCliente+"',"+idEmpresa+") on duplicate key update `mailCliente`='"+mailCliente+"', `idDestino`="+idDepositoDestino+", `tracking`='"+trackString+"' ;";
+				}
+				
+				
+				Logica.persistir(insert);
+				System.out.println("insert:"+insert);
+				
+			
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				return false;
+			}
+		}
+		
+		
+		return retorno;
+		
+	}
+	public String getIdFenicio() {
+		return idEcommerce;
+	}
+	public void setIdFenicio(String id) {
+		this.idEcommerce = id;
+	}
+	public String getFecha() {
+		return fecha;
+	}
+	public void setFecha(String fecha) {
+		this.fecha = fecha;
+	}
+	public String getTicketNumber() {
+		return ticketNumber;
+	}
+	public void setTicketNumber(String ticketNumber) {
+		this.ticketNumber = ticketNumber;
+	}
+	
+	
+	public boolean updateShipping(int idDepositoDestino, String trackString, int idEmpresa) 
+	{
+		boolean retorno = false;
+		
+		try 
+		{
+			_EncuentraConexion econ = new _EncuentraConexion();
+			Connection cone;
+			cone = econ.getConnection();
+
+			String consulta = "select * from ecommerce_pedido_destino where  idPedido = "+this.getIdPedido()+" and Cerrado = 1 and idEmpresa="+idEmpresa;
+			
+			if(!econ.hayReg(consulta))//es decir que no hay registros cerrados
+			{
+				retorno = true;
+			}
+			  
+		} 
+		catch (Exception e) 
+		{
+			return false;
+		}
+		
+		if(retorno)
+		{
+			try 
+			{
+				
+				String insert = "";
+				
+				
+				if(trackString==null)
+				{
+					insert="INSERT INTO `ecommerce_pedido_destino` (`idPedido`, `idDestino`, `idEmpresa`) VALUES ('"+this.getIdPedido()+"', '"+idDepositoDestino+"',"+idEmpresa+") on duplicate key update  `idDestino`="+idDepositoDestino+" ;";
+				}
+				else
+				{
+					insert="INSERT INTO `ecommerce_pedido_destino` ( `idPedido`, `idDestino`,`tracking`, `idEmpresa`) VALUES ('"+this.getIdPedido()+"', '"+idDepositoDestino+"','"+trackString+"',"+idEmpresa+") on duplicate key update  `idDestino`="+idDepositoDestino+", `tracking`='"+trackString+"' ;";
+				}
+				
+				
+				Logica.persistir(insert);
+				System.out.println("insert:"+insert);
+				
+			
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				return false;
+			}
+		}
+		
+		
+		return retorno;
+		
+	}
+	public String getTrackingNumber() {
+		return trackingNumber;
+	}
+	public void setTrackingNumber(String trackingNumber) {
+		this.trackingNumber = trackingNumber;
+	}
+	public String getSubpedido() 
+	{
+		if(subpedido!=null)
+		{
+			return subpedido;
+		}
+		else
+		{
+			return idPedido+"";
+		}
+	}
+	public void setSubpedido(String subpedido) {
+		this.subpedido = subpedido;
+	}
+	
+
+	
+	
+}

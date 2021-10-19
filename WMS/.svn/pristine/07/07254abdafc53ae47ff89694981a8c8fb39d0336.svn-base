@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="WMS"
+  id="myeclipse.1277512983305"
+  context-root="/WMS"
+  j2ee-spec="5.0"
+  archive="WMS.war">
+  <attributes>
+    <attribute name="webrootdir" value="/webApps" />
+  </attributes>
+</project-module>
+

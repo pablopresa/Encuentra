@@ -1,0 +1,105 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+        
+		<jsp:include page="/v3/util/menu.jsp"></jsp:include>
+
+            	<div class="row">
+                	<div class="col-md-12">
+                    	<h3>Recepción&nbsp;<i class="fa fa-angle-double-right" aria-hidden="true"></i>&nbsp;Confirmar cantidades</h3>   
+                        <h6>Seleccione la recepcion que desea controlar</h6>
+                    </div>
+                </div>              
+                 <!-- /. ROW  -->
+                <hr />
+                <div class="row">
+                <div class="col-md-12">
+                	<c:if test="${menError!=null}">
+                	<h6><strong>Mensaje:</strong></h6>
+                    <div class="alert alert-info">
+                    	<strong style="color: red"> <c:out value="${menError}"></c:out></strong>            
+                    </div>
+                    </c:if>
+                    <!-- Advanced Tables -->
+                    <div class="card">
+                        <div class="card-header">
+                        	<h5>
+                             	Recepciones con conteos finalizados
+                             </h5>	
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                            	<input id="json" type="text" value = "${recepcionesJson}" style="display: none;">
+                                <table class=" display table nowrap table-striped table-hover dataTable" id="encuentra-default">
+                                    <thead>
+                                        <tr>
+                                           <th>Proveedor</th>
+											<th>Fecha (AAAA-MM-DD)</th>
+											<th>Esperadas</th>
+											<th>Contadas</th>
+											<th>Recibidas</th>
+											<th>Seleccionar</th>
+											<c:if test="${!sf}">
+						                		<th>Recepcionar todo</th>
+						                    </c:if>											
+											<c:if test="${sf}">
+						                		<th></th>
+						                    </c:if>
+											
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    	<c:forEach var="d" items="${recepciones}">
+										<tr class="gradeD">
+											<td><div align="center"><c:out value="${d.proveedor.descripcion}"></c:out></div></td>
+											<td><div align="center"><c:out value="${d.agenda}"></c:out></div></td>
+											<td><div align="center"><c:out value="${d.cantidadEsperada}"></c:out></div></td>
+											<td><div align="center"><c:out value="${d.cantidadContada}"></c:out></div></td>
+											<td><div align="center"><c:out value="${d.cantidadRecepcionada}"></c:out></div></td>
+											<td><div align="center"><a href="<%=basePath%>DetalleArticulosRecepcion.do?idRecepcion=${d.id}&proveedorSel=${d.proveedor.id}"><input type="button"  class="btn btn-info" value="Ver Articulos"/></a></div></td>
+											<c:if test="${!sf}">
+						                		<td>
+													<c:if test="${d.cantidadContada==0 && d.cantidadRecepcionada==0}">
+													<div align="center"><a href="<%=basePath%>ConfirmarTodoRecepcion.do?idRecepcion=${d.id}"><input type="button"  class="btn btn-danger" value="Recepcionar"/></a></div>
+												</c:if>
+											</td>
+						                    </c:if>											
+											<c:if test="${sf}">
+						                		<td>
+						                				<button class="btn btn-icon btn-outline-danger" onclick="BorrarLinea(${d.id})" >
+															<span class="feather icon-slash"></span>
+														</button>
+						                			
+						                		</td>
+						                    </c:if>
+											
+										
+										</tr>
+									</c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!--End Advanced Tables -->
+                </div>
+            </div>
+        <script>
+        	
+        	function BorrarLinea(id)
+        	{
+        		if (confirm('Seguro que desea borrar esta linea?')){
+        			
+        			 window.location.assign('<%=basePath%>RecepcionesSFborrar.do?idRecepcion='+id);
+        		}
+        	}
+        </script>
+        
+		<jsp:include page="/v3/util/footer.jsp"></jsp:include>

@@ -1,0 +1,674 @@
+package cliente_rest_Invoke;
+
+import java.awt.font.LineMetrics;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.persistence.Enumerated;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
+import org.json.JSONObject;
+import org.json.XML;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.itextpdf.text.DocumentException;
+
+import beans.Fecha;
+import beans.Usuario;
+import beans.jsonEstadoMP;
+import beans.encuentra.IPrint;
+
+import cliente_rest_Invoke.Call;
+
+import dataTypes.DataArticuloEcommerceVerifR;
+import dataTypes.DataDescDescripcion;
+import dataTypes.DataEcommerce_canales_envio;
+import dataTypes.DataIDDescDescripcion;
+import dataTypes.DataIDDescripcion;
+import eCommerce_jsonObjectsII.Cliente;
+import eCommerce_jsonObjectsII.Compras;
+import eCommerce_jsonObjectsII.EncuentraPedido;
+import eCommerce_jsonObjectsII.EncuentraPedidoArticulo;
+import eCommerce_jsonObjectsII.EncuentraPedidoArticuloReq;
+import eCommerce_jsonObjectsII.Items;
+import eCommerce_jsonObjectsII.PedidoModdo;
+import eCommerce_jsonObjectsII.UESEnvio;
+import eCommerce_jsonObjectsII.VentasModdo;
+import eCommerce_jsonObjectsII.linesModdo;
+import helper.PropertiesHelper;
+import jsonObjects.Credenciales;
+import jsonObjects.DISTRIaltaEnvio;
+import jsonObjects.DISTRIenvio;
+import jsonObjects.DISTRIetiqueta;
+import jsonObjects.DISTRIlogin;
+import jsonObjects.DISTRIservicio;
+import jsonObjects.PrintObject;
+import jsonObjects.RespuestaMIR;
+import jsonObjects.SendMail;
+import jsonObjects.Shipping;
+import logica.Logica;
+import main.EcommerceProcessOrders;
+
+public class Call_WS_MODDO {	
+	
+	//String host = "http://qa-lt.moddopt.com"; /*QA*/
+	String host = "https://adminco.modalia.com/hermesCore/";
+	
+	public static void main (String[] args)
+	{
+		Logica Logica = new Logica();
+		Usuario u = Logica.loginEncuentraSinEmpresa("Encuentra", "Forus!#$");
+		
+		int idEmpresa = u.getIdEmpresa();
+		Call_WS_MODDO moddo = new Call_WS_MODDO();
+		String token = moddo.getToken(2);
+		moddo.getPedidos(token, 0, "[1,38]", idEmpresa);
+	}
+	
+	public String getToken(int idEmpresa){
+		
+		Logica Logica = new Logica();
+		String url = "login/authenticate";	/*QA*/
+		String json = "{\"userName\": \"Nviera\", \"password\": \"Nviera200!\"}";
+		String tok = "";
+		try {
+			DataIDDescripcion token = Logica.darDataIdDescripcion("SELECT TIME_TO_SEC(timediff(CURRENT_TIMESTAMP(),Obtenido)) tiempo,token FROM apitoken_cliente WHERE idCliente = 1");
+			if(token!=null)
+			{
+				if(token.getId()<3600)//una hora de vida
+				{
+					return token.getDescripcion();
+				}
+				else
+				{
+					tok = callWSPOST_ParamJSON(host,url, json,"");
+					Logica.persistir("UPDATE apitoken_cliente SET token='"+tok+"' WHERE IdEmpresa="+idEmpresa+" and  `idCliente`=1;");
+					return tok;
+				}
+			}
+			else
+			{
+				tok = callWSPOST_ParamJSON(host,url, json,"");
+				Logica.persistir("UPDATE apitoken_cliente SET token='"+token+"' WHERE IdEmpresa="+idEmpresa+" and `idCliente`=1;");
+				return tok;
+			}
+			
+			
+		} catch (Exception e) {
+			return tok;
+		}
+		
+		
+	}
+	
+	public void getPedidos(String tok, int dias,String jsonEstados, int idEmpresa){
+		
+		try {
+			Fecha startDate = new Fecha(-dias,0,0);
+			Fecha endDate = new Fecha(0,0,0);
+			Gson gson = new Gson();
+			String funcion = "rest/orders/idSite/336/startDate/"+startDate.darFechaAnio_Mes_Dia()+
+					"T00:00:00Z/endDate/"+endDate.darFechaAnio_Mes_Dia()+"T23:59:59Z";	
+			List<String> parameters = new ArrayList<String>();
+			parameters.add("");
+			List<String> values = new ArrayList<String>();
+			values.add(jsonEstados);
+			String salida =  callWSGET(host, funcion, parameters, values, tok);
+			List<PedidoModdo> ventas = gson.fromJson(salida, new TypeToken<List<PedidoModdo>>(){}.getType()); 
+			
+			Fecha fechaActual = new Fecha();
+			
+			Logica Logica = new Logica();	
+			List<DataIDDescripcion> couriers = Logica.darListaDataIdDescripcionMYSQLConsulta("select id,idModdo from couriers where idEmpresa="+idEmpresa);
+			List<DataIDDescripcion> pedido9000 = new ArrayList<DataIDDescripcion>();
+						
+			Hashtable<String, Hashtable<String, EncuentraPedidoArticulo>> subpedidos = null;
+			Hashtable<String, EncuentraPedidoArticulo> lineas = null;
+			
+			for(PedidoModdo v:ventas){
+				
+				Double importeTotal = 0.0; 
+				Double importetotalOV = 0.0;
+				Double descuento=0.0;
+				Double costoEnvio = 0.0;
+				Double porcDescuento = 0.0;
+				int cantidad=0;				
+						
+				System.out.println(v.getOrderNumber());
+				
+				EncuentraPedido p = new EncuentraPedido();						//DATOS DE LA VENTA
+				String fechaPedido = v.getDateIso().replace("T", " ");
+				p.setUrlEtiqueta("");
+				p.setFecha(fechaPedido.substring(0,fechaPedido.length()-5));
+				p.setDescripcion(v.getInvoiceData().getName()+" "+v.getInvoiceData().getSurnames());				
+				p.setEstado("preparando");					
+				p.setIdFenicio(v.getOrderNumber());
+				p.setTicketNumber(v.getTicketNumber());				
+				p.setCantidad(cantidad);				
+				p.setFormaPago(v.getPaymentType());
+				p.setCanalAnaloga(8);					
+				costoEnvio = (double) v.getShippingCost();
+				
+				
+				
+				//SEPARO SUBPEDIDOS
+				subpedidos = new Hashtable<String, Hashtable<String,EncuentraPedidoArticulo>>();	
+				for ( linesModdo it: v.getLines()) 
+				{					
+					Double importe = (double) it.getAmount();
+					int cantidadItem =  1; 					
+					EncuentraPedidoArticulo art = new EncuentraPedidoArticulo();
+					
+					art.setArticulo(it.getEan());
+					art.setCantidad(cantidadItem);
+					art.setProcesada(0);
+					art.setImporte(importe);
+					art.setOrigen(Integer.parseInt(it.getStoreId()));
+					if(it.getTrackingNumber()!= null) 
+						{art.setSubTracking(it.getTrackingNumber());}
+					
+					if(subpedidos.get(it.getSubOrderNumber()) == null) {
+						lineas = new Hashtable<String, EncuentraPedidoArticulo>();
+						lineas.put(it.getEan(), art);
+						subpedidos.put(it.getSubOrderNumber(), lineas);
+					}else {
+						if(subpedidos.get(it.getSubOrderNumber()).get(it.getEan()) == null) {
+							subpedidos.get(it.getSubOrderNumber()).put(it.getEan(), art);
+						}else {
+							EncuentraPedidoArticulo artE = new EncuentraPedidoArticulo();
+							artE = subpedidos.get(it.getSubOrderNumber()).get(it.getEan());
+							artE.setCantidad(art.getCantidad()+1);
+							artE.setImporte(art.getImporte()+importe);
+							subpedidos.get(it.getSubOrderNumber()).put(it.getEan(), artE);
+						}
+					}											
+					//setPedidoSincronizado(tok, it.getIdSiteProducto()+"", it.getStoreId(), v.getOriginalOrderNumber());					
+				}
+				
+				//CREO TANTOS PEDIDOS COMO SUBPEDIDOS TENGO
+				 Enumeration<String> keys = subpedidos.keys();
+				 while (keys.hasMoreElements()) {
+					 int idPedido = Logica.darSeries("insert into utilseries (IdTipo,IdEmpresa) values ('MODDO',"+idEmpresa+")").get(0);
+					 p.setIdPedido(new Long(idPedido+""));
+					 String subPedido = keys.nextElement();
+					 p.setSubpedido(subPedido);
+					 
+					 Logica.logPedido(p.getIdPedido(), 0, 0, "comienzo sinconizacion",0,idEmpresa);
+						
+					Logica.logger(0, 100, "desempaquetando pedido WEB "+p.getIdPedido(),idEmpresa);
+									
+					if(costoEnvio>0.0)
+					{
+						Logica.logPedido(p.getIdPedido(), 0, 0, "Agregando costo de envio "+costoEnvio,0,idEmpresa);
+					}
+								
+					List<EncuentraPedidoArticulo> articulos = new ArrayList<EncuentraPedidoArticulo>(subpedidos.get(subPedido).values());
+					for(EncuentraPedidoArticulo it: articulos){
+						Logica.logPedido(p.getIdPedido(), 0, 0, "Agregando linea articulo "+it.getArticulo(),0,idEmpresa);	
+						cantidad+=it.getCantidad();
+						importeTotal+=it.getImporte();
+					}	
+					importetotalOV = (double) v.getAmount();
+					porcDescuento = (descuento*100)/importeTotal;
+					if(descuento==0 && importeTotal==0){
+						porcDescuento=0.0;
+					}
+					p.setDescuento(descuento);
+					p.setPrecio(importetotalOV);
+					p.setCantidad(cantidad);
+					
+					p.setArticulosPedido(articulos);				
+					p.setArticulosPedidoReq(new ArrayList<EncuentraPedidoArticuloReq>());
+					
+					if(p.save(idEmpresa))
+					{
+						Logica.logPedido(p.getIdPedido(), 0, 0, "Pedido Sincronizado ",0,idEmpresa);	
+						int doc = 0;
+						try {
+							doc = Integer.parseInt(v.getInvoiceData().getCustomerDocument());
+						} catch (Exception e) {
+							// TODO: handle exception
+						}						
+						Logica.logPedido(p.getIdPedido(), 0, 0, "Marcando el pedido en estado preparando ",0,idEmpresa);
+						//UpdateState
+								
+						//DESTINO
+						p.setSucursalPick("");
+						for(DataIDDescripcion c:couriers){
+							String opp = (int)v.getIdOperator() + "";
+							if(c.getDescripcion().equals(opp)){
+								p.setSucursalPick(String.valueOf(c.getId()));
+								break;
+							}
+						}
+						System.out.println("SETEANDO DESTINO");
+						System.out.println("----------------");
+						String url = "";	
+						String tracking = "";
+						
+						//SOLO GENERAMOS ETIQUETAS PARA LOS PEDIDOS QUE SALEN DE CENTRAL
+						if(p.getArticulosPedido().get(0).getOrigen()==9000) {
+							if(!v.getShippingType().equals("C")){	//pickup
+								/*DataArticuloEcommerceVerifR articuloR = new DataArticuloEcommerceVerifR(p.getIdPedido(), 0, p.getCantidad(), "", p.getDescripcion(), "", Integer.parseInt(p.getSucursalPick()));
+								articuloR.setFecha(fechaActual.darFechaAnio_Mes_Dia());
+								//GENERO ETIQUETA PICKUP
+								try 
+								{
+									DataIDDescripcion env = Logica.darEnvioPedido(articuloR.getIdPedido(),idEmpresa);
+									url = IPrint.ImprimirEtiquetasNuevas(articuloR,idEmpresa,env,"CD 9000"," Av. Italia 4346   								   						    Tel.:2613 7566 		  Montevideo-Uruguay",1,true,"","");
+									tracking = p.getIdPedido()+"";
+								} catch (FileNotFoundException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (DocumentException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}*/							
+							}
+							else{	//COURIER
+								DataDescDescripcion eti = setEtiqueta(p.getIdPedido(), Integer.parseInt(p.getSucursalPick()), p.getCanalAnaloga(), idEmpresa);								
+								
+								if(!eti.getDescripcion().equals("")){								
+									url = eti.getDescripcion();
+									tracking = eti.getId();
+								}
+							}
+						}
+						
+						try {
+							if(tracking.equals("") && p.getArticulosPedido().get(0).getSubTracking()!= null) {
+								tracking = p.getArticulosPedido().get(0).getSubTracking();
+							}
+						} catch (Exception e) {
+							// TODO: handle exception
+						}							
+						
+						p.setUrlEtiqueta(url);
+						p.updateEtiqueta(0,idEmpresa);
+						p.updateShipping(Integer.parseInt(p.getSucursalPick()), tracking,"",idEmpresa);
+						
+						
+						Logica.logPedido(p.getIdPedido(), 0, 0, "grabando Orden para importar",0,idEmpresa);
+											
+						//GUARDO A QUE DEPOSITOS SE VAN A PEDIR LOS ARTICULOS
+						
+						DataIDDescripcion data;
+						for (EncuentraPedidoArticulo it : articulos){
+							data = new DataIDDescripcion(it.getCantidad(),it.getArticulo());
+							data.setIdLong(p.getIdPedido());
+							data.setIdB(0);
+							pedido9000.add(data);						
+							
+							Logica.persistir("INSERT INTO `ecommerce_pedido_articulos_req` (`idPedido`, `idArticulo`, `Deposito`, `CantidadRequerida`,"+
+									" `CantidadProcesasa`, `Confirmado`,cantConfirmada,docVisual, idEmpresa) " +
+									" VALUES ('"+p.getIdPedido()+"', '"+it.getArticulo()+"', '"+it.getOrigen()+"', '"+it.getCantidad()+"', '0', '0',0,"+0+","+idEmpresa+");");
+						
+							
+							Logica.logPedido(p.getIdPedido(), 0, 0, " Guardando pedido de articulo "+it.getArticulo()+
+									" a deposito "+it.getOrigen(),0,idEmpresa);							
+							
+							
+						}
+						//UpdateState(p.getSubpedido(), "", 2, p.getTicketNumber(), (int)v.getIdOperator(), "", tok);	//CAMBIO ESTADO DE SUBPEDIDO
+					}
+					//UpdateState(p.getIdFenicio(), "", 2, p.getTicketNumber(), (int)v.getIdOperator(), "", tok); //CAMBIO ESTADO DEL PEDIDO
+				 }				 	
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void setPedidoSincronizado(String tok, String site, String store, String pedido){
+		 try {
+			String url = "/hermesCore/rest/orders/updatePendingAcceptByStore/idSite/"+site+"/idStore/"+store+"/orderNumber/"+pedido;
+			callWSGET(host, url, new ArrayList<String>(), new ArrayList<String>(), tok);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+	public String JSONUpdateState(String pedido, String track, int estado, String ticket, String courier, String fechaEntrega){
+		String json = "";
+		try {
+			json = "{"+
+								"\"orderNumber\":\""+pedido+"\","+
+								"\"trackingNumber\":\""+track+"\","+
+								"\"status\":\""+estado+"\","+
+								"\"ticketNumber\":\""+ticket+"\","+
+								"\"idOperator\":\""+courier+"\","+
+								"\"deliveryDate\":\""+fechaEntrega+"\""+
+							"}";
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		 return json;
+	}
+	
+	public void UpdateState(String pedido, String track, int estado, String ticket, int courier, String fechaEntrega, String tok){
+		 try {
+			String url = "/rest/orders/updateOrders/idSite/336";
+			String json = "{"+
+								"\"orderNumber\":\""+pedido+"\","+
+								"\"trackingNumber\":\""+track+"\","+
+								"\"status\":\""+statusMapperEncuentra_Moddo(estado)+"\","+
+								"\"ticketNumber\":\""+ticket+"\","+
+								"\"idOperator\":\""+CouriersMapperEncuentra_Moddo(courier)+"\","+
+								"\"deliveryDate\":\""+fechaEntrega+"\""+
+							"}";
+			callWSPOST_ParamJSON(host, url, json, tok);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	public DataDescDescripcion setEtiqueta (Long idpedido, int destino, int canal, int idEmpresa) {
+		Logica Logica = new Logica();
+		DataDescDescripcion etiqueta = new DataDescDescripcion("","");
+		
+		DataEcommerce_canales_envio envio = Logica.darEcommerce_canal_envio(canal, idEmpresa, destino);
+		
+		if(envio!= null)
+		{	
+			Cliente clienteSh = Logica.darClienteShippingEcommerce(idpedido, idEmpresa);
+			Credenciales credenciales = new Credenciales();
+			
+			credenciales.setUser(envio.getUsuario());
+			credenciales.setPass(envio.getPass());
+			credenciales.setPedido(idpedido+"");										
+			
+			Shipping shipp = new Shipping();
+			
+			shipp.setCredenciales(credenciales);
+			shipp.setCliente(clienteSh);
+													
+			Call_WS_APIENCUENTRA enc = new Call_WS_APIENCUENTRA();
+			etiqueta = enc.setEnvio(shipp, envio, idpedido+"", envio.getFechaEntrega(), "PM", idEmpresa);
+			
+		}		
+		
+		return etiqueta;
+	}
+	
+	public int CouriersMapperEncuentra_Moddo(int courier) {
+		int estado = 0;
+		try {
+			switch (courier) {
+			case 400000:
+				estado = 0;
+				break;
+			case 500000:
+				estado = 22;
+				break;
+			case 700000:
+				estado = 33;
+				break;			
+			}
+		} catch (Exception e) {
+			return estado;
+		}
+		return estado;
+	}
+	
+	public int statusMapperEncuentra_Moddo(int status) {
+		int estado = 0;
+		try {
+			switch (status) {
+			case 1:
+				estado = 2;
+				break;
+			case 2:
+				estado = 2;
+				break;
+			case 3:
+				estado = 2;
+				break;
+			case 4:
+				estado = 3;
+				break;
+			case 5:
+				estado = 3;
+				break;
+			case 6:
+				estado = 4;
+			case 99:
+				estado = 8;	
+				break;	
+
+			}
+		} catch (Exception e) {
+			return estado;
+		}
+		return estado;
+	}
+	
+	private String callWSPOST_ParamJSON(String URLbase,String funcion, String jotason,String token)
+	{
+		String retorno = "";
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		try 
+		{
+	    	
+	    	System.out.println("llamando a "+URLbase);
+	    	System.out.println("Parametros JSON "+jotason);
+	    	System.out.println("Respuesta");
+
+	    	String payload = jotason;
+	    	StringEntity entityI;
+	    	
+	    	entityI = new StringEntity(payload, ContentType.APPLICATION_JSON);
+	    
+	    	HttpPost request = new HttpPost(URLbase+funcion);
+	    	request.setEntity(entityI);
+	    	
+	    	if(!token.equals(""))
+	        {
+	        	request.setHeader("core-token",token);
+	        }
+	    	
+		  	HttpResponse httpResponse = httpClient.execute(request);
+		  	
+		  	int code=httpResponse.getStatusLine().getStatusCode();
+		  	HttpEntity entity = httpResponse.getEntity();
+		  	
+		  	byte[] buffer = new byte[1024];
+		    
+		  	if (entity != null) 
+		  	{
+		        InputStream inputStream = entity.getContent();
+		        try 
+		        {
+		          int bytesRead = 0;
+		          BufferedInputStream bis = new BufferedInputStream(inputStream);
+		          byte[] contents = new byte[1024];
+		          String strFileContents=""; 
+		          while((bytesRead = bis.read(contents)) != -1) 
+		          { 
+		              strFileContents += new String(contents, 0, bytesRead);              
+		          }
+
+		          return strFileContents;
+		          
+		          
+		        }
+		        catch (RuntimeException runtimeException) 
+		        {
+		          // In case of an unexpected exception you may want to abort
+		          // the HTTP request in order to shut down the underlying
+		          // connection immediately.
+		          request.abort();
+		          runtimeException.printStackTrace();
+		        }
+		        finally 
+		        {
+		          // Closing the input stream will trigger connection release
+		          try 
+		          {
+		            inputStream.close();
+		          } 
+		          catch (Exception ignore) 
+		          {
+		        	  
+		          }
+		        }
+		      }
+		    } 
+	    	catch (ClientProtocolException e) 
+		    {
+		      e.printStackTrace();
+		    }
+	    	catch (IOException e) 
+	    	{
+		      // thrown by entity.getContent();
+		      e.printStackTrace();
+		    }
+	    	finally 
+	    	{
+		      httpClient.getConnectionManager().shutdown();
+		    }
+		System.out.println(retorno);
+		return retorno;
+		
+	}
+	
+	private String callWSGET(String URLbase, String funcion, List<String> parameters,List<String> values, String token)
+	{
+		String retorno = "";
+		HttpClient httpClient = new DefaultHttpClient();
+	    try 
+		{
+	    	
+	    	System.out.println("Respuesta");
+	    	HttpResponse httpResponse;
+	    	
+    		HttpParams params = new BasicHttpParams();
+	        
+	        int pasada=0;
+	        String q="";
+	    	
+	        for (String par : parameters) 
+	        {	
+	        	q+="?";
+	    		q+=par+"="+values.get(pasada)+"&";
+				pasada++;
+			}
+	    	
+	        /*
+	        OkHttpClient client = new OkHttpClient();
+	        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+	        RequestBody body = RequestBody.create(mediaType, "%20modificacionDat=%2020190909");
+	        Request request = new Request.Builder()
+	          .url("http://banteysa.dyndns.org:8080/OpusEncuentraWMS/wms/services/getProducts")
+	          .get()
+	          .addHeader("Content-Type", "application/x-www-form-urlencoded")
+	          .addHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcHVzUGF0aCI6Ii9ob21lL3BydWViYSIsImV4cCI6MTU2ODA3ODkyOCwiaWF0IjoxNTY4MDUwMTI4LCJlbnRlcnByaXNlIjoiMDAwMCIsInVzZXJuYW1lIjoiRU5DVUVOVFJBIn0.O42CmKzVi9WiJj1r9rrZASjCWO117gr4eTb2Oejv-IY")
+	          
+	          .addHeader("Host", "banteysa.dyndns.org:8080")
+	          .build();
+	        Response response = client.newCall(request).execute();
+	        String jsonData = response.body().string();
+	        System.out.println( jsonData);
+	        */
+	        
+	        HttpGet httpPostRequest = new HttpGet(URLbase+funcion+q);
+	        System.out.println("llamando a "+URLbase+funcion+q);
+	    	if(!token.equals(""))
+	        {
+	        	httpPostRequest.setHeader("core-token",token);
+	        }
+	    	httpResponse = httpClient.execute(httpPostRequest);
+    		
+	    	
+	    	
+	    	
+	    	HttpEntity entity = httpResponse.getEntity();
+		  	byte[] buffer = new byte[1024];
+		    
+		  	if (entity != null) 
+		  	{
+		        InputStream inputStream = entity.getContent();
+		        try 
+		        {
+		          int bytesRead = 0;
+		          BufferedInputStream bis = new BufferedInputStream(inputStream);
+		          byte[] contents = new byte[1024];
+		          String strFileContents=""; 
+		          while((bytesRead = bis.read(contents)) != -1) 
+		          { 
+		              strFileContents += new String(contents, 0, bytesRead);              
+		          }
+
+		          return strFileContents;
+		          
+		          
+		        }
+		        catch (RuntimeException runtimeException) 
+		        {
+		          // In case of an unexpected exception you may want to abort
+		          // the HTTP request in order to shut down the underlying
+		          // connection immediately.
+		          //httpPostRequest.abort();
+		          runtimeException.printStackTrace();
+		        }
+		        finally 
+		        {
+		          // Closing the input stream will trigger connection release
+		          try 
+		          {
+		            inputStream.close();
+		          } 
+		          catch (Exception ignore) 
+		          {
+		        	  
+		          }
+		        }
+		      }
+		    } 
+	    	catch (ClientProtocolException e) 
+		    {
+		      e.printStackTrace();
+		    }
+	    	catch (IOException e) 
+	    	{
+		      // thrown by entity.getContent();
+		      e.printStackTrace();
+		    }
+	    	finally 
+	    	{
+		      httpClient.getConnectionManager().shutdown();
+		    }
+	    System.out.println(retorno);
+		return retorno;
+		
+	}
+}
+

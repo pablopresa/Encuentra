@@ -6384,7 +6384,7 @@ public  List<DataLineaRepo> darListaLineasRepoPick(int idPick, int idEmpresa)
 private  List<DataLineaRepo> darListaLineasReservadasRepoPick(int idPick, int idEmpresa, int idUsuario) 
 {
 	@SuppressWarnings("unused") Connection cone;
-	try 
+	/*try 
 	{
 		cone = econ.getConnection();
 	} 
@@ -6394,17 +6394,17 @@ private  List<DataLineaRepo> darListaLineasReservadasRepoPick(int idPick, int id
 		e1.printStackTrace();
 	}
 	List<DataIDDescripcion> list= econ.darIdDescripcion("SELECT distinct destino,'' FROM reposicion_articulos WHERE mayorista=1 AND idEmpresa="+idEmpresa+" and idpicking="+idPick);
-	
+	*/
 	String rao = "left outer JOIN reposicion_articulos_ojos RAO ON RAO.idArticulo = AR.idArticulo AND RAO.idEmpresa = AR.idEmpresa AND RAO.idPicking = RA.idPicking AND RAO.destino=RA.Destino and RA.idSolicitudTraslado=RAO.solicitud and ra.idUsuario=rao.idUsuario ";
 	
 	
 	String justificacion=", ' ' ";
 	
 	// Si destino es e-commerce
-	if(list.size()==1 && list.get(0).getId()==1200){
+	//if(list.size()==1 && list.get(0).getId()==1200){
 		rao+=" and RAO.pedido=RA.seccion ";
 		justificacion= ", RA.Justificacion ";
-	}
+	//}
 	
 	String wHusu = "";
 	String iNusu = "";
@@ -7834,11 +7834,11 @@ public  List<DataPicking> encuentraDarPicking(int idPick, int idEmpresa)
 			" GROUP BY RAR.IdSincronizacion, RAR.idArticulo, RAR.Origen, DOR.Nombre, RAR.Destino, DES.Nombre, RAR.idPicking, RAR.idUsuario,RAR.IdSolicitudTraslado ";
 			
 	try {
-		cone = econ.getConnection();
+		/*cone = econ.getConnection();
 		List<DataIDDescripcion> list= econ.darIdDescripcion("SELECT distinct destino,'' FROM reposicion_articulos WHERE mayorista=1 and idpicking="+idPick);	
-		if(list.size()==1 && list.get(0).getId()==1200){
+		if(list.size()==1 && list.get(0).getId()==1200){*/
 			consulta += ",RAR.Seccion ";
-		}
+		//}
 		consulta += " ORDER BY RAR.picked desc";
 	} catch (Exception e1) {		
 		e1.printStackTrace();
@@ -7887,11 +7887,11 @@ public  List<DataPicking> encuentraDarPickingCBulto(int idPick, int idEmpresa)
 			"WHERE RAR.idPicking = "+idPick+" AND RAR.Verif < RAR.cantidad AND RAR.Estado NOT in (4,7) AND RAR.IdEmpresa= "+idEmpresa+
 			" GROUP BY RAR.IdSincronizacion, RAR.idArticulo, RAR.Origen, DOR.Nombre, RAR.Destino, DES.Nombre, RAR.idPicking, RAR.idUsuario,RAR.IdSolicitudTraslado, rao.idBulto ";
 	try {
-		cone = econ.getConnection();
-		List<DataIDDescripcion> list= econ.darIdDescripcion("SELECT distinct destino,'' FROM reposicion_articulos WHERE mayorista=1 and idpicking="+idPick);	
-		if(list.size()==1 && list.get(0).getId()==1200){
+		//cone = econ.getConnection();
+		//List<DataIDDescripcion> list= econ.darIdDescripcion("SELECT distinct destino,'' FROM reposicion_articulos WHERE mayorista=1 and idpicking="+idPick);	
+		//if(list.size()==1 && list.get(0).getId()==1200){
 			consulta += ",RAR.Seccion ";
-		}
+		//}
 		consulta += " ORDER BY RAR.picked desc";
 	} catch (Exception e1) {		
 		e1.printStackTrace();

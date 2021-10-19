@@ -1,0 +1,9 @@
+dbServer=LABSAP
+dbName=STADIUM_DEV2
+dbType=7
+compUser=manager
+language=ln_Spanish
+licenseServer=LABSAP
+compPwd=PcG92u6N
+OsonecaAPI=10.108.0.218
+stadiumAPI=10.108.0.8

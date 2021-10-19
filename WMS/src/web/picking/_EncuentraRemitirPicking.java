@@ -71,6 +71,7 @@ public class _EncuentraRemitirPicking extends Action
 			boolean integracionActiva = false;
 			integracionActiva = Logica.darIntegracionProductiva(2, idEmpresa);
 			
+			Hashtable<Integer, List<DataPicking>> picksLocales = new Hashtable<Integer, List<DataPicking>>();
 			Hashtable<Integer, List<DataPicking>> picksEcommerce = new Hashtable<Integer, List<DataPicking>>();
 			Hashtable<Integer, List<DataPicking>> picksPedidoMayo = new Hashtable<Integer, List<DataPicking>>();
 						
@@ -78,10 +79,12 @@ public class _EncuentraRemitirPicking extends Action
 			{
 				if(!p.isMayorista() )
 				{
+					p.setSolicitud(p.getDestino().getId());
+					picksLocales = util.clasificarOrdenes(p,picksLocales);
+					p.setSolicitud(0);
 				}
 				else
-				{
-					
+				{					
 					if(depositosWEB.containsKey(p.getDestino().getId())){
 						picksEcommerce = util.clasificarOrdenes(p,picksEcommerce);
 					}
@@ -93,12 +96,14 @@ public class _EncuentraRemitirPicking extends Action
 			
 			System.out.println("llamando a la API");
 			
+			List<List<DataPicking>> listaLC = new ArrayList<List<DataPicking>>(picksLocales.values());
 			List<List<DataPicking>> listaEC = new ArrayList<List<DataPicking>>(picksEcommerce.values());
 			List<List<DataPicking>> listaMayo = new ArrayList<List<DataPicking>>(picksPedidoMayo.values());
 			
 			List<DataPicking> noEncontrados = new ArrayList<>();
 			
 			List<List<DataPicking>> allDataPickings = new ArrayList<List<DataPicking>>();
+			allDataPickings.addAll(listaLC);
 			allDataPickings.addAll(listaEC);
 			allDataPickings.addAll(listaMayo);
 			
@@ -118,11 +123,7 @@ public class _EncuentraRemitirPicking extends Action
 				ArtsSinAfectar = null;
 				data = null;
 				for (List<DataPicking> l : allDataPickings) 
-				{
-					
-					
-					
-					
+				{					
 					list = new ArrayList<>();
 					ArtsSinAfectar = new ArrayList<>();
 					for (DataPicking p : l) 
@@ -233,6 +234,10 @@ public class _EncuentraRemitirPicking extends Action
 				String obsTicket = "Movimiento hacia cliente "+destino;
 				if(depositosWEB.containsKey(destino)) {
 					tipoComanda = 1;
+					obsTicket = "Remito del picking "+pickings.get(0).getIdPicking();
+				}
+				if(!picksLocales.isEmpty()) {
+					tipoComanda = 2;
 					obsTicket = "Remito del picking "+pickings.get(0).getIdPicking();
 				}
 				ImpresionesPDF.imprimirTicketMovStock(idDepoCentral, idDepoWEB, uLog.getNick(), obsTicket,remitoEC, pickings.get(0).getIdPicking()+"",tipoComanda, uLog.getIdEquipo(),idEmpresa, 1);

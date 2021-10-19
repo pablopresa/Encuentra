@@ -1,0 +1,28 @@
+package beans.reportes;
+
+public class BultosRangoFechaDestino {
+	private String fecha, origen, destino, cantBultos;
+
+	public BultosRangoFechaDestino(String fecha, String origen, String destino, String cantBultos) {
+		this.fecha = fecha;
+		this.origen = origen;
+		this.destino = destino;
+		this.cantBultos = cantBultos;
+	}
+
+	public String getFecha() {
+		return fecha;
+	}
+
+	public String getOrigen() {
+		return origen;
+	}
+
+	public String getDestino() {
+		return destino;
+	}
+
+	public String getCantBultos() {
+		return cantBultos;
+	}
+}

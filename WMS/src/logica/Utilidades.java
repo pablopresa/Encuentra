@@ -1149,7 +1149,7 @@ public class Utilidades
 			
 			Hashtable<Integer,DataIDDescripcion> retorno = new Hashtable<Integer, DataIDDescripcion>();
 			List<DataIDDescripcion> lista = l.darListaDataIdDescripcionMYSQLConsulta("SELECT DISTINCT C.IdDepositoEcommerce, D.Nombre FROM ecommerce_canal_ml C JOIN depositos D ON D.idDeposito = C.IdDepositoEcommerce AND D.IdEmpresa = C.IdEmpresa WHERE C.idEmpresa="+idEmpresa+"");
-			retorno.remove(0);
+			lista.remove(0);
 			for (DataIDDescripcion d : lista) 
 			{
 				retorno.put(d.getId(), d);

@@ -1,0 +1,698 @@
+package logica;
+
+import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import beans.Fecha;
+import beans.MovStock;
+import beans.Usuario;
+import beans.bulto;
+import beans.encuentra.DataLineaRepo;
+import beans.encuentra.DataPicking;
+import beans.encuentra.IPrint;
+import cliente_rest_Invoke.Call_WS_APIENCUENTRA;
+import dataTypes.DataIDDescripcion;
+import dataTypes.DataIDIDDescripcion;
+import helper.PropertiesHelper;
+import jsonObjects.SendMail;
+import main.EcommerceProcessOrders;
+import persistencia.MSSQL;
+import persistencia._EncuentraConexion;
+
+public class Utilidades 
+{
+	public Utilidades(){}
+
+	public List<Integer> darSeries(int cuantos, String uso)
+	{
+		
+		String insert = "insert into utilseries (IdTipo) values ";
+		String values = "";
+		for (int i = 0; i < cuantos; i++) 
+		{
+			values+="('"+uso+"'),";
+		}
+		
+		values = values.substring(0, values.length()-1);
+		
+		Logica l = new Logica();
+		return l.darSeries(insert+values);
+		
+		
+	}
+	
+	
+	
+	
+	public void ConfirmoMovimientoEcommerce(DataIDDescripcion d, int idDepoCentral, int idDepoWEB, int idEmpresa, Usuario uLog , Logica Logica) {
+		System.out.println("VERIFICANDO PEDIDOS WEB");
+		EcommerceProcessOrders pro = new EcommerceProcessOrders();
+		pro.confirmarSKUForus(d.getDescripcion(), idDepoCentral, d.getId(),new Long(d.getDescripcionB()),idEmpresa,uLog.getNumero());		
+		
+		Logica.encuentraBajaArticulosOjos(d.getId(),d.getDescripcion(), "1",idEmpresa);									//BAJAR DE LA ZONA DE PICKING
+		Logica.encuentraMoverOjos(idDepoWEB+"P",d.getDescripcion(),d.getId(),uLog.getNumero(),idEmpresa);					//AGREGO ARTICULO A CLASIFICADOR ECOMMERCE
+		Logica.IngresarMovimientoArticulo("1",idDepoWEB+"P", d.getDescripcion(), d.getId(), uLog.getNumero(),idEmpresa);	//REGISTRO EL MOVIMIENTO DE MERCADERIA 
+	}
+	
+	
+	public void EnviarMailNoEncontrados(Utilidades util, List<DataPicking> noEncontrados, int idEmpresa, Call_WS_APIENCUENTRA api) {
+		String mailsD = util.darParametroEmpresaSTR(idEmpresa, 6);
+		
+		String body1 = "<h2 style=\"text-align: center;\"><strong>Articulos <span style=\"color: #ff6600;\">no encontrados</span> en el picking</strong></h2> "+
+					"	<table style=\"height: 36px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\"> "+
+					"	  <tbody> "+
+					"	    <tr style=\"height: 18px; background-color: #a81865;\"> "+
+					"	      <td style=\"width: 20%; text-align: center; height: 18px;\"> "+
+					"	        <h3><strong><span style=\"color: #ffffff;\">Picking</span></strong></h3> "+
+					"	      </td> "+
+					"	      <td style=\"width: 20%; text-align: center; height: 18px;\"> "+
+					"	        <h3><strong><span style=\"color: #ffffff;\">Usuario</span></strong></h3> "+
+					"	      </td> "+
+					"	      <td style=\"width: 20%; text-align: center; height: 18px;\"> "+
+					"	        <h3><strong><span style=\"color: #ffffff;\">Articulo</span></strong></h3> "+
+					"	      </td> "+
+					"	      <td style=\"width: 20%; text-align: center; height: 18px;\"> "+
+					"	        <h3><strong><span style=\"color: #ffffff;\">Cantidad</span></strong></h3> "+
+					"	      </td> "+
+					"	      <td style=\"width: 20%; text-align: center; height: 18px;\"> "+
+					"	        <h3><strong><span style=\"color: #ffffff;\">Pedido</span></strong></h3> "+
+					"	      </td> "+
+					"	    </tr> ";
+					
+		String body2 = "";
+		
+		
+		
+		for (DataPicking n : noEncontrados) 
+		{
+			body2+=
+		
+					"	    <tr style=\"height: 18px; border-color: #000000; text-align: center;\"> "+
+					"	      <td style=\"width: 20%; height: 18px;\">"+n.getIdPicking()+"</td> "+
+					"	      <td style=\"width: 20%; height: 18px;\">"+n.getUsuario().getDescripcion()+"</td> "+
+					"	      <td style=\"width: 20%; height: 18px;\">"+n.getArticulo()+"</td> "+
+					"	      <td style=\"width: 20%; height: 18px;\">"+n.getSol()+"</td> "+
+					"	      <td style=\"width: 20%; height: 18px;\">"+n.getIdPedido()+"</td> "+
+					"	      </td> "+
+					"	    </tr> ";
+		}			
+	
+		String body3 = "	  </tbody> "+
+					"	</table> "+
+					"	<p>&nbsp;</p> "+
+					"	<p>&nbsp;</p> "+
+					"	<p>&nbsp;</p> "+
+					"	<p>&nbsp;</p> "+
+					"	<p style=\"text-align: center;\">Notificacion generada automaticamente por Encuentra</p>";
+		
+		List<String> mailDestinos = new ArrayList<String>();
+		String[] arregloMails = mailsD.split(",");
+		for (int i = 0; i < arregloMails.length; i++) 
+		{
+			mailDestinos.add(arregloMails[i]);
+		}
+		
+		SendMail sm = new SendMail("P"+noEncontrados.get(0).getIdPicking(),mailsD,"Articulos no encontrados", body1+body2+body3,
+				"encuentra@200.com.uy");
+		List<SendMail> mails = new ArrayList<SendMail>();
+		mails.add(sm);
+		api.PutColaEnvioMails(mails, idEmpresa);
+		//em.enviarMailHTMLOD("encuentra@200.com.uy", mailDestinos, "Articulos no encontrados", body1+body2+body3);
+	}
+	
+	
+	public Hashtable<Integer, List<DataPicking>> clasificarOrdenes(DataPicking p, Hashtable<Integer, List<DataPicking>> hash){
+		
+		try {
+			p.getDestino().setDescripcionB("");
+			if(hash.get(p.getSolicitud())==null)
+			{
+				List<DataPicking> picks = new ArrayList<DataPicking>();
+				picks.add(p);
+				hash.put(p.getSolicitud(), picks);
+			}
+			else
+			{
+				List<DataPicking> picks = hash.get(p.getSolicitud());
+				picks.add(p);
+				hash.put(p.getSolicitud(), picks);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return hash;
+	}
+	
+	
+	
+	public String query_ConfirmoMovimientoEcommerce(DataIDDescripcion d, int idDepoCentral, int idDepoWEB, int idEmpresa, Usuario uLog , Logica Logica, List<DataIDDescripcion> estados) {
+		System.out.println("VERIFICANDO PEDIDOS WEB");
+		EcommerceProcessOrders pro = new EcommerceProcessOrders();
+		
+		StringBuilder queries = new StringBuilder();
+		
+		
+		
+		queries.append(pro.query_confirmarSKUForus(d.getDescripcion(), idDepoCentral, d.getId(),new Long(d.getDescripcionB()),idEmpresa,uLog.getNumero(),estados));		
+		queries.append(Logica.query_encuentraBajaArticulosOjos(d.getId(),d.getDescripcion(), "1",idEmpresa));									//BAJAR DE LA ZONA DE PICKING
+		queries.append(Logica.query_encuentraMoverOjos(idDepoWEB+"P",d.getDescripcion(),d.getId(),uLog.getNumero(),idEmpresa));					//AGREGO ARTICULO A CLASIFICADOR ECOMMERCE
+		queries.append(Logica.query_IngresarMovimientoArticulo("1",idDepoWEB+"P", d.getDescripcion(), d.getId(), uLog.getNumero(),idEmpresa));	//REGISTRO EL MOVIMIENTO DE MERCADERIA
+		
+		
+		return queries.toString();
+	}
+	
+	
+	
+	public  double redondea(double numero, int decimales) 
+	{ 
+	  double resultado;
+	  BigDecimal res;
+
+	  res = new BigDecimal(numero).setScale(decimales, BigDecimal.ROUND_UP);
+	  resultado = res.doubleValue();
+	  return resultado; 
+	}  
+	
+	
+	public String buscarFiltro (String buscado, String[]values)
+	{
+		 String retorno= "";
+		 System.out.println(values);
+		 for (int i = 0; i < values.length; i++) 
+		 {
+			 try
+			 {
+				 if(values[i].contains(buscado))
+				 {
+					 try
+					 {
+						 String valor = values[i].split("=")[1];
+						 retorno+=valor+",";
+					 }
+					 catch (Exception e)
+					 {
+						 
+					 }
+					 
+				 }
+			 }
+			 catch (Exception e)
+			 {
+				 
+			 }
+				 
+		 }
+		
+		 if(!retorno.equals(""))
+		 {
+			 return retorno.substring(0, retorno.length()-1);
+		 }
+		 return retorno;
+	}
+	
+	public  String darNombreMes(int idMes)
+	{
+		switch (idMes) 
+		{
+			case 1:
+				return "ene";
+			case 2:
+				return "feb";
+			case 3:
+				return "mar";
+			case 4:
+				return "abr";
+			case 5:
+				return "may";
+			case 6:
+				return "jun";
+			case 7:
+				return "jul";
+			case 8:
+				return "ago";
+			case 9:
+				return "sep";
+			case 10:
+				return "oct";
+			case 11:
+				return "nov";
+			case 12:
+				return "dic";
+			
+
+		default:
+			return "N/D";
+		}
+	}
+	
+	
+	public  int darDiasDiff(String fecha1, String fecha2) {
+		String consulta = "SELECT DATEDIFF(day, '" + fecha1 + "', '" + fecha2
+				+ "');";
+
+		return MSSQL.darDiasDiff(consulta);
+
+	}
+	
+	
+
+	public  String clearComillas(String input, boolean invertir)
+	{
+		String ouput="";
+		String repleacement = "#€@";
+		if(invertir)
+		{
+			/*busca las comillas y las pasa a #€@*/
+			ouput = input.replace("'", repleacement);
+		}
+		else
+		{
+			ouput = input.replace(repleacement, "'");
+		}
+		
+		return ouput;
+	}
+	
+	
+	public int tryParse (String in)
+	{
+		int retorno = 0;
+		try
+		{
+			retorno = Integer.parseInt(in);
+		}
+		catch (Exception e) 
+		{
+			
+		}
+		
+		return retorno;
+	}
+	
+	
+	public int darEmpresa(Usuario u)
+	{
+		int idEmpresa = 0;
+		try
+		{
+				idEmpresa = u.getIdEmpresa();
+		}
+		catch (Exception e) 
+		{
+			
+		}
+		
+		return idEmpresa;
+	}
+
+	public Long tryParseL(String in) 
+	{
+		Long retorno = 0L;
+		try
+		{
+			retorno = Long.parseLong(in);
+		}
+		catch (Exception e) 
+		{
+			
+		}
+		
+		return retorno;
+	}
+
+	public String darParametroEmpresaSTR(int idEmpresa, int idParametro) 
+	{
+		Logica l = new Logica();
+		return l.darParametroEmpresa(idEmpresa,idParametro);
+	}
+	
+	public int darParametroEmpresaINT(int idEmpresa, int idParametro) 
+	{
+		Logica l = new Logica();
+		try
+		{
+			return Integer.parseInt(l.darParametroEmpresa(idEmpresa,idParametro));
+		}
+		catch (Exception e) 
+		{
+			return -1;
+		}
+	}
+
+	public boolean darParametroEmpresaBool(int idEmpresa, int idParametro) 
+	{
+		Logica l = new Logica();
+		try {
+			int bol = Integer.parseInt(l.darParametroEmpresa(idEmpresa,idParametro));
+			
+			if(bol==1)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		
+		
+	}
+
+	
+	public void facturacionAutomatica(Long idpedido, int idEmpresa, Logica Logica) {
+		try {			
+			Call_WS_APIENCUENTRA api = new Call_WS_APIENCUENTRA();
+			
+			String facturacion = Logica.darParametroEmpresa(idEmpresa, 23); 
+			if(facturacion!= null && facturacion.equals("1")) {
+				api.CheckInOrder(idpedido, idEmpresa);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+
+	
+	public String validarComillas(String texto) {
+		if(texto.contains("\'")) {
+			texto = texto.replace('\'',' ');
+		}
+		if(texto.contains("\"")) {
+			texto = texto.replace('\"',' ');
+		}
+		return texto;
+	}
+	
+	public String statusMapperFenicio(int status) {
+		String estado = "";
+		try {
+			switch (status) {
+			case 1:
+				estado = "Preparando";
+				break;
+			case 2:
+				estado = "Preparando";
+				break;
+			case 25:
+				estado = "Listo para enviar";
+				break;
+			case 3:
+				estado = "Listo para enviar";
+				break;
+			case 34:
+				estado = "Listo para enviar";
+				break;	
+			case 4:
+				estado = "En camino";
+				break;
+			case 5:
+				estado = "Listo para retirar";
+				break;			
+			case 6:
+				estado = "Pedido entregado";
+				break;
+			case 99:
+				estado = "Cancelado";
+				break;	
+
+			default:
+				estado = "";
+				break;
+			}
+		} catch (Exception e) {
+			return "";
+		}
+		return estado;
+	}
+	
+	public int darUltimoIdAutomatico(int idParametro, int idEmpresa) {
+        _EncuentraConexion ec = new _EncuentraConexion();
+        int utilizarId = 0;
+        try {
+            utilizarId = ec.devolverIDDisponible(idParametro, idEmpresa);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return utilizarId;
+    }
+	
+	//Devuelve un arreglo de strings para prefijos 
+	public String[] auxIndices(int largo) {   
+	    String[] resultado = new String[largo];
+	    String colName = "";
+	    for(int i = 0; i < largo; i++) {
+	        char c = (char)('A' + (i % 26));
+	        colName = c + "";
+	        if(i > 25){
+	            colName =  resultado[(i / 26) - 1] + "" + c;
+	        }
+	        resultado[i] = colName;
+	    }
+	    return resultado;
+	}
+	
+	public DataIDDescripcion remitir(int origen, int destino, int idUsuario, List<DataIDDescripcion> articulos, Long origenDoc, 
+			int docSolicitud, int doc, int razon, String usuario, String obs, int idEmpresa, bulto b, boolean entregaSolicitud){
+		DataIDDescripcion remito = null;
+		try {
+			
+			MovStock m = new MovStock();			
+			m.setOrigen(origen);
+			m.setDestino(destino);
+			m.setIdUsuario(idUsuario);
+			m.setDetalle(articulos);
+			m.setOrigenDoc(origenDoc);
+			m.setDocSolicitud(docSolicitud);
+			m.setDoc(doc);
+			m.setRazon(razon);
+			m.setUsuario(usuario);
+			m.setObservacion(obs);	
+			m.setEntrega(entregaSolicitud);
+			
+			Call_WS_APIENCUENTRA api = new Call_WS_APIENCUENTRA();
+			remito = api.movStock(m, false, idEmpresa);
+			//remito = new DataIDDescripcion((int)((Math.random() * 9000000)+1000000),"");
+			if(remito.getId()>0) {
+				Logica Logica = new Logica();
+				if(!entregaSolicitud) {
+					Logica.remitirBultoPicking(b, origen, idEmpresa);
+				}
+				else {
+					//Logica.remitirBultoMayorista(articulos, origen, destino, docSolicitud, idEmpresa);
+				}
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return remito;
+	}
+	
+	public int parseStringInt(String a) {
+		int salida = 0;
+		try {
+			salida = Integer.parseInt(a);
+		} catch (Exception e) {
+			//e.printStackTrace();
+		}
+		return salida;
+	}
+
+	
+	public String soloNumeros(String cadena) {
+		String salida = "";
+		try {
+			salida = cadena.replaceAll("[A-Za-z]", "");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return salida;
+	}
+
+	
+	public static int parseStringIntStatic(String a) {
+		int salida = 0;
+		try {
+			salida = Integer.parseInt(a);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return salida;
+	}
+	
+	public static boolean parseIntToBoolean(int a) {
+		boolean salida = false;
+		try {
+			if(a==1)
+				salida = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return salida;
+	}
+	
+	public static int parseBooleanToInt(Boolean a) {
+		int salida = 0;
+		try {
+			if(a)
+				salida = 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return salida;
+	}
+	
+	public static boolean parseStringToBoolean(String a) {
+		boolean salida = false;
+		try {
+			if(a.equals("true"))
+				salida = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return salida;
+	}
+
+	public Fecha darHoraHabilDeposito(int idDeposito,int idEmpresa, Fecha fecha) 
+	{
+		Logica lo= new Logica();
+		if(lo.hayRegistro("SELECT * FROM deposito_horario DH WHERE idDeposito = "+idDeposito+" AND IdEmpresa ="+idEmpresa+" AND idDia = "+fecha.getDiaSemana()+" and horaDesde<="+fecha.getHora()+" AND "+fecha.getHora()+"<horaHasta"))
+		{
+			return fecha;
+		}
+		else
+		{
+			DataIDDescripcion fechaPosible = lo.darDataIdDescripcion("SELECT idDia,horaDesde FROM deposito_horario DH WHERE idDeposito = "+idDeposito+" AND IdEmpresa ="+idEmpresa+" AND idDia > "+fecha.getDiaSemana()+" AND (horaHasta-horaDesde)>0 LIMIT 1");
+			
+			int diaPosible = fechaPosible.getId();//esto es el dia de la semana;
+			int horaPosible = Integer.parseInt(fechaPosible.getDescripcion());
+			
+			int [] diasSemana = {1,2,3,4,5,6,7};
+			
+			for (int i : diasSemana) 
+			{
+				Fecha temp = new Fecha(i, 0, 0);
+				if(temp.getDiaSemana()==diaPosible)
+				{
+					temp.setHora(horaPosible);
+					return temp;
+				}
+			}
+			
+			
+			
+			
+			
+			
+		}
+		
+		return null;
+	}
+	
+	public byte[] encodeFile(String IN_FILE) {
+		byte[] encoded = null;
+		try {
+			byte[] inFileBytes = Files.readAllBytes(Paths.get(IN_FILE));
+			
+			 encoded = java.util.Base64.getEncoder().encode(inFileBytes);			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return encoded;
+    }
+	
+	public byte[] decodeFile(String IN_FILE) {
+		byte[] decoded = null;
+		try {
+	        decoded = java.util.Base64.getDecoder().decode(IN_FILE);	        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return decoded;
+    }
+	
+	public byte[] decodeFile(byte[] inFileBytes) {
+		byte[] decoded = null;
+		try {
+	        decoded = java.util.Base64.getDecoder().decode(inFileBytes);	        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return decoded;
+    }
+	
+	public void writeToFile(String fileName, byte[] bytes) {
+		try {
+			FileOutputStream fos = new FileOutputStream(fileName);
+	        fos.write(bytes);
+	        fos.flush();
+	        fos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        
+    }
+	
+	public PropertiesHelper initPropertiesHelper(String path) {
+		PropertiesHelper pH=new PropertiesHelper(path);	    	
+    	try
+    	{
+    		pH.loadProperties();
+    	}
+    	catch(Exception e)
+    	{
+    		
+    	}
+    	return pH;
+	}
+	
+	public void etiquetas_verificacion_destinos (List<DataLineaRepo> lista, Usuario uLog, int idPicking, int idEmpresa) {
+		try {
+			Utilidades util = new Utilidades();
+			Boolean necesitaEtiquetas = util.darParametroEmpresaBool(idEmpresa, 43);
+			if(necesitaEtiquetas) {
+				Hashtable<Integer, DataIDDescripcion> destinos = new Hashtable<Integer, DataIDDescripcion>();
+				for(DataLineaRepo l: lista) {
+					if(destinos.get(l.getIdDepDestino()) == null) {
+						DataIDDescripcion d = new DataIDDescripcion(l.getIdDepDestino(), l.getDescDeposito());
+						destinos.put(l.getIdDepDestino(), d);
+					}
+					
+				}
+				Call_WS_APIENCUENTRA api = new Call_WS_APIENCUENTRA();
+				String etiq = "";
+				//GENERAR ETIQUETAS
+				
+				List<DataIDDescripcion> destinosList = new ArrayList<DataIDDescripcion>(destinos.values());
+				
+				//resumen picking
+				etiq = IPrint.etiquetas_verificacion_destinos(idPicking, destinosList,uLog);	
+				api.PutColaImpresion("labels"+idPicking+"_"+idEmpresa, etiq, 0, 1,uLog.getIdEquipo(),idEmpresa);
+				
+				//etiquetas destinos pallets
+				for(DataIDDescripcion ls : destinosList)
+				{
+					etiq = IPrint.etiquetas_verificacion_destinos(ls, uLog);
+					api.PutColaImpresion("destiny"+ls.getId()+"_"+idEmpresa, etiq, 0, 1,uLog.getIdEquipo(),idEmpresa);
+				}
+				
+	            
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}

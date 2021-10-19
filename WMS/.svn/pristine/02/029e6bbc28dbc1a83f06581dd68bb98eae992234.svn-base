@@ -1,0 +1,109 @@
+package webservices;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import com.google.gson.Gson;
+
+import beans.Usuario;
+import dataTypes.ColectionDataIDDescripcion;
+import dataTypes.DataIDDescripcion;
+
+import logica.Logica;
+import persistencia.MSSQL;
+
+
+
+
+@Path("/Views")
+public class Views 
+{
+	
+	@POST
+	@Path("/stocks")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String stocks(String data, @QueryParam ("origen") String origen, @QueryParam ("token") String token) throws IOException
+	{	   
+		Logica l = new Logica();	
+		Gson gson = new Gson();
+		String json = "";
+		Hashtable<String, Integer> retorno = new Hashtable<String, Integer>();
+		
+		try
+		{		
+			Usuario u = l.loginEncuentraAPI2(token);
+			
+			if(u!=null) {
+				int idEmpresa = u.getIdEmpresa();	
+				List<DataIDDescripcion> arts = new ArrayList<DataIDDescripcion>();
+				arts = gson.fromJson(data, ColectionDataIDDescripcion.class).getColeccion();
+				retorno = MSSQL.darStocks(arts, Integer.parseInt(origen));	
+			}			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		json = gson.toJson(retorno);
+		json = "{ \"coleccion\" : "+json+"}";
+		System.out.println(json);
+		return json;
+	}
+	
+	
+	
+	
+	@POST
+	@Path("/parametros")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String parametros(String data,  @QueryParam ("token") String token) throws IOException
+	{	   
+		Logica l = new Logica();	
+		Gson gson = new Gson();
+		String json = "";
+		Hashtable<Integer, String> retorno = new Hashtable<Integer, String>();
+		
+		try
+		{		
+			Usuario u = l.loginEncuentraAPI2(token);
+			
+			if(u!=null) {
+				int idEmpresa = u.getIdEmpresa();	
+				List <DataIDDescripcion> parametros =  l.darParametrosEmpresa(idEmpresa);
+				for (DataIDDescripcion p : parametros) 
+				{
+					retorno.put(p.getId(), p.getDescripcion());
+				}
+			}			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		json = gson.toJson(retorno);
+		json = "{ \"coleccion\" : "+json+"}";
+		System.out.println(json);
+		return json;
+	}
+	
+}

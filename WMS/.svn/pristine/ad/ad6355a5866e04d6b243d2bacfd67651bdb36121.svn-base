@@ -1,0 +1,159 @@
+package beans.encuentra;
+
+import java.util.List;
+
+import dataTypes.DataIDDescripcion;
+
+public class DataPicking 
+{
+	private String articulo, descripcion,posSort;
+	private DataIDDescripcion origen, destino, usuario;
+	private int idPicking,sol,pick,remitida, idPacking, verificada, idPosLineaSAP, stockOrigen, stockOSAP,solicitud;
+	private Long idPedido;
+	private List<String> barras;
+	private boolean mayorista;
+	public String getArticulo() {
+		return articulo;
+	}
+	public void setArticulo(String articulo) {
+		this.articulo = articulo;
+	}
+	public DataIDDescripcion getOrigen() {
+		return origen;
+	}
+	public void setOrigen(DataIDDescripcion origen) {
+		this.origen = origen;
+	}
+	public DataIDDescripcion getDestino() {
+		return destino;
+	}
+	public void setDestino(DataIDDescripcion destino) {
+		this.destino = destino;
+	}
+	public DataIDDescripcion getUsuario() {
+		return usuario;
+	}
+	public void setUsuario(DataIDDescripcion usuario) {
+		this.usuario = usuario;
+	}
+	public int getIdPicking() {
+		return idPicking;
+	}
+	public void setIdPicking(int idPicking) {
+		this.idPicking = idPicking;
+	}
+	public int getSol() {
+		return sol;
+	}
+	public void setSol(int sol) {
+		this.sol = sol;
+	}
+	public int getPick() {
+		return pick;
+	}
+	public void setPick(int pick) {
+		this.pick = pick;
+	}
+	public int getRemitida() {
+		return remitida;
+	}
+	public void setRemitida(int remitida) {
+		this.remitida = remitida;
+	}
+	
+	
+	
+	
+	public int getStockOrigen() 
+	{
+		return this.stockOrigen;
+		
+	}
+	public void setStockOrigen(int stockOrigen) {
+		this.stockOrigen = stockOrigen;
+	}
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	public int getVerificada() {
+		return verificada;
+	}
+	public void setVerificada(int verificada) {
+		this.verificada = verificada;
+	}
+	public List<String> getBarras() {
+		return barras;
+	}
+	public void setBarras(List<String> barras) {
+		this.barras = barras;
+	}
+	public int getIdPacking() {
+		return idPacking;
+	}
+	public void setIdPacking(int idPacking) {
+		this.idPacking = idPacking;
+	}
+	public DataPicking(String articulo, DataIDDescripcion origen,
+			DataIDDescripcion destino, DataIDDescripcion usuario,
+			int idPicking, int sol, int pick, int remitida) {
+		this.articulo = articulo;
+		this.origen = origen;
+		this.destino = destino;
+		this.usuario = usuario;
+		this.idPicking = idPicking;
+		this.sol = sol;
+		this.pick = pick;
+		this.remitida = remitida;
+		this.verificada = 0;
+		this.idPedido = 0L;
+		this.idPosLineaSAP =0;
+	}
+	public DataPicking() 
+	{
+		this.verificada = 0;
+	}
+	public String getPosSort() {
+		return posSort;
+	}
+	public void setPosSort(String posSort) {
+		this.posSort = posSort;
+	}
+	public boolean isMayorista() {
+		return mayorista;
+	}
+	public void setMayorista(boolean mayorista) {
+		this.mayorista = mayorista;
+	}
+	public Long getIdPedido() {
+		return idPedido;
+	}
+	public void setIdPedido(Long idPedido) {
+		this.idPedido = idPedido;
+	}
+	public int getIdPosLineaSAP() {
+		return idPosLineaSAP;
+	}
+	public void setIdPosLineaSAP(int idPosLineaSAP) {
+		this.idPosLineaSAP = idPosLineaSAP;
+	}
+	public int getStockOSAP() {
+		return stockOSAP;
+	}
+	public void setStockOSAP(int stockOSAP) {
+		this.stockOSAP = stockOSAP;
+	}
+	public int getSolicitud() {
+		return solicitud;
+	}
+	public void setSolicitud(int solicitud) {
+		this.solicitud = solicitud;
+	}
+	
+	
+	
+	
+
+}
