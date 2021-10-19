@@ -42,7 +42,7 @@ public class ClienteBASFenicio
 		 int idDepoOrigen = Integer.parseInt(parametros.get(4));
 		 
 		 List<Cliente> clientes = new ArrayList<>();
-		 int diasBusqueda = 20;
+		 int diasBusqueda = 10;
 		 
 		 for (CanalMarketPlace canal : canalesL) 
 		 {
