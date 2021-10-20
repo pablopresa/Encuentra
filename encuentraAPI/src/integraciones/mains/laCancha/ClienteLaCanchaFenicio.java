@@ -1,4 +1,4 @@
-package integraciones.mains.lacancha;
+package integraciones.mains.laCancha;
 
 import java.util.ArrayList;
 import java.util.HashMap;

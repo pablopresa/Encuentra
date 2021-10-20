@@ -22,15 +22,13 @@ import beans.encuentra.DataOjoArticulo;
 
 public class _EncuentraOjosArticulos extends Action 
 {
-
-
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception 
 	{
 		HttpSession session = request.getSession();
-		Logica Logica = new Logica();
+		Logica logica = new Logica();
 		String mensaje = "buscando articulo";
 		String articulo = request.getParameter("art");
 		String idOjo = request.getParameter("idOjo");
@@ -65,10 +63,6 @@ public class _EncuentraOjosArticulos extends Action
 			subcategoria = buscarFiltro("subcategory", values);
 		}
 		
-		
-		
-		
-		
 		/*String uRecepcion = buscarFiltro("uRecepcion", values);
 		String uAlmacen = buscarFiltro("uAlmacen", values);
 		String uClasificacion = buscarFiltro("uClasificacion", values);
@@ -76,42 +70,36 @@ public class _EncuentraOjosArticulos extends Action
 		String uEcommerce = buscarFiltro("uEcommerce", values);
 		*/
 				
-		
 		String mob = request.getParameter("mob");
 		String pick = request.getParameter("picking");
 		
-		
 		ServletContext context = request.getSession().getServletContext();
 		Hashtable<String, String> artBarra = (Hashtable<String, String>) context.getAttribute("barras_"+idEmpresa);
-		List<DataIDDescripcion> categorias = Logica.darListaDataIdDescripcion("art_categoria",idEmpresa);
-		List<DataIDDescripcion> subCategorias = Logica.darListaDataIdDescripcion("art_genero",idEmpresa);
-		List<DataIDDescripcion> estanterias = Logica.darEstanterias(idEmpresa);
+
+		List<DataIDDescripcion> familias = logica.darListaDataIdDescripcion("art_familia", idEmpresa);
+		List<DataIDDescripcion> subfamilias = logica.darListaDataIdDescripcion("art_subfamilia", idEmpresa);
+		List<DataIDDescripcion> estanterias = logica.darEstanterias(idEmpresa);
+
 		if(idOjo==null && estanteria ==null && categoria == null && (articulo ==null || articulo.isEmpty()) && subcategoria ==null)
 		{
 			session.setAttribute("ojosTienen", null);
 			session.setAttribute("estanterias", estanterias);
-			session.setAttribute("categorias", categorias);
-			session.setAttribute("subCategorias", subCategorias);
+			session.setAttribute("categorias", familias);
+			session.setAttribute("subCategorias", subfamilias);
 			session.setAttribute("cantidad", 0);
 			
-			if(mob !=null && mob.equals("1"))
-			{
+			if(mob !=null && mob.equals("1")) {
 				return mapping.findForward("mob");
 			}
-			else
-			{
+			else {
 				return mapping.findForward("ok");
 			}
 		}
 		
-		
-		
-		
 		//Voy con la barra y traigo el articulo
 		String articuloAux = null;
 		if (articulo != null && !articulo.equals(""))		
-			articuloAux = Logica.darArticuloAlEscanear(articulo,artBarra,idEmpresa);
-		
+			articuloAux = logica.darArticuloAlEscanear(articulo,artBarra,idEmpresa);
 		
 		boolean desconsolidar = false;
 		boolean stockERP = switchStock!=null && switchStock.equals("on");
@@ -133,8 +121,7 @@ public class _EncuentraOjosArticulos extends Action
 		int empaque = 0;
 		String urlFoto = "";
 		String descripcionArticulo = "";
-		List<DataIDDescripcion> femps = Logica.darEmpaqueFoto("'"+articulo+"'", idEmpresa);
-		
+		List<DataIDDescripcion> femps = logica.darEmpaqueFoto("'"+articulo+"'", idEmpresa);
 		
 		if(!femps.isEmpty())
 		{
@@ -144,12 +131,10 @@ public class _EncuentraOjosArticulos extends Action
 			descripcionArticulo = fotoEmpaque.getDescripcionB();
 		}
 		
-		
-		
 		int deposito = 0;
 		try {deposito = Integer.parseInt(uLog.getDeposito());}catch (Exception e) { e.printStackTrace(); }
 		
-		Integer existeOjo = Logica.encuentraExisteUbica(articulo,idEmpresa,deposito);
+		Integer existeOjo = logica.encuentraExisteUbica(articulo,idEmpresa,deposito);
 
 		if(existeOjo==1) { // Si existe ojo
 			idOjo=articulo;
@@ -159,15 +144,13 @@ public class _EncuentraOjosArticulos extends Action
 		}
 		request.setAttribute("mensaje", mensaje);
 		request.setAttribute("bandera", bandera);
-		List<DataOjoArticulo> ojosArticulos = Logica.encuentraDarOjosArticulos(idOjo, estanteria,categoria, usos, articulo,stockERP,desconsolidar, idEmpresa, deposito, subcategoria);
+		List<DataOjoArticulo> ojosArticulos = logica.encuentraDarOjosArticulos(idOjo, estanteria,categoria, usos, articulo,stockERP,desconsolidar, idEmpresa, deposito, subcategoria);
 		
 		session.setAttribute("listaUbicaciones", ojosArticulos);
 
 		int cantidad = 0;
 		
-		
-		for (DataOjoArticulo d : ojosArticulos) 
-		{
+		for (DataOjoArticulo d : ojosArticulos) {
 			cantidad +=d.getCantidad();
 		}
 		
@@ -175,41 +158,35 @@ public class _EncuentraOjosArticulos extends Action
 		session.setAttribute("urlFoto", urlFoto);
 		session.setAttribute("descripcionArticulo", descripcionArticulo);
 		
-		
 		session.setAttribute("stockERP", stockERP);
 		session.setAttribute("ojosTienen", ojosArticulos);
 
 		String descripcionOjo = "";
 		try {
 			descripcionOjo = ojosArticulos.get(0).getDescripcion();
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
-		}session.setAttribute("descripcionOjo", "");
-		
+		}
+		session.setAttribute("descripcionOjo", "");
 		
 		session.setAttribute("estanterias", estanterias);
 		session.setAttribute("cantidad", cantidad);
-		session.setAttribute("categorias", categorias);
-		session.setAttribute("subCategorias", subCategorias);
+		session.setAttribute("categorias", familias);
+		session.setAttribute("subCategorias", subfamilias);
 		
 		uLog.registrarEventoMin(session.getId(), "Consulta ubicaciones del artículo "+articulo);
 		
-		if(pick!=null && pick.equals("1"))
-		{
+		if(pick!=null && pick.equals("1")) {
 			return mapping.findForward("mobPick");
 		}
 		
-		
-		if(mob !=null && mob.equals("1"))
-		{
+		if(mob !=null && mob.equals("1")) {
 			return mapping.findForward("mob");
 		}
-		else
-		{
+		else {
 			return mapping.findForward("ok");
 		}
-		
-	
 	}
 	
 	public String buscarFiltro (String buscado, String[]values)
@@ -220,16 +197,13 @@ public class _EncuentraOjosArticulos extends Action
 		 {
 			 if(values[i].contains(buscado))
 			 {
-				 try
-				 {
+				 try {
 					 String valor = values[i].split("=")[1];
-					 retorno+=valor+",";
+					 retorno += valor+",";
 				 }
-				 catch (Exception e)
-				 {
-					 
+				 catch (Exception e) {
+					 e.printStackTrace();
 				 }
-				 
 			 }
 		 }
 		
@@ -244,22 +218,17 @@ public class _EncuentraOjosArticulos extends Action
 	{
 		 String retorno= "";
 		 System.out.println(values);
-		 for (int i = 0; i < values.length; i++) 
-		 {
-			 for (int j = 0; j < buscados.length; j++) 
-			 {
-				 if(values[i].contains(buscados[j]))
-				 {
-					 try
-					 {
+		 for (int i = 0; i < values.length; i++) {
+			 for (int j = 0; j < buscados.length; j++) {
+				 if(values[i].contains(buscados[j])) {
+					 try {
 						 String valor = values[i].split("=")[1];
-						 retorno+=valor+",";
+						 retorno += valor+",";
 					 }
 					 catch (Exception e)
 					 {
-						 
+						e.printStackTrace(); 
 					 }
-					 
 				 }
 			 }
 		 }

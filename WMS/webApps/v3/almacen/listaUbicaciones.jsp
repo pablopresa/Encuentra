@@ -12,6 +12,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <!-- /. NAV SIDE  -->
 
 
+	<c:if test="${subfamilias!=null}">
+		<input type="hidden" id="subfamilias" value="${subfamilias}" />
+	</c:if>
+
+
+
 	<c:if test="${uLogeado!=null}">
 
 		<c:forEach var="d" items="${uLogeado.seguridadUI}">
@@ -19,9 +25,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<c:set var="puede" scope="request" value="1" />
 			</c:if>
 		</c:forEach>
-
-
-
 
 		<div class="row">
 			<div class="col-md-12">
@@ -84,7 +87,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 									<label>Familias:</label>
 									<div class="col-sm-6 col-lg-5">
 										<div class="col-sm-12">
-											<select class="select2-multi" multiple="multiple" name="categoria">
+											<select class="select2-multi" multiple="multiple" name="categoria" id="familia">
 												<c:forEach var="e" items="${categorias}">
 													<option value="${e.id}">${e.descripcion}</option>
 												</c:forEach>
@@ -95,7 +98,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 									<label>Subfamilias:</label>
 									<div class="col-sm-6 col-lg-5">
 										<div class="col-sm-12">
-											<select class="select2-multi" multiple="multiple" name="subcategory">
+											<select class="select2-multi" multiple="multiple" name="subcategory" id="subcategoria">
 												<c:forEach var="sc" items="${subCategorias}">
 													<option value="${sc.id}">${sc.descripcion}</option>
 												</c:forEach>
@@ -316,8 +319,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						firstDivContent.innerHTML = data;				
 						$("#mymodal").modal();
 					});
-
 				}
+				
 			</script>
 			
 		<script type="text/javascript">
@@ -326,7 +329,53 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				$(".select2-multi").select2({
 					placeholder: "Puede seleccionar Estanterías"
 				});
+		        
+				$("#familia").change(function(){
+					
+					var familias="(";
+					var primero = true;
+					
+					var selected = $("#familia :selected").each(function() {
+						if(primero==true){
+				            familias += this.value;
+				            primero=false;
+						}
+						else{
+							familias += "," + this.value;	
+						}
+			        });
+					familias+=")";
+					
+					var path = "<%=basePath%>/CargarSubfamiliasUbicaciones.do?familias="+familias;
+				    var xmlhttp = new XMLHttpRequest();
+					xmlhttp.onreadystatechange = function() {
+					    if (xmlhttp.readyState == XMLHttpRequest.DONE ) 
+					    {
+					       if (xmlhttp.status == 200) 
+					       {
+					    	   var salida = JSON.parse(xmlhttp.responseText);	
+							
+					    	   $("#subcategoria").empty();
+							
+							for(var i=0; i<salida.length; i++){
+								$("#subcategoria").append("<option value='"+salida[i].id+"'>"+salida[i].descripcion+"</option>");
+							}
+					       }
+					       else if (xmlhttp.status == 400) 
+					       {
+					          alert('There was an error 400');
+					       }
+					       else 
+					       {
+					           alert('something else other than 200 was returned');
+					       }
+					    }
+					};
+				    	 xmlhttp.open("POST", path);
+					     xmlhttp.send();
+				});
 			});
+		    
 		</script>
 			
 		<script type="text/javascript">
