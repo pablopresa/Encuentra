@@ -148,7 +148,11 @@ public class Synchronizer
 						if(dc.getTipo()!=null && dc.getTipo().equals("LOCAL"))
 						{
 
-							eper.persistir("INSERT INTO depositos (idDeposito,IdDepositoSAP, Nombre,IdEmpresa) VALUES ("+dc.getIdDeposito()+",'"+dc.getIdDeposito()+"','"+nombreQuery+"',"+idEmpresa+") ON DUPLICATE KEY UPDATE Nombre = VALUES(Nombre)");
+							eper.persistir("INSERT INTO depositos (idDeposito,IdDepositoSAP, Nombre,IdEmpresa,Tipo) VALUES ("+dc.getIdDeposito()+",'"+dc.getIdDeposito()+"','"+nombreQuery+"',"+idEmpresa+",0) ON DUPLICATE KEY UPDATE Nombre = VALUES(Nombre)");
+							ojoE = dc.getIdDeposito()+"E";
+							ojoP = dc.getIdDeposito()+"P";
+							eper.persistir("INSERT INTO ojos (idOjo,idEstanteria,IdEmpresa) VALUES ('"+ojoE+"',"+estanteriaE+","+idEmpresa+")  ON DUPLICATE KEY UPDATE idEstanteria = VALUES (idEstanteria)");
+							eper.persistir("INSERT INTO ojos (idOjo,idEstanteria,IdEmpresa) VALUES ('"+ojoP+"',"+estanteriaP+","+idEmpresa+")  ON DUPLICATE KEY UPDATE idEstanteria = VALUES (idEstanteria)");
 						}
 						else
 						{

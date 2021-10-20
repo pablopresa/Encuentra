@@ -7,4 +7,16 @@
       <attribute name="version-id" value="jersey_1.1"/>
     </node>
   </facet>
+  <facet id="java"/>
+  <facet id="jst.web.jstl"/>
+  <facet id="wst.jsdt.web"/>
+  <facet id="jst.web"/>
+  <facet id="jst.jaxws">
+    <node name="libprov">
+      <attribute name="config-id" value="jst.jaxws_2.1"/>
+      <attribute name="copy-tlds" value="true"/>
+      <attribute name="provider-id" value="me-jaxws-library-provider"/>
+      <attribute name="version-id" value="jst.jaxws_2.1"/>
+    </node>
+  </facet>
 </root>

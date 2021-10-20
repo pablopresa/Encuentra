@@ -289,7 +289,7 @@ public class _EncuentraRemitirPickingFromFile extends Action
 								if(list.size()>0)
 								{
 									if(idEmpresa != 6) {
-										String [] retorno = api.prepararRemito(idDepoCentral, destino, uLog, l, idEmpresa, idDepoWEB, list);
+										String [] retorno = api.prepararRemito(idDepoCentral, destino, uLog, l, idEmpresa, idDepoWEB, list,0);
 										if(!retorno[0].equals(""))
 										{
 											menError += "DOC "+l.get(0).getSolicitud()+" - "+retorno[0] + " <br/>";
