@@ -1,9 +1,0 @@
-{% if meta.source %}
-<div class="source-links" data-genuitec-lp-enabled="false" data-genuitec-file-id="wc1-198" data-genuitec-path="/encuentra/webApps/gentelella-master/gentelella-master/vendors/bootstrap-datetimepicker/docs/theme/content.html">
-{% for filename in meta.source %}
-    <span class="label label-primary">{{ filename }}</span>
-{% endfor %}
-</div>
-{% endif %}
-
-{{ content }}

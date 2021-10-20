@@ -75,9 +75,11 @@ public class _EncuentraOjosArticulos extends Action
 		
 		ServletContext context = request.getSession().getServletContext();
 		Hashtable<String, String> artBarra = (Hashtable<String, String>) context.getAttribute("barras_"+idEmpresa);
+
 		List<DataIDDescripcion> familias = logica.darListaDataIdDescripcion("art_familia", idEmpresa);
 		List<DataIDDescripcion> subfamilias = logica.darListaDataIdDescripcion("art_subfamilia", idEmpresa);
 		List<DataIDDescripcion> estanterias = logica.darEstanterias(idEmpresa);
+
 		if(idOjo==null && estanteria ==null && categoria == null && (articulo ==null || articulo.isEmpty()) && subcategoria ==null)
 		{
 			session.setAttribute("ojosTienen", null);

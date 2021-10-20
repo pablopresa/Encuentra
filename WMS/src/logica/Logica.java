@@ -6340,7 +6340,7 @@ public  List<DataLineaRepo> darListaLineasRepoPick(int idPick, int idEmpresa)
 private  List<DataLineaRepo> darListaLineasReservadasRepoPick(int idPick, int idEmpresa, int idUsuario) 
 {
 	@SuppressWarnings("unused") Connection cone;
-	try 
+	/*try 
 	{
 		cone = econ.getConnection();
 	} 
@@ -6350,17 +6350,17 @@ private  List<DataLineaRepo> darListaLineasReservadasRepoPick(int idPick, int id
 		e1.printStackTrace();
 	}
 	List<DataIDDescripcion> list= econ.darIdDescripcion("SELECT distinct destino,'' FROM reposicion_articulos WHERE mayorista=1 AND idEmpresa="+idEmpresa+" and idpicking="+idPick);
-	
+	*/
 	String rao = "left outer JOIN reposicion_articulos_ojos RAO ON RAO.idArticulo = AR.idArticulo AND RAO.idEmpresa = AR.idEmpresa AND RAO.idPicking = RA.idPicking AND RAO.destino=RA.Destino and RA.idSolicitudTraslado=RAO.solicitud and ra.idUsuario=rao.idUsuario ";
 	
 	
 	String justificacion=", ' ' ";
 	
 	// Si destino es e-commerce
-	if(list.size()==1 && list.get(0).getId()==1200){
+	//if(list.size()==1 && list.get(0).getId()==1200){
 		rao+=" and RAO.pedido=RA.seccion ";
 		justificacion= ", RA.Justificacion ";
-	}
+	//}
 	
 	String wHusu = "";
 	String iNusu = "";
@@ -7790,11 +7790,11 @@ public  List<DataPicking> encuentraDarPicking(int idPick, int idEmpresa)
 			" GROUP BY RAR.IdSincronizacion, RAR.idArticulo, RAR.Origen, DOR.Nombre, RAR.Destino, DES.Nombre, RAR.idPicking, RAR.idUsuario,RAR.IdSolicitudTraslado ";
 			
 	try {
-		cone = econ.getConnection();
+		/*cone = econ.getConnection();
 		List<DataIDDescripcion> list= econ.darIdDescripcion("SELECT distinct destino,'' FROM reposicion_articulos WHERE mayorista=1 and idpicking="+idPick);	
-		if(list.size()==1 && list.get(0).getId()==1200){
+		if(list.size()==1 && list.get(0).getId()==1200){*/
 			consulta += ",RAR.Seccion ";
-		}
+		//}
 		consulta += " ORDER BY RAR.picked desc";
 	} catch (Exception e1) {		
 		e1.printStackTrace();
@@ -7843,11 +7843,11 @@ public  List<DataPicking> encuentraDarPickingCBulto(int idPick, int idEmpresa)
 			"WHERE RAR.idPicking = "+idPick+" AND RAR.Verif < RAR.cantidad AND RAR.Estado NOT in (4,7) AND RAR.IdEmpresa= "+idEmpresa+
 			" GROUP BY RAR.IdSincronizacion, RAR.idArticulo, RAR.Origen, DOR.Nombre, RAR.Destino, DES.Nombre, RAR.idPicking, RAR.idUsuario,RAR.IdSolicitudTraslado, rao.idBulto ";
 	try {
-		cone = econ.getConnection();
-		List<DataIDDescripcion> list= econ.darIdDescripcion("SELECT distinct destino,'' FROM reposicion_articulos WHERE mayorista=1 and idpicking="+idPick);	
-		if(list.size()==1 && list.get(0).getId()==1200){
+		//cone = econ.getConnection();
+		//List<DataIDDescripcion> list= econ.darIdDescripcion("SELECT distinct destino,'' FROM reposicion_articulos WHERE mayorista=1 and idpicking="+idPick);	
+		//if(list.size()==1 && list.get(0).getId()==1200){
 			consulta += ",RAR.Seccion ";
-		}
+		//}
 		consulta += " ORDER BY RAR.picked desc";
 	} catch (Exception e1) {		
 		e1.printStackTrace();
@@ -13850,6 +13850,28 @@ public List<ReportObject> DistribucionesPorPicking(String fechaI, String fechaF,
 		}
 	}
 	
+	public bulto BuscarBultoPicking(int idPicking,int destino, int idEmpresa){
+		@SuppressWarnings("unused") Connection cone;
+		try {
+			cone = econ.getConnection();
+			
+			String consulta = "SELECT b.* \r\n"
+					+ "FROM bulto b \r\n"
+					+ "INNER JOIN  bulto_contenido BC on BC.idBulto = b.idBulto AND b.IdEmpresa = BC.IdEmpresa where BC.picking="+idPicking+" AND b.destino="+destino+" AND b.IdEmpresa="+idEmpresa+""; 
+			String consulta2 = "select * from bulto_contenido where  idEmpresa="+idEmpresa+" AND  idBulto='@@'";
+			String consulta3 = "select * from bulto_caracteristica where idEmpresa="+idEmpresa+" AND  idBulto='@@'";
+			String consulta4 = "select * from bulto_remito where  idEmpresa="+idEmpresa+" AND idBulto='@@'";
+
+			return econ.DarBulto(consulta, consulta2,consulta3,consulta4,idEmpresa);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			return new bulto();
+		}
+	}
+	
+	
 	
 	/****************************************EXPEDICION*************************************/
 	public  List<DataIDDescripcion> ArticulosEnEstanteriaClasificacion(String dep, int idEmpresa) 
@@ -13859,7 +13881,7 @@ public List<ReportObject> DistribucionesPorPicking(String fechaI, String fechaF,
 		{
 		cone = econ.getConnection();
 		
-		String query = "";
+ 		String query = "";
 		if(dep.equals("")){
 			query = "SELECT SUM(ota.Cantidad),if(d.iddeposito>9000,d.nombre,CONCAT(d.idDeposito,'-',d.alias)),d.idDeposito FROM ojostienenarticulos ota "+
 					"INNER JOIN ojos o on o.idOjo=ota.idOjo  AND o.idEmpresa=ota.idEmpresa "+

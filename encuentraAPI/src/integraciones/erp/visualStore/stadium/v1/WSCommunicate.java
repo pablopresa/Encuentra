@@ -51,6 +51,7 @@ public class WSCommunicate {
 		Holder<Integer> tr = new Holder<Integer>();
 		Holder<String> msj = new Holder<String>();
 		DataIDDescripcion retorno = new DataIDDescripcion();
+		retorno.setDescripcionB("");
 		try 
 	    {
 			
@@ -166,6 +167,7 @@ public class WSCommunicate {
 		Holder<Integer> tr = new Holder<Integer>();
 		Holder<String> msj = new Holder<String>();
 		DataIDDescripcion retorno = new DataIDDescripcion(0,"");
+		retorno.setDescripcionB("");
 		try 
 	    {
 			//Holder<String> mensaje,

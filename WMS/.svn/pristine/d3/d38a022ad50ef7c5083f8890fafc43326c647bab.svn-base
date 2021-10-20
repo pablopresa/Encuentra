@@ -1,7 +1,0 @@
-<div class="input-group" data-genuitec-lp-enabled="false" data-genuitec-file-id="wc1-205" data-genuitec-path="/encuentra/webApps/gentelella-master/gentelella-master/vendors/bootstrap-datetimepicker/test/screen-capture/t2.html">
-                <span class="input-group-addon">
-                    end time
-                </span>
-                <input type="text" name="filter.endTime[]" class="form-control" placeholder="end time" id="end-time-input" value=""
-                data-datetimepicker data-click-target>
-            </div> 

@@ -1,7 +1,0 @@
-txt=C:\\Program Files/apache-tomcat-7.0.64/webapps/WMS/txt/
-zip=C:\\Program Files/apache-tomcat-7.0.64/webapps/WMS/zip/
-pdf=C:\\Program Files/apache-tomcat-7.0.64/webapps/WMS/pdf/
-xlsx=C:\\Program Files/apache-tomcat-7.0.64/webapps/WMS/xlsx/
-img=F\\:/Anexos/
-HTTP_pdf=http://encuentra.200.com.uy/WMS/pdf
-api=200.58.149.123:8077
