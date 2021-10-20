@@ -88,7 +88,7 @@ public class Call_WS_APIENCUENTRA {
     	}
 	}
 	
-	public String[] prepararRemito (int idDepoCentral, int destino, Usuario uLog,List<DataPicking> l,int idEmpresa, int idDepoWEB,List<DataIDDescripcion> list )
+	public String[] prepararRemito (int idDepoCentral, int destino, Usuario uLog,List<DataPicking> l,int idEmpresa, int idDepoWEB,List<DataIDDescripcion> list, int razon )
 	{
 		
 		String [] menError = {"",""};
@@ -102,7 +102,7 @@ public class Call_WS_APIENCUENTRA {
 		m.setOrigenDoc(new Long(l.get(0).getIdPicking()));
 		m.setDocSolicitud(l.get(0).getSolicitud());
 		m.setDoc(0);
-		m.setRazon(0);
+		m.setRazon(razon);
 		m.setObservacion("");
 		m.setUsuario(uLog.getNombre()+" "+uLog.getApellido());
 		if(destino!=idDepoWEB) { m.setEntrega(true);}
@@ -114,7 +114,7 @@ public class Call_WS_APIENCUENTRA {
 		{
 			
 			menError[0]=respVisual.getDescripcion();
-			menError[1]=respVisual.getDescripcionB();
+			menError[1]=respVisual.getId()+"";
 			
 		}
 		
@@ -166,12 +166,7 @@ public class Call_WS_APIENCUENTRA {
 		{
 			
 			Logica log = new Logica();
-			
-			
-			
 			String token_API=log.darParametroEmpresa(idEmpresa,10);
-			
-			
 			
 			String host = apiHost;
 			String servicio = "http://"+host+"/encuentraAPI/Integraciones/PrintSpooler/put?token="+token_API; 

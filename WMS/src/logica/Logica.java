@@ -13894,6 +13894,28 @@ public List<ReportObject> DistribucionesPorPicking(String fechaI, String fechaF,
 		}
 	}
 	
+	public bulto BuscarBultoPicking(int idPicking,int destino, int idEmpresa){
+		@SuppressWarnings("unused") Connection cone;
+		try {
+			cone = econ.getConnection();
+			
+			String consulta = "SELECT b.* \r\n"
+					+ "FROM bulto b \r\n"
+					+ "INNER JOIN  bulto_contenido BC on BC.idBulto = b.idBulto AND b.IdEmpresa = BC.IdEmpresa where BC.picking="+idPicking+" AND b.destino="+destino+" AND b.IdEmpresa="+idEmpresa+""; 
+			String consulta2 = "select * from bulto_contenido where  idEmpresa="+idEmpresa+" AND  idBulto='@@'";
+			String consulta3 = "select * from bulto_caracteristica where idEmpresa="+idEmpresa+" AND  idBulto='@@'";
+			String consulta4 = "select * from bulto_remito where  idEmpresa="+idEmpresa+" AND idBulto='@@'";
+
+			return econ.DarBulto(consulta, consulta2,consulta3,consulta4,idEmpresa);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			return new bulto();
+		}
+	}
+	
+	
 	
 	/****************************************EXPEDICION*************************************/
 	public  List<DataIDDescripcion> ArticulosEnEstanteriaClasificacion(String dep, int idEmpresa) 
@@ -13903,7 +13925,7 @@ public List<ReportObject> DistribucionesPorPicking(String fechaI, String fechaF,
 		{
 		cone = econ.getConnection();
 		
-		String query = "";
+ 		String query = "";
 		if(dep.equals("")){
 			query = "SELECT SUM(ota.Cantidad),if(d.iddeposito>9000,d.nombre,CONCAT(d.idDeposito,'-',d.alias)),d.idDeposito FROM ojostienenarticulos ota "+
 					"INNER JOIN ojos o on o.idOjo=ota.idOjo  AND o.idEmpresa=ota.idEmpresa "+

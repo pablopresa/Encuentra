@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 
 import beans.MovStock;
 import beans.Usuario;
+import beans.bulto;
 import beans.encuentra.DataPicking;
 
 import cliente_rest_Invoke.Call_WS_APIENCUENTRA;
@@ -59,7 +60,7 @@ public class _EncuentraRemitirPicking extends Action
 			
 			
 			
-			//int idDepoCentral = util.darParametroEmpresaINT(idEmpresa,4);
+			int razonRemito = util.darParametroEmpresaINT(idEmpresa,60);
 			int idDepoCentral = Integer.parseInt(uLog.getDeposito());
 			
 			if(idDepoCentral==-1)
@@ -126,6 +127,7 @@ public class _EncuentraRemitirPicking extends Action
 				{					
 					list = new ArrayList<>();
 					ArtsSinAfectar = new ArrayList<>();
+					int cantidad =0;
 					for (DataPicking p : l) 
 						{
 							destino = p.getDestino().getId();
@@ -138,6 +140,8 @@ public class _EncuentraRemitirPicking extends Action
 							
 							if(p.getVerificada()-p.getRemitida()>0)
 							{
+								cantidad+=p.getVerificada()-p.getRemitida();
+								
 								data = new DataIDDescripcion(p.getVerificada()-p.getRemitida(),p.getArticulo());
 								//data.setIdB(idDepoWEB);
 								data.setIdB(destino);
@@ -168,6 +172,7 @@ public class _EncuentraRemitirPicking extends Action
 						if(true)//aca decia integracion activa
 						{
 							boolean afectarEstadoEC = false;
+							boolean incluirRemito = false;
 							
 							if(list.size()>0)
 							{
@@ -175,47 +180,60 @@ public class _EncuentraRemitirPicking extends Action
 								
 								if(integracionActiva)
 								{
-									retorno = api.prepararRemito(idDepoCentral, destino, uLog, l, idEmpresa, idDepoWEB, list);
+									retorno = api.prepararRemito(idDepoCentral, destino, uLog, l, idEmpresa, idDepoWEB, list,razonRemito);
 									
-									if(!retorno[0].equals(""))
+									if(depositosWEB.containsKey(destino))
 									{
-										menError += "DOC "+l.get(0).getSolicitud()+" - "+retorno[0] + " <br/>";
-									}
-									else 
-									{
-										afectarEstadoEC=true;								
-									}
-									if(!retorno[1].equals(""))
+										if(!retorno[0].equals(""))
 										{
-											//MODIFICO NUMERO DE DOCUMENTO EN ARTICULOS QUE NO SE AFECTARON EN ESTA DISTRIBUCION
-										if(depositosWEB.containsKey(destino))
-											{
-												Logica.updateDocVisual(l.get(0).getSolicitud(), ArtsSinAfectar, 
-													Integer.parseInt(retorno[1]),idEmpresa);
-											}
-											menError +="Se genero un nuevo documento ("+retorno[1]+") por la diferencia del documento "
-											+l.get(0).getSolicitud()+" <br/>";
+											menError += "DOC "+l.get(0).getSolicitud()+" - "+retorno[0] + " <br/>";
 										}
+										else 
+										{
+											afectarEstadoEC=true;	
+											incluirRemito=true;
+										}
+									}
+									else
+									{
+										if(!retorno[1].equals("") && !retorno[1].equals("0"))
+										{
+											incluirRemito=true;
+											int idPicking = l.get(0).getIdPicking();
+											
+											bulto b = Logica.BuscarBultoPicking(idPicking,destino,idEmpresa);
+											
+											b.Cargar_Remito(retorno[1], 1, cantidad);
+											
+										}
+									}
+									
+									
+									
 								}
 								else // si la integracion no esta activa igual marco los cambios de estado con la verificacion.
 								{
 									afectarEstadoEC=true;
+									incluirRemito=true;
 								}
 								
 								
 								
 									
-								if(afectarEstadoEC)
+								
+								for(DataIDDescripcion d:list) 
 								{
-									for(DataIDDescripcion d:list) 
+									if(incluirRemito)
 									{
 										remitoEC.add(d);
-										if(depositosWEB.containsKey(destino))
-										{
-											util.ConfirmoMovimientoEcommerce(d, idDepoCentral, idDepoWEB, idEmpresa, uLog, Logica);
-										}
+									}
+									
+									if(afectarEstadoEC && depositosWEB.containsKey(destino))
+									{
+										util.ConfirmoMovimientoEcommerce(d, idDepoCentral, idDepoWEB, idEmpresa, uLog, Logica);
 									}
 								}
+								
 								
 							}
 						}

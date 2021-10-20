@@ -253,10 +253,8 @@ public class ClienteStdFenicio
 						 }
 					 }
 				 
-			 	
-				 
-				 List<String> articulosS = new ArrayList<>(articulos.values());
-				 List<DataIDDescripcion> arts = new ArrayList<>();
+			 	List<String> articulosS = new ArrayList<>(articulos.values());
+			 	List<DataIDDescripcion> arts = new ArrayList<>();
 				 
 				 Map<String, ArticuloCantidadEncuentra> hashartCantEnc = new HashMap<>();
 				 

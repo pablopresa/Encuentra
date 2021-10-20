@@ -128,7 +128,7 @@ public class _EncuentraCerrarCaja extends Action
 							//ETIQUETA DE BULTO
 							String etiq = "";
 							etiq = util.imprimirEtiqueta(b, unidades, idEmpresa);	
-							b.Cargar_Remito(b.getIdBulto(), 1, unidades);
+							
 				            api.PutColaImpresion(b.getIdBulto(), etiq, 0, 1,uLog.getIdEquipo(),idEmpresa,1);
 				            //REMUEVO LA CAJA DE LA COLECCION
 							cajasAbiertas.remove(equipo+"-"+idDestino);
