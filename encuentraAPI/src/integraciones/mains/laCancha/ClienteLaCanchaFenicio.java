@@ -31,6 +31,7 @@ public class ClienteLaCanchaFenicio {
 		List<CanalMarketPlace> canalesL = new ArrayList<>(canales.values());
 
 		LogicaAPI logica = new LogicaAPI();
+		
 		String token = logica.darToken(f.getIdEmpresa());
 		Call_WS_APIENCUENTRA wms = new Call_WS_APIENCUENTRA();
 		Map<Integer, String> parametros = wms.darParametros(token, "");
