@@ -1,7 +1,7 @@
 package integraciones.erp.ascher;
 
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import beans.encuentra.ArticuloReposicion;
 import beans.encuentra.DepositoMayorista;
@@ -14,8 +14,8 @@ public class DataDeposOrdenes
 	private List<DepositoMayorista> depositos;
 	private List<SDTPedidoEncuentra> cabezales;
 	
-	Hashtable<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>> renglones;
-	Hashtable<Integer, OrdenVenta> ordenes;
+	Map<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>> renglones;
+	Map<Integer, OrdenVenta> ordenes;
 	
 	
 	public List<ArticuloReposicion> getArticulos() {
@@ -44,20 +44,17 @@ public class DataDeposOrdenes
 	public void setCabezales(List<SDTPedidoEncuentra> cabezales) {
 		this.cabezales = cabezales;
 	}
-	public Hashtable<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>> getRenglones() 
+	public Map<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>> getRenglones() 
 	{
 		return renglones;
 	}
-	public void setRenglones(Hashtable<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>> renglones) {
+	public void setRenglones(Map<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>> renglones) {
 		this.renglones = renglones;
 	}
-	public Hashtable<Integer, OrdenVenta> getOrdenes() {
+	public Map<Integer, OrdenVenta> getOrdenes() {
 		return ordenes;
 	}
-	public void setOrdenes(Hashtable<Integer, OrdenVenta> ordenes) {
+	public void setOrdenes(Map<Integer, OrdenVenta> ordenes) {
 		this.ordenes = ordenes;
 	}
-	
-	
-	
 }

@@ -4,24 +4,19 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import beans.datatypes.DTO_Articulo;
-import beans.datatypes.DataDescDescripcion;
 import beans.datatypes.DataIDDescripcion;
 import beans.datatypes.DataIDDescripcionList;
-import beans.datatypes.StockDeposito;
-import beans.encuentra.ArticuloRepoFromLoad;
 import beans.encuentra.ArticuloReposicion;
 import beans.encuentra.DepositoMayorista;
-import integraciones.erp.odoo.laIsla.SincroLaIsla;
 import integraciones.erp.visualStore.objetos.OrdenVenta;
 import integraciones.erp.visualStore.objetos.OrdenVentaLinea;
-import integraciones.wms.Call_WS_APIENCUENTRA;
-import logica.LogicaAPI;
 import logica.Util;
 
 public class ClientePPGAux
@@ -116,12 +111,12 @@ public class ClientePPGAux
  	{
  		
  				
- 		Hashtable<Integer, OrdenVenta> ordens = new Hashtable<>();
- 		Hashtable<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>> renglonesOrdenes = new Hashtable<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>>();
+ 		Map<Integer, OrdenVenta> ordens = new HashMap<>();
+ 		Map<Integer, List<SDTPedidoEncuentraRenglonesSDTPedidoEncuentraRenglon>> renglonesOrdenes = new HashMap<>();
  		DataDeposOrdenes retorno = new DataDeposOrdenes();
  		List<ArticuloReposicion> articulos = new ArrayList<>();
  		
- 		Hashtable<String, DepositoMayorista> depositos = new Hashtable<>();
+ 		Map<String, DepositoMayorista> depositos = new HashMap<>();
  		List<SDTPedidoEncuentra> cabezales = new ArrayList<>();
  			 	
  		CargaListaPedidosEncuentra  serviceC = new CargaListaPedidosEncuentra();
@@ -137,8 +132,6 @@ public class ClientePPGAux
  		for (SDTPedidosEncuentraListaSDTPedidosEncuentraListaItem aConsulta : respC.getSdtpedidos().getSDTPedidosEncuentraListaSDTPedidosEncuentraListaItem()) 
  		{
  			
- 			
-			
 			CargaPedidoEncuentraExecute careCA = new CargaPedidoEncuentraExecute();
 			SDTPedidoEncuentra cab = new SDTPedidoEncuentra();
 			 	
@@ -178,7 +171,6 @@ public class ClientePPGAux
 					 * " VALUES ("+this.getIdCarrito()+", "+this.getPorcDescuento()+", '"+this.getCliMail()+"', '"+this.getCliDireccion()+"', '"+this.getCliRuc()+"', '"+this.getCliCedula()+"', '"+this.getCliNombre()+"', 
 					 * '"+this.getCliTelefono()+"', '"+urlEtiqueta+"', "+cantUnidades+", 0, "+this.getMl()+",'"+this.getFormaPago()+"',"+this.getImportePago()+",'"+this.getCliMail()+"', "+idEmpresa+")";*/
 					
-					
 					ov.setIdCarrito(Long.parseLong(cab.getNro()+""));
 					ov.setPorcDescuento(0.0);
 					ov.setCliMail("");
@@ -197,11 +189,8 @@ public class ClientePPGAux
 					ov.setCiudad(respCA.getSdtpedidocabezal().getLocalidad());
 					ov.setCourrier(respCA.getSdtpedidocabezal().getEnvioDescr());
 					
-					
-					
 					depositos.put(idDepositoDestino+"",dp);
 					List<OrdenVentaLinea> ordenVentaLineas = new ArrayList<>();
-					 	
 					 	
 					 	System.out.println("Pedido "+respCA.getSdtpedidocabezal().getNro()); 
 					 	System.out.println("Lineas ");
@@ -224,14 +213,9 @@ public class ClientePPGAux
 					 		System.out.println(aConsulta.prioridad);
 					 		ar.setPrioridad(Boolean.parseBoolean(aConsulta.prioridad));
 					 		
-
-					
-
-					 		
 					 		System.out.println("");
 					 		System.out.println("PRIORIDAD: "+aConsulta.getPrioridad());
 					 		ar.setPrioridad(aConsulta.getPrioridad().equalsIgnoreCase("A"));
-					
 
 					 		OrdenVentaLinea ovl = new OrdenVentaLinea(0.0, (""+l.getCantidad()).replace(".0", ""), l.getArtId());
 					 		ovl.setLinea(l.getId());
@@ -247,11 +231,7 @@ public class ClientePPGAux
 					 	
 					 	ordens.put(cab.getNro(),ov);
 					 	
-					 
 		 		}
-		 		
-		 		
-		 		
 		 		
 		 		retorno.setRenglones(renglonesOrdenes);
 		 		retorno.setArticulos(articulos);
@@ -259,7 +239,6 @@ public class ClientePPGAux
 		 		retorno.setCabezales(cabezales);	 
 		 		retorno.setOrdenes(ordens);
 			 }
-			
 
  		return retorno;
  			 	
@@ -272,7 +251,7 @@ public class ClientePPGAux
 	{
 		
 		Util u = new Util();
-		List<DTO_Articulo> retorno = new ArrayList<DTO_Articulo>();
+		List<DTO_Articulo> retorno = new ArrayList<>();
 		
 		CargaArticulosPPyK serviceA = new CargaArticulosPPyK();
 		
@@ -290,7 +269,6 @@ public class ClientePPGAux
 		try {
 			writer = new PrintWriter("C:/Program Files/apache-tomcat-7.0.64/webapps/encuentraAPI/pdf/filenamePrueba.txt", "UTF-8");
 		} catch (FileNotFoundException | UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	 	while (hayMas) 
@@ -301,16 +279,12 @@ public class ClientePPGAux
 	 		sdta.setConsumidor("Encuentra");
 	 		sdta.setEmpresa("P");
 	 		
-	 		
 	 		System.out.println("whiling pagina "+pagina);
 	 		
 	 		careA.setSdtarticuloswebxgrupo(sdta);
 	 		CargaArticulosPPyKExecuteResponse  respA = portA.execute(careA);
 	 		
 	 		int largo = 0;
-	 		
-	 		
-            
             
 	 		for (SDTArticulosWebxGrupoArticulo a : respA.getSdtarticuloswebxgrupo().getArticulos().getArticulo()) 
 		 	{
@@ -360,9 +334,8 @@ public class ClientePPGAux
 					}
 					catch (Exception e) 
 					{
-						
+						e.printStackTrace();
 					}
-					
 					
 					try {
 						for (SdtArtFotosSdtArtFoto foto : a.getSdtArtFotos().getSdtArtFotosSdtArtFoto()) 
@@ -371,10 +344,7 @@ public class ClientePPGAux
 							ar.setImagen(foto.getFoto());
 						}   
 					} catch (Exception e) {
-						// TODO: handle exception
-					}
-					
-					
+						e.printStackTrace();					}
 					
 					retorno.add(ar);
 	 				
@@ -391,8 +361,6 @@ public class ClientePPGAux
 	 			hayMas=false;
 	 		}
 	 		pagina ++;
-	 		
-	 		
 		}
 	 	writer.close();
 	 	
@@ -424,7 +392,6 @@ public class ClientePPGAux
 
 	public List<DataIDDescripcionList> darFamilias() 
 	{
-		
 		List<DataIDDescripcionList> retorno = new ArrayList<>();
 		
 		
@@ -437,35 +404,29 @@ public class ClientePPGAux
 	 	
 	 	CargaFamiliasExecuteResponse respF =  portFam.execute(carexF);
 	 	
-	 	
 	 	for (SdtLineasSubFliasSdtLineaSubFlias m : respF.getSdtlineassubflias().getSdtLineasSubFliasSdtLineaSubFlias()) 
 	 	{
-
 	 		try {
 	 			System.out.println(m.getLinId()+" - "+ m.getLinDsc());
 
-				
 				DataIDDescripcionList familia = new DataIDDescripcionList(m.getLinId(), m.getLinDsc());
-				List<DataIDDescripcion> subF = new ArrayList<DataIDDescripcion>();
+				List<DataIDDescripcion> subF = new ArrayList<>();
 				
 				if(m.getSdtSubFlias() != null) {
 					for (SdtSubFliasSdtSubFlia mi : m.getSdtSubFlias().getSdtSubFliasSdtSubFlia()) 
 					{
 						System.out.println("\t "+mi.getSubFliaId()+" - "+ mi.getSubFliaDsc());
-						subF.add(new DataIDDescripcion(mi.getSubFliaId(), mi.getSubFliaDsc()));
-						
+						subF.add(new DataIDDescripcion(m.getLinId(), mi.getSubFliaId(), mi.getSubFliaDsc()));
 					}
 				}
 				familia.setLista(subF);
 				retorno.add(familia);
 			} catch (Exception e) {
-				// TODO: handle exception
+				e.printStackTrace();
 			}
-			
 		}
 	 	
 	 	return retorno;
-	
 	}
 
 	public List<DataIDDescripcion> darMarcas() 
@@ -480,7 +441,6 @@ public class ClientePPGAux
 	 	carex.setSdtmarcas(new ArrayOfSdtMarcasSdtMarca());
 	 	
 	 	CargaMarcasExecuteResponse resp =  port.execute(carex);
-	 	
 	 	
 	 	for (SdtMarcasSdtMarca m : resp.getSdtmarcas().getSdtMarcasSdtMarca()) 
 	 	{
