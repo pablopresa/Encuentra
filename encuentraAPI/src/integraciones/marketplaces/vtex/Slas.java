@@ -2,25 +2,15 @@ package integraciones.marketplaces.vtex;
 public class Slas
 {
     private String id;
-
     private String name;
-
     private String shippingEstimate;
-
-    private String deliveryWindow;
-
+    private DeliveryWindow deliveryWindow;
     private int price;
-
     private String deliveryChannel;
-
     private PickupStoreInfo pickupStoreInfo;
-
     private String polygonName;
-
     private String lockTTL;
-
     private String pickupPointId;
-
     private String transitTime;
 
     public void setId(String id){
@@ -41,10 +31,10 @@ public class Slas
     public String getShippingEstimate(){
         return this.shippingEstimate;
     }
-    public void setDeliveryWindow(String deliveryWindow){
+    public void setDeliveryWindow(DeliveryWindow deliveryWindow){
         this.deliveryWindow = deliveryWindow;
     }
-    public String getDeliveryWindow(){
+    public DeliveryWindow getDeliveryWindow(){
         return this.deliveryWindow;
     }
     public void setPrice(int price){

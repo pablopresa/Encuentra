@@ -14,9 +14,19 @@ import persistencia._EncuentraConexion;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EncuentraPedido 
 {
-	private int cantidad, cerrado, ml, idDepositoEnvio;
-	private String descripcion, estado,urlEtiqueta, sucursalPick, formaPago,fecha;
-	private Double descuento,precio, montoEnvio;;
+	private int cantidad;
+	private int cerrado;
+	private int ml;
+	private int idDepositoEnvio;
+	private String descripcion;
+	private String estado;
+	private String urlEtiqueta;
+	private String sucursalPick;
+	private String formaPago;
+	private String fecha;
+	private Double descuento;
+	private Double precio;
+	private Double montoEnvio;
 	private List <EncuentraPedidoArticulo> articulosPedido;
 	private List <EncuentraPedidoArticuloReq> articulosPedidoReq;
 	private DataIDDescripcion canalMercadoLibre;
@@ -34,8 +44,6 @@ public class EncuentraPedido
 	private int idEstado;
 	private Cliente cliente;
 	
-
-	
 	public Cliente getCliente() {
 		return cliente;
 	}
@@ -43,10 +51,7 @@ public class EncuentraPedido
 		this.cliente = cliente;
 	}
 
-
 	private String horarioD,horarioH;	
-	
-	
 	
 	public String getHorarioD() {
 		return horarioD;
@@ -60,11 +65,6 @@ public class EncuentraPedido
 	public void setHorarioH(String horarioH) {
 		this.horarioH = horarioH;
 	}
-	
-	
-	
-	
-	
 	public boolean isFreshipping() {
 		return freshipping;
 	}
@@ -170,20 +170,12 @@ public class EncuentraPedido
 	}
 	public EncuentraPedido() {
 	}
-	
-	
-	
 	public String getFormaPago() {
 		return formaPago;
 	}
 	public void setFormaPago(String formaPago) {
 		this.formaPago = formaPago;
 	}
-	
-	
-	
-	
-	
 	public Double getPrecio() {
 		return precio;
 	}
@@ -253,8 +245,6 @@ public class EncuentraPedido
 						art.setVariacion("");
 					}
 					
-					
-					
 					sb.append("INSERT INTO `ecommerce_pedido_articulos` (`idPedido`, `idArticulo`, `cantidadPedido`, `idEmpresa`,`NotaArticulo`,`CantidadRegalo`) VALUES ('"+this.getIdPedido()+"', '"+art.getArticulo()+"', '"+art.getCantidad()+"',"+idEmpresa+",'"+art.getVariacion()+"',"+art.getCantidadRegalo()+") on duplicate key update  NotaArticulo = CONCAT(NotaArticulo ,' ','"+art.getVariacion()+"') , `cantidadPedido`=`cantidadPedido`+'"+art.getCantidad()+"'; ");
 					sb.append("INSERT INTO `articulos` (`idArticulo`, `Descripcion`, `IdTipo`,`idEmpresa`) VALUES ('"+this.getIdPedido()+"_"+art.getArticulo()+"', '"+this.getDescripcion().replace("'", "")+"', 2,"+idEmpresa+") on duplicate key update Descripcion ='"+this.getDescripcion().replace("'", "")+"';");
 				}
@@ -275,8 +265,6 @@ public class EncuentraPedido
 		}
 		
 		return retorno;
-		
-		
 		
 	}
 	
@@ -305,9 +293,6 @@ public class EncuentraPedido
 				Logica.persistir("INSERT INTO `ecommerce_pedido_articulos` (`idPedido`, `idArticulo`, `cantidadPedido`,idEmpresa) VALUES ('"+this.getIdPedido()+"', '"+art.getArticulo()+"', '"+art.getCantidad()+"',"+idEmpresa+");");
 			}
 				
-			
-		
-		
 		}
 		catch (Exception e)
 		{
@@ -317,11 +302,7 @@ public class EncuentraPedido
 		}
 		
 		return retorno;
-		
-		
-		
 	}
-	
 	
 	public int getIdDepositoEnvio() {
 		return idDepositoEnvio;
@@ -353,8 +334,6 @@ public class EncuentraPedido
 				Logica.persistir("update ecommerce_pedido_articulos_req set procesarEnPickup = 0 where idEmpresa="+idEmpresa+" AND idPedido="+this.getIdPedido());
 			}
 			
-			
-		
 		}
 		catch (Exception e)
 		{
@@ -364,9 +343,6 @@ public class EncuentraPedido
 		}
 		
 		return retorno;
-		
-		
-		
 	}
 	public boolean updateDestino(int destino, String track, int idEmpresa,double costoEnvio, boolean freeshipping) 
 	{

@@ -358,7 +358,8 @@ public class Synchronizer
 	@Path("/putConexionSubfamilias")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String putConexionSubfamilias(String data,@QueryParam ("token") String a, @QueryParam ("tabla") String tabla, @QueryParam ("columna1") String columna1, @QueryParam ("columna2") String columna2)
+	public String putConexionSubfamilias(String data,@QueryParam ("token") String a, @QueryParam ("tabla") String tabla, @QueryParam ("columna1") String columna1, 
+			@QueryParam ("columna2") String columna2, @QueryParam ("columna3") String columna3)
 	{
 		Logica l = new Logica();
 		_EncuentraPersistir eper = new _EncuentraPersistir();
@@ -376,7 +377,7 @@ public class Synchronizer
 				List<DataIDDescripcion> datos = new ArrayList<>();
 				try {
 					datos = gson.fromJson(data, new TypeToken<List<DataIDDescripcion>>(){}.getType());
-					eper.persistirIdID(datos, tabla, columna1, columna2, idEmpresa);
+					eper.persistirIdIdDescripcion(datos, tabla, columna1, columna2, columna3, idEmpresa);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

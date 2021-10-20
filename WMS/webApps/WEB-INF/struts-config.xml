@@ -1384,9 +1384,6 @@
 	  	</action>
 	  	
 	  	<!--  -->
-	  	
-	  
-	  	
 	  		
 		<action path="/AltaFileRecepcionXLS" type="web.almacen.bas.ImportRecepcion">
 			<forward name="ok" path="/v3/recepcion/RecepcionDesdeArchivo.jsp" redirect="true"/>
@@ -1461,7 +1458,6 @@
 	  	<action path="/PrintArticulosBarrasRecepcionII" type="web.recepcion._EncuentraPrintBarrasRecepcionII">
 	  		<forward name="ok" path="/v3/mantenimiento/listaDepositos.jsp" redirect="true"/>
 	  	</action>
-	  	
 
 	  	<action path="/FiltrarTEST" type="web.informes.FiltrarTEST">
 	  		<forward name="ok" path="/v3/reporteTEST.jsp" redirect="true"/>
@@ -1523,6 +1519,10 @@
 	  	
 	  	<action path="/reporteRecepcionCantidad" type="web.recepcion._EncuentraReporteRecepcion">
 	  		<forward name="ok" path="/v3/reportes/reporteRecepcionCantidad.jsp"/>
+	  	</action>	  	
+	  	
+	  	<action path="/CargarSubfamiliasUbicaciones" type="web.almacen._CargarSubfamiliasUbicaciones">
+	  		<forward name="ok" path="/v3/util/print_html.jsp"/>
 	  	</action>	  	
 	  	
   	</action-mappings>

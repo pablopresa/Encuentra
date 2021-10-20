@@ -1,14 +1,12 @@
 package beans;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import beans.datatypes.DataIDDescripcion;
 import integraciones.marketplaces.fenicioTrack.Fenicio;
 import integraciones.marketplaces.fenicioTrack.FenicioBAS;
 import integraciones.marketplaces.fenicioTrack.FenicioForus;
-import integraciones.marketplaces.fenicioTrack.FenicioLAISLA;
 import integraciones.marketplaces.moddo.Moddo;
 import integraciones.marketplaces.objetos.UpdateStateResponse;
 import integraciones.marketplaces.objetos.marketPlace;
@@ -22,17 +20,14 @@ public class TaskStatusChange {
 		for(DataIDDescripcion e: empresas) {
 			List<marketPlace> marketPlaces= darInstanciasMarketPlaces(e.getId());
 			for(marketPlace mp: marketPlaces) {
-				Enumeration<Integer> canales = mp.getCanales().keys();
-				while (canales.hasMoreElements()) {
-					int c=canales.nextElement();
-					List<jsonEstadoMP> pendientes = LogicaAPI.pendienteColaEstadoMarketPlace(c,mp.getIdEmpresa());
+				for(Integer c : mp.getCanales().keySet()) {
+					List<jsonEstadoMP> pendientes = LogicaAPI.pendienteColaEstadoMarketPlace(c, mp.getIdEmpresa());
 					if(!pendientes.isEmpty()) {
 						StatusChange(mp, pendientes, c);
 					}					
 				}
 			}			
 		}
-		
 	}
 	
 	public TaskStatusChange () {}
@@ -64,8 +59,6 @@ public class TaskStatusChange {
 		}
 		return lista;
 	}
-	
-	
 	
 	public static void StatusChange(marketPlace mp, List<jsonEstadoMP> pendientes, int canal) {
 		try {

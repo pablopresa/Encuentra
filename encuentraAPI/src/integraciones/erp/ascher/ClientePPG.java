@@ -1,7 +1,7 @@
 package integraciones.erp.ascher;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,28 +21,26 @@ public class ClientePPG
  {
 	 	ClientePPGAux cli = new ClientePPGAux();
 	 	
-	 	List<DataIDDescripcionList> listaFamiliasSubFamilias = cli.darFamilias();
+	 	List<DataIDDescripcionList> listaFamiliasSubfamilias = cli.darFamilias();
 	 	List<DataIDDescripcion> listaFamilias = new ArrayList<>();
 	 	List<DataIDDescripcion> listaSubFamilias = new ArrayList<>();
 	 	List<DataIDDescripcion> listaRelacionFamiliasSubFamilias = new ArrayList<>();
 	 	
-	 	for (DataIDDescripcionList ddl : listaFamiliasSubFamilias) 
+	 	for (DataIDDescripcionList familia : listaFamiliasSubfamilias) 
 	 	{
-	 		listaFamilias.add(new DataIDDescripcion(ddl.getId(), ddl.getDescripcion()));
-	 		for (DataIDDescripcion dd : ddl.getLista()) 
+	 		listaFamilias.add(new DataIDDescripcion(familia.getId(), familia.getDescripcion()));
+	 		for (DataIDDescripcion subfamilia : familia.getLista()) 
 	 		{
-				listaSubFamilias.add(dd);
-				DataIDDescripcion RelacionFamiliasSubFamilias = new DataIDDescripcion(ddl.getId(), dd.getId());
-				listaRelacionFamiliasSubFamilias.add(RelacionFamiliasSubFamilias);
+				listaSubFamilias.add(subfamilia);
+				DataIDDescripcion familiasSubfamilias = new DataIDDescripcion(subfamilia.getId(), subfamilia.getIdB(), subfamilia.getDescripcion());
+				listaRelacionFamiliasSubFamilias.add(familiasSubfamilias);
 			}
 		}
-	 	
 
-	 	String[] nombresMetodos = {"categorias","marcas","generos","familias","subfamilias","productos"};
+	 	String[] nombresMetodos = {"familias","subfamilias"};
 	 	//String[] nombresMetodos = {"ordenes"};
-	 	
 		
-		Call_WS_APIENCUENTRA cwa = new Call_WS_APIENCUENTRA();
+		Call_WS_APIENCUENTRA wms = new Call_WS_APIENCUENTRA();
 		LogicaAPI logica = new LogicaAPI();
 		List<DataIDDescripcion> datos = null;
 		List<DTO_Articulo> datosArt = null;
@@ -54,12 +52,12 @@ public class ClientePPG
 				case "categorias"://zafras
 					//cwa.putMaestros(token, listaFamilias, "art_categoria");
 					datos = cli.darCategorias();
-					cwa.putMaestros(token, datos, "art_categoria");
+					wms.putMaestros(token, datos, "art_categoria");
 					break;
 
 				case "marcas":
 					datos = cli.darMarcas();
-					cwa.putMaestros(token, datos, "art_marca");
+					wms.putMaestros(token, datos, "art_marca");
 					break;
 
 				/*
@@ -76,36 +74,37 @@ public class ClientePPG
 				*/	
 					
 				case "familias":
-					cwa.putMaestros(token, listaFamilias, "art_familia");
+					wms.putMaestros(token, listaFamilias, "art_familia");
 					break;
 					
 				case "subfamilias":
-					cwa.putMaestros(token, listaSubFamilias, "art_subfamilia");
-					cwa.putConexionSubfamilias(token, listaRelacionFamiliasSubFamilias, "art_familia_subfamilia", "IdFamilia", "IdSubfamilia");
+//					cwa.putMaestros(token, listaSubFamilias, "art_subfamilia");
+					wms.putConexionSubfamilias(token, listaRelacionFamiliasSubFamilias, "art_familia_subfamilia", "IdFamilia", "IdSubfamilia", "Descripcion");
 					break;
 			
 				case "productos":
 					try {
 						 
 						datosArt = cli.darArticulos();
-						cwa.putArticulos(token, datosArt);
+						wms.putArticulos(token, datosArt);
 						List<StockDeposito> stock = new ArrayList<>();
-						for (DTO_Articulo a : datosArt) 
-						{
+						for (DTO_Articulo a : datosArt) {
 							StockDeposito s = new StockDeposito("5",a.getIdArticulo(),a.getStock());
 							stock.add(s);
 						}
 						
-						cwa.putStk(token, stock);
+						wms.putStk(token, stock);
 						
-					} catch (Exception e) {}
+					} 
+					catch (Exception e) {
+						e.printStackTrace();
+					}
 					break;
 			
 				case "ordenes":
 					DataDeposOrdenes depositosOrdenes = cli.darOrdenes();
 				 	int lineasEnArt = 0;
 				 	int lineasEnReng = 0;
-					
 					
 					for (SDTPedidoEncuentra d : depositosOrdenes.getCabezales()) 
 				 	{
@@ -129,16 +128,14 @@ public class ClientePPG
 						}
 				 		
 					}
-				 	cwa.putDeposM(token, depositosOrdenes.getDepositos());
+				 	wms.putDeposM(token, depositosOrdenes.getDepositos());
 				 	
-				 	
-				 	
-				 	Map<Integer, String> parametrosE = cwa.darParametros(token, "");
+				 	Map<Integer, String> parametrosE = wms.darParametros(token, "");
 				 	int depositoCentral = Integer.parseInt(parametrosE.get(4));
 				 	
-				 	Map<Integer, ArticuloRepoFromLoad> pickingDestinos = new Hashtable<>();
-				 	Map<Integer, Integer> depositos = new Hashtable<>();
-				 	Map<String, DataIDDescripcion> articulosEnOrden = new Hashtable<>();
+				 	Map<Integer, ArticuloRepoFromLoad> pickingDestinos = new HashMap<>();
+				 	Map<Integer, Integer> depositos = new HashMap<>();
+				 	Map<String, DataIDDescripcion> articulosEnOrden = new HashMap<>();
 				 	for (ArticuloReposicion a : depositosOrdenes.getArticulos()) 
 				 	{
 				 		lineasEnArt++;
@@ -224,7 +221,7 @@ public class ClientePPG
 				 	}
 				 	
 				 	List<ArticuloRepoFromLoad> lista2 = new ArrayList<>(pickingDestinos.values());
-				 	List <DataIDDescripcion> respuesta = cwa.savePickingOrder(token,lista2);
+				 	List <DataIDDescripcion> respuesta = wms.savePickingOrder(token,lista2);
 				 	
 				 	for (DataIDDescripcion r : respuesta) 
 				 	{

@@ -3,12 +3,10 @@ import java.util.List;
 public class ShippingData
 {
     private String id;
-
-
     private List<LogisticsInfo> logisticsInfo;
-
     private String trackingHints;
-
+    private Address address;
+    
     private List<SelectedAddresses> selectedAddresses;
 
     public void setId(String id){
@@ -35,6 +33,13 @@ public class ShippingData
     public List<SelectedAddresses> getSelectedAddresses(){
         return this.selectedAddresses;
     }
+	public Address getAddress() {
+		return address;
+	}
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+    
 }
 
 

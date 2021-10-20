@@ -60,6 +60,25 @@ public class Vtex extends marketPlace {
 		}
 		return salida.getCompras();
 	}
+	@Override
+	public Map<String, DataIDDescripcion> DestinoPedidos(int canal, int dias, Map<String, DataIDDescripcion> retornable)
+	{
+		List<EncuentraPedido> pedidos = this.getPedidos(canal,"",dias);
+		
+		for (EncuentraPedido p : pedidos) 
+		{
+			try {
+				System.out.println(p.getIdFenicio());
+				retornable.put(p.getIdFenicio(), p.getDestino());
+			}
+			catch(Exception e) {
+				System.out.println("Error pedido "+p.getIdPedido());
+				System.out.println(e.getMessage());
+			}
+		}
+		
+		return retornable;
+	}
 
 //		private String callHttpPatch(String json, String url) {
 //			return callHttp(json, url, "PATCH");
@@ -144,33 +163,47 @@ public class Vtex extends marketPlace {
 
 				EncuentraPedido p = new EncuentraPedido();
 
-				p.setIdFenicio(order.getOrderId());
+				String canalVentaWs = order.getShippingData().getLogisticsInfo().get(0).getDeliveryChannel();
+				System.out.println("Canal de venta: " + canalVentaWs);
+				if(canalVentaWs.equals("delivery")) {
+					
+					DeliveryIds courier = order.getShippingData().getLogisticsInfo().get(0).getDeliveryIds().get(0);
+					System.out.println("Courier: " + courier.getCourierId() +" - " + courier.getCourierName());
+//					destino = new DataIDDescripcion(courier.getCourierId(), ""+canal);
+					p.setSucursalPick(courier.getWarehouseId());
+					p.setEmpresaEnvio(courier.getCourierName());
+					p.setEmpresaEnvioCod(courier.getCourierId());
+					p.setDestino(new DataIDDescripcion(0,""+canal));
+				}
+				else {
+					String direccion =  order.getShippingData().getAddress().getAddressId();
+					System.out.println("Pickup: " + direccion);
+					int idDireccion = Integer.parseInt(direccion);
+					p.setSucursalPick(direccion);
+					p.setEmpresaEnvio(direccion);
+					p.setEmpresaEnvioCod(direccion);
+					p.setDestino(new DataIDDescripcion(idDireccion,""+canal));
+				}
 				
+//						Si el deliverychannel = delivery tomo el destino de 
+//						tomo nombre y id de courier, si es pickup me tomo de pickupstoreinfo - address - addressid
+//						Si no es delivery le seteo el codigo de la sucursal en envio y enviocod
+				
+				p.setIdFenicio(order.getOrderId());
                 p.setDescripcion(cliente.getFirstName()+" "+cliente.getLastName());
                             
                 p.setTicketNumber("");
                 p.setEstado("");
                 p.setUrlEtiqueta("");
                 
-                try {
-                	Slas courier = order.getShippingData().getLogisticsInfo().get(0).getSlas().get(0);
-                	
-                	p.setEmpresaEnvio(courier.getName());
-                	p.setEmpresaEnvioCod(courier.getId());
-                }
-                catch (Exception e) {
-					p.setEmpresaEnvio("");
-					p.setEmpresaEnvioCod("");
-				}
-                
                 List<Items> articulosWs = order.getItems();
                 List<EncuentraPedidoArticulo> articulos = new ArrayList<>();
                 EncuentraPedidoArticulo articulo;
                 for(Items artWs : articulosWs) {
                 	articulo = new EncuentraPedidoArticulo();
-                	articulo.setArticulo(artWs.getProductId());
+                	articulo.setArticulo(artWs.getProductId());//TODO
                 	articulo.setCantidad(artWs.getQuantity());
-                	articulo.setCodFenicio(artWs.getId());
+                	articulo.setCodFenicio(artWs.getId());//TODO
                 	articulo.setImporte((double)artWs.getCostPrice());
                 	articulo.setSKUFenicio(artWs.getSellerSku());
                 	articulos.add(articulo);
@@ -180,17 +213,5 @@ public class Vtex extends marketPlace {
 			}
 			
 			return pedidos;
-			
 		}
-
-	public Map<String, DataIDDescripcion> DestinoPedidos(int canal, int dias,
-			Map<String, DataIDDescripcion> retornable) {
-		List<EncuentraPedido> pedidos = getPedidos(canal, "", dias);
-		for (EncuentraPedido p : pedidos) {
-			System.out.println(p.getIdPedido());
-			retornable.put(p.getIdPedido() + "", p.getDestino());
-		}
-		return retornable;
-	}
-
 }

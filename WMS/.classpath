@@ -16,6 +16,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/eclipselink-src-2.4.2.v20130514-5956486.zip"/>
 	<classpathentry kind="lib" path="lib/xws-security-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="webApps/WEB-INF/lib/javax.servlet.jar"/>
 	<classpathentry kind="lib" path="webApps/WEB-INF/lib/httpcore-4.4.jar"/>
 	<classpathentry kind="lib" path="webApps/WEB-INF/lib/joda-time-2.9.4.jar"/>
 	<classpathentry kind="lib" path="webApps/WEB-INF/lib/okhttp-3.9.0.jar"/>

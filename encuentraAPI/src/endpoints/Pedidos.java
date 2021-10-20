@@ -1,7 +1,6 @@
 package endpoints;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import beans.encuentra.MovimientosC;
 import integraciones.erp.visualStore.objetos.OrdenVenta;
 import integraciones.erp.visualStore.objetos.OrdenVentaLinea;
 import integraciones.marketplaces.fenicio.FenicioAPIorden;
-import integraciones.marketplaces.objetos.CanalMarketPlace;
 import integraciones.marketplaces.objetos.marketPlace;
 import integraciones.wms.Call_WS_APIENCUENTRA;
 import logica.LogicaAPI;
@@ -84,15 +82,8 @@ public class Pedidos {
 			@QueryParam("canal") String c) {
 		// System.out.println(data);
 
-		String mensaje = "";
-		String json = "";
-		int codResp = 0;
 		Usuario u = LogicaAPI.loginEncuentraAPI2(a);
 
-		if (u.getNick() == null) {
-			mensaje = "access_token invalido";
-
-		}
 		LogicaAPI l = new LogicaAPI();
 		String host = l.darHostFenicioAPI(u.getIdEmpresa(), c);
 
@@ -123,7 +114,6 @@ public class Pedidos {
 	public String putTracking(String data, @QueryParam("token") String a) {
 		// System.out.println(data);
 
-		String mensaje = "";
 		String json = "";
 		Gson gson = new Gson();
 		ResponseOrderFunctions response = new ResponseOrderFunctions();
@@ -470,23 +460,12 @@ public class Pedidos {
 					if (!estadosMP.isEmpty()) {
 						List<marketPlace> marketPlaces = TaskStatusChange.darInstanciasMarketPlaces(idEmpresa);
 						for (marketPlace mp : marketPlaces) {
-							/*Enumeration<Integer> canales = mp.getCanales().keys();
-							while (canales.hasMoreElements()) {
-								int c = canales.nextElement();
-								if (c == estadosMP.get(0).getCanal()) {
-									TaskStatusChange.StatusChange(mp, estadosMP, c);
-									break;
-								}
-							}*/
-
-							for(Map.Entry<Integer, CanalMarketPlace> pair : mp.getCanales().entrySet()) {
-								int c = pair.getKey();
+							for(Integer c : mp.getCanales().keySet()) {
 								if (c == estadosMP.get(0).getCanal()) {
 									TaskStatusChange.StatusChange(mp, estadosMP, c);
 									break;
 								}
 							}
-							
 						}
 					}
 

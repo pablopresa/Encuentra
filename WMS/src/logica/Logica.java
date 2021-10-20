@@ -3498,8 +3498,6 @@ public class Logica
 
 		try {
 
-			
-
 			String consulta = "UPDATE `ojostienenarticulos` SET `Cantidad`= `Cantidad`-"
 					+ id
 					+ " WHERE idEmpresa="+idEmpresa+" AND `idOjo`='"
@@ -3509,24 +3507,17 @@ public class Logica
 
 			String consultaII = " delete from `ojostienenarticulos` where idEmpresa="+idEmpresa+" AND `Cantidad` = 0;";
 			return consulta+consultaII;
-
-		} catch (Exception e) 
-		{
+		} 
+		catch (Exception e) {
 			return "";
 		}
 
 	}
 
-
-	
-
 	public  void encuentraBajaArticulosOjos(int id, String descripcion, String idOjo, int idEmpresa) 
 	{
 
 		try {
-
-			
-
 			String consulta = "UPDATE `ojostienenarticulos` SET `Cantidad`= `Cantidad`-"
 					+ id
 					+ " WHERE idEmpresa="+idEmpresa+" AND `idOjo`='"
@@ -3543,8 +3534,6 @@ public class Logica
 		}
 
 	}
-
-	
 
 	public  String query_encuentraUpdateAvanceLineaTarea(int idTarea, int unidad,int idmain, int idEmpresa) {
 		try {
@@ -3563,12 +3552,7 @@ public class Logica
 						+ " WHERE idEmpresa="+idEmpresa+" AND `IdTarea`=" + idTarea + " AND `main`=" + idmain
 						+ " LIMIT 1; ";	
 			}
-			
-			
-			
-
 			try {
-			
 
 				return consulta;
 
@@ -3589,7 +3573,6 @@ public class Logica
 					+ " LIMIT 1;";
 
 			try {
-			
 
 				eper.persistir(consulta);
 
@@ -3600,7 +3583,6 @@ public class Logica
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 	public String query_encuentraUpdateAvancePicking(int idPicking, String articulo, int cantidad, int idOr, int idDest, boolean verificacion,Long pedido, int doc, int idEmpresa,int depositoEcommerce, int autoVerificacion)
@@ -3623,7 +3605,6 @@ public class Logica
 			String consulta = "UPDATE `reposicion_articulos` SET `Picked`=`Picked`+"+cantidad+" , picked_at=CURRENT_TIMESTAMP() "+verif+remit+" WHERE idEmpresa="+idEmpresa+" AND `idPicking`="+idPicking+" AND `idArticulo`='"+articulo+"' AND `Origen`="+idOr+" AND `Destino`="+idDest+" and idSolicitudTraslado="+doc+ pedidoEC+"; ";
 
 			try {
-				
 
 				return consulta;
 
@@ -3635,7 +3616,6 @@ public class Logica
 			e.printStackTrace();
 		}
 		return "";
-
 	}
 	
 	public boolean encuentraUpdateAvancePicking(int idPicking, String articulo, int cantidad, int idOr, int idDest, boolean verificacion,Long pedido, int doc, int idEmpresa,int depositoEcommerce, int autoVerificacion)
@@ -3658,7 +3638,6 @@ public class Logica
 			String consulta = "UPDATE `reposicion_articulos` SET `Picked`=`Picked`+"+cantidad+" , picked_at=CURRENT_TIMESTAMP() "+verif+remit+" WHERE idEmpresa="+idEmpresa+" AND `idPicking`="+idPicking+" AND `idArticulo`='"+articulo+"' AND `Origen`="+idOr+" AND `Destino`="+idDest+" and idSolicitudTraslado="+doc+ pedidoEC+";";
 
 			try {
-				
 
 				salida = eper.persistir(consulta);
 
@@ -3670,15 +3649,14 @@ public class Logica
 			e.printStackTrace();
 		}
 		return salida;
-
 	}
 
 	public  List<DataIDDescripcion> darEstanterias(int idEmpresa) {
 		@SuppressWarnings("unused") Connection cone;
 		try {
 			cone = econ.getConnection();
-		} catch (Exception e) {
-			
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -3691,8 +3669,8 @@ public class Logica
 		@SuppressWarnings("unused") Connection cone;
 		try {
 			cone = econ.getConnection();
-		} catch (Exception e) {
-			
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -3709,7 +3687,6 @@ public class Logica
 		String consulta2 = "delete from `tareas` where idEmpresa="+idEmpresa+" AND `IdTarea` = " + idTarea;
 
 		try {
-			
 
 			eper.persistir(consulta0);
 			eper.persistir(consulta1);
@@ -3718,12 +3695,7 @@ public class Logica
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
-
-	
-
-	
 
 	public  boolean encuentraAltaUsuario(Usuario u) {
 		String consulta = "INSERT INTO `usuarios` (`idUsuario`, `Contraseña`, `Nickname`, `Nombre`, `Apellido`, `Perfil`, `idDeposito`,idEmpresa) "
@@ -3747,7 +3719,6 @@ public class Logica
 				+ "', `Nickname`='"+ u.getNick()+ "', `Nombre`='"+ u.getNombre()+ "', `Apellido`='"+ u.getApellido()+ "', `Perfil`='"+ u.getPerfil()
 				+ "', `idDeposito`="+ u.getDeposito()+ ";";
 		try {
-			
 
 			eper.persistir(consulta);
 			return true;
@@ -3756,7 +3727,6 @@ public class Logica
 			e.printStackTrace();
 			return false;
 		}
-
 	}
 	
 
@@ -3786,7 +3756,6 @@ public class Logica
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 	public  String  query_encuentraAltaNoncontrados(int idTarea, DataLineaRepo d, int encontrado, int linea, int idE) {
@@ -3807,8 +3776,6 @@ public class Logica
 				+ idTarea + " AND `idEstado` = 2";
 
 		try {
-		
-		
 			
 			return consulta+"  "+consultaUp;
 
@@ -3816,11 +3783,7 @@ public class Logica
 			e.printStackTrace();
 			return "";
 		}
-
 	}
-
-	
-
 
 	public  List<DataIDDescripcion> darListaDataIdDescripcion(String tabla, int idEmpresa) {
 
@@ -3833,24 +3796,21 @@ public class Logica
 			if(tabla.equals("seg_grupos")){
 				consulta = "select * from " + tabla+" where idEmpresa="+idEmpresa+" and idGrupo not in(105,100)";	
 			}
-			else{				
-				consulta = "select * from " + tabla+" where idEmpresa="+idEmpresa;
-			}
-			
-			if(tabla.equals("vista_rep_art_distribucion")) {
+			else if(tabla.equals("vista_rep_art_distribucion")) {
 				consulta = "select * from " + tabla+" where idEmpresa="+idEmpresa+" ORDER BY idSolicitudTraslado";
+			}
+			else {				
+				consulta = "select * from " + tabla+" where idEmpresa="+idEmpresa;
 			}
 			
 			System.out.println(consulta);
 			return econ.darListaDataIdDescripcion(consulta);
-
-		} catch (Exception e) {
-
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			return new ArrayList<>();
 		}
 	}
-	
 	
 	public  List<DataIDDescripcion> darListaDataIdDescripcionMYSQLConsulta(String consulta) {
 
@@ -3865,7 +3825,6 @@ public class Logica
 			return new ArrayList<>();
 		}
 	}
-	
 	
 	public  List<DataEcommerce_canales_envio> darListaEcommerce_canales_envio(int canal, int idEmpresa) {
 
@@ -3929,7 +3888,6 @@ public class Logica
 		}
 	}
 	
-	
 	private  List<DataIDIDDescripcion> darListaDataIdIdDescripcionMYSQLConsulta(String consulta) {
 
 		@SuppressWarnings("unused") Connection cone;
@@ -3943,8 +3901,6 @@ public class Logica
 			return null;
 		}
 	}
-	
-
 	
 	public  List<DataIDIDDescripcion> darListaPinckConfirmarTodo(boolean picking, int idEmpresa) 
 	{
@@ -18811,6 +18767,13 @@ public boolean persistirGenericos(List<DataIDDescripcion> datos, String nombreTa
 			e.printStackTrace();
 		}
 		return new ArrayList<>();
+	}
+
+	public List<DataIDDescripcion> darSubfamilias(String familias) {
+		
+		String consulta = "select idSubfamilia, Descripcion from art_familia_subfamilia afs where afs.idFamilia in "+familias;
+		return econ.darListaDataIdDescripcion(consulta);
+		
 	}
 }
 

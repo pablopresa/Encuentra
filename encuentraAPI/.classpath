@@ -2,20 +2,21 @@
 <classpath>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
+			<attribute name="module" value="true"/>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="WebRoot/WEB-INF/lib/JSTL 1.2.2"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry exported="true" kind="con" path="com.genuitec.runtime.library/com.genuitec.jstl_1.2.1">
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.jstl_1.2.1">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="WEB-INF/lib"/>
 			<attribute name="owner.project.facets" value="jst.web.jstl"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="WebRoot/WEB-INF/lib/httpclient-4.5.6.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/httpclient-4.5.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebRoot/WEB-INF/lib/httpcore-4.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebRoot/WEB-INF/lib/jackson-all-1.9.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebRoot/WEB-INF/lib/jackson-core-2.0.0.jar"/>
@@ -61,7 +62,7 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-lang-2.5.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/javax.activation-1.2.0.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jaxws-api-2.3.1.jar"/>
-	<classpathentry exported="true" kind="con" path="com.genuitec.runtime.library/com.genuitec.jaxb_ri_2.1">
+	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.jaxb_ri_2.1">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 			<attribute name="owner.project.facets" value="jpt.jaxb"/>
@@ -95,5 +96,11 @@
 			<attribute name="owner.project.facets" value="jpt.jaxb"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/200/Proyectos/WMS/webApps/WEB-INF/lib/gson-2.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/200/Proyectos/WMS/webApps/WEB-INF/lib/webservices-rt.jar"/>
+	<classpathentry kind="lib" path="C:/200/Proyectos/WMS/webApps/WEB-INF/lib/itextpdf-5.5.6.jar"/>
+	<classpathentry kind="lib" path="C:/200/Proyectos/WMS/webApps/WEB-INF/lib/itext-4.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/200/Proyectos/WMS/webApps/WEB-INF/lib/iText-5.0.5.jar"/>
+	<classpathentry kind="lib" path="C:/200/Proyectos/WMS/webApps/WEB-INF/lib/1.04_PDFOneJava_gpl.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

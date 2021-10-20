@@ -7,12 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -136,6 +133,7 @@ public class Fenicio extends marketPlace{
 	}
 	
 	//PREPARA EL JSON QUE SE DEBE ENVIAR PARA CAMBIO DE ESTADO
+	@Override
 	public String JSONUpdateState (Long idPedido, String idEcommerce, String track, int estado) {
 		String json = "";
 			json=
@@ -168,18 +166,15 @@ public class Fenicio extends marketPlace{
 		return salida.getCompras();
 	}
 	
-	//SINCRO PEDIDOS
-	public void sincroFenicio() {
-		/*Enumeration<Integer> canales = this.canales.keys();
-		while (canales.hasMoreElements()) {
-			int idCanal=canales.nextElement();
-			getPedidos(idCanal);
-		}*/
-	}
+//  SINCRO PEDIDOS
+//	public void sincroFenicio() {
+//		for(Integer idCanal : this.canales.keySet())
+//			getPedidos(idCanal);
+//	}
 	
 	//GET PEDIDOS
 	@Override
-	public List<EncuentraPedido> getPedidos(int canal, String status, int dias, Map<String, String> pedidosIn, Map<String, Integer> depositosPickHT) 
+	public List<EncuentraPedido> getPedidos(int canal, String status, int dias) 
 	{					
 		int pag=1;
         int cantidadPasadas = 20;
@@ -207,7 +202,7 @@ public class Fenicio extends marketPlace{
                
                System.out.println(retorno);
                Gson gson = new Gson();
-               Pedido pedido =gson.fromJson(retorno,Pedido.class);
+               Pedido pedido =gson.fromJson(retorno, Pedido.class);
            
                if(pri)
                {
@@ -227,7 +222,6 @@ public class Fenicio extends marketPlace{
                cantidadPasadas--;
                pag++;
         }
-                                                      
         
         int current = 1;
         System.out.println(pedidosALL.size()); 
@@ -401,9 +395,9 @@ public class Fenicio extends marketPlace{
 		
 	}
 	//get pedidos destino
-	public Hashtable<String, DataIDDescripcion> DestinoPedidos(int canal, int dias, Hashtable<String, DataIDDescripcion> retornable)
+	public Map<String, DataIDDescripcion> DestinoPedidos(int canal, int dias, Map<String, DataIDDescripcion> retornable)
 	{
-		List<EncuentraPedido> pedidos = getPedidos(canal,"",dias, null, null);
+		List<EncuentraPedido> pedidos = getPedidos(canal,"",dias);
 		
 		for (EncuentraPedido p : pedidos) 
 		{
@@ -412,13 +406,7 @@ public class Fenicio extends marketPlace{
 		}
 		
 		return retornable;
-		
-		
 	}
-	
-	
-
-
 	
 	//GET PEDIDOS Api Fenicio
 	public List<Ordenes> getPedidosAPI(int canal, int dias) 
@@ -430,7 +418,6 @@ public class Fenicio extends marketPlace{
         boolean pri = true;
         while (cantidadPasadas>=0) 
         {
-         
         	
         	  String urlBase = this.getCanales().get(canal).getHost();
         	  urlBase = urlBase.replace("/tracking/", "");
@@ -461,10 +448,7 @@ public class Fenicio extends marketPlace{
         }
     return pedidosALL;
 
-	
 }
-	
-	
 	
 	//GET ETIQUETAS
 	public String getEtiqueta(int id, int canal,int idEmpresa){
@@ -481,9 +465,7 @@ public class Fenicio extends marketPlace{
 			String urlBase = this.getCanales().get(canal).getHost();
 	    	  urlBase = urlBase.replace("/tracking/", "");
 	    	  
-	    	  
-	    	  Set<String> keys = pedidosEncuentra.keySet();
-				for(String pedido: keys)
+				for(String pedido: pedidosEncuentra.keySet())
 				{
 					String funcion = "/API_V1/ordenes/"+pedido;
 			           
@@ -500,7 +482,6 @@ public class Fenicio extends marketPlace{
 						} catch (Exception e) {
 							System.out.println("no se encontro el pedido");
 						}
-			           
 				}
 				
 			} catch (Exception e) {
@@ -532,13 +513,10 @@ public class Fenicio extends marketPlace{
 	    	
 	    	//httpPostRequest.setEntity(params);
 	    	
-	    	ArrayList<NameValuePair> postParameters;
-	    	postParameters = new ArrayList<>();
+	    	ArrayList<NameValuePair> postParameters = new ArrayList<>();
 	        postParameters.add(new BasicNameValuePair("compras", jotason));
-	        
 
 	        httpPostRequest.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));
-	    	
 	    	
 		  	HttpResponse httpResponse = httpClient.execute(httpPostRequest);
 		  	int code=httpResponse.getStatusLine().getStatusCode();
@@ -640,7 +618,6 @@ public class Fenicio extends marketPlace{
 			String usu = this.canales.get(canal).getUser();
 			String pass = this.canales.get(canal).getPass();
 
-	       
 	        String credencial = usu+ ":" + pass;
 	        String base64 = new String(Base64.getEncoder().encode(credencial.getBytes()));
 	        

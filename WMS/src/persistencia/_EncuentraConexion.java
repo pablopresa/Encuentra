@@ -1316,15 +1316,11 @@ public class _EncuentraConexion
 				catch (Exception e) {
 					e.printStackTrace();
 				}
-				
 			}
-
-
 
 			desconectar(rs,null, s);
 		}
-		catch (Exception e) 
-		{
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 

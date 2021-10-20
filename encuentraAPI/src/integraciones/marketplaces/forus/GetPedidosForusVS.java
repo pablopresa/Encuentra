@@ -36,8 +36,7 @@ import logica.LogicaAPI;
 
 public class GetPedidosForusVS 
 {
-	public GetPedidosForusVS() 
-	{
+	public GetPedidosForusVS() {
 		
 	}
 	
@@ -49,7 +48,7 @@ public class GetPedidosForusVS
 		
 		List<Compras> compras = logica.sincroPedidosWebForusUY(idEmpresa, destinoPedidos, depositosPick, idCanal);
 	
-		System.out.println(compras.size());	
+		System.out.println("COMPRAS: " + compras.size());	
 			for (Compras c : compras) 
 			{
 				
@@ -100,7 +99,6 @@ public class GetPedidosForusVS
 							art.setOrigen(Integer.parseInt(it.getOrigen()));
 							pedidos.add(art);
 							importeTotal+=importe;
-								
 								
 					}
 					
@@ -268,11 +266,7 @@ public class GetPedidosForusVS
 						}
 						url = IPrint.ImprimirEtiquetasNuevas(articuloR,mp.getIdEmpresa(),env,"CD 9000"," Av. Italia 4346   								   						    Tel.:2613 7566 		  Montevideo-Uruguay",1,true,"","");
 						
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (DocumentException e) {
-						// TODO Auto-generated catch block
+					} catch (FileNotFoundException | DocumentException e) {
 						e.printStackTrace();
 					}							
 					p.setUrlEtiqueta(url);

@@ -648,20 +648,19 @@ public class Call_WS_APIENCUENTRA
 		return new ArrayList<>();
 	}
 	
-	public List<DataIDDescripcion> putConexionSubfamilias(String token, List<DataIDDescripcion> datos, String tabla, String columna1, String columna2)
+	public List<DataIDDescripcion> putConexionSubfamilias(String token, List<DataIDDescripcion> datos, String tabla, String columna1, String columna2, String columna3)
 	{
 			
 		try {
 			
 			//String host = "encuentra.200.com.uy";
 			
-			String servicio = "http://"+host+"/WMS/Integraciones/Synchronizer/putConexionSubfamilias?tabla="+tabla+"&columna1="+columna1+"&columna2="+columna2+"&token="+token; 
+			String servicio = "http://"+host+"/WMS/Integraciones/Synchronizer/putConexionSubfamilias?tabla="+tabla+"&columna1="+columna1+"&columna2="+columna2+"&columna3="+columna3+"&token="+token; 
 			Gson gson = new Gson();
 			
 			String jsonList = gson.toJson(datos);
 			
 			String salida =  callWSPOST_ParamJSON(servicio, jsonList);
-			
 			
 			ContenedorListaDataIdDesc cont =  new ContenedorListaDataIdDesc(salida);
 			return cont.getDatos();

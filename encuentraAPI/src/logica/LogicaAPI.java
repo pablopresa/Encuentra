@@ -2,6 +2,7 @@ package logica;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -1039,9 +1040,7 @@ public class LogicaAPI
 	{
 
 		try {
-			Connection cone;
-			cone = _EncuentraConexionAPI2.getConnection();
-			
+			Connection cone = _EncuentraConexionAPI2.getConnection();
 			
 			List<DataIDDescripcion>  r =  _EncuentraConexionAPI2.darlistaDataIdDesc(q);
 			cone = null;
@@ -1055,15 +1054,13 @@ public class LogicaAPI
 		}
 	}
 	
-	
 	public  List<Compras> sincroPedidosWebForusUY(int idEmpresa, Map<String, DataIDDescripcion> destinoPedidos, List<DataIDDescripcion> depositosPick, int idCanal) 
 	{
 		List<Compras> compras = new ArrayList<>();
-		MSSQL_API MSSQL = new MSSQL_API();
 		try {
 			
 			depositosPick.remove(0);
-			Map<String, String> depositosPickHT = new Hashtable<>();
+			Map<String, String> depositosPickHT = new HashMap<>();
 			for (DataIDDescripcion d : depositosPick) 
 			{
 				depositosPickHT.put(d.getDescripcion(), String.valueOf(d.getId()));
@@ -1085,24 +1082,25 @@ public class LogicaAPI
 			List<DataIDDescripcion> idVentasAtrasadas = new ArrayList<>();
 			try {
 				idVentasAtrasadas = darListaDataIdDescripcionMYSQLConsulta("select id,'' from aaatemporal");
-				idVentasAtrasadas.remove(0);
+				if(!idVentasAtrasadas.isEmpty())
+					idVentasAtrasadas.remove(0);
 			} catch (Exception e) {
-				
+				e.printStackTrace();
 			}
 				
-			if(idVentasAtrasadas.size()>0){
+			if(!idVentasAtrasadas.isEmpty()){
 				for(DataIDDescripcion id:idVentasAtrasadas){
 					ventasAtrasadas+=id.getId()+",";
 				}
 				ventasAtrasadas = ventasAtrasadas.substring(0,ventasAtrasadas.length()-1);
 				String queryAtrasados = queryPedidos + " in ("+ventasAtrasadas+")"; 
-				compras = MSSQL.darComprasWeb(queryAtrasados, depositosPickHT,0,idEmpresa,destinoPedidos,idCanal);
+				compras = MSSQL_API.darComprasWeb(queryAtrasados, depositosPickHT,0,idEmpresa,destinoPedidos,idCanal);
 				persistir("delete from aaatemporal where idEmpresa="+idEmpresa);
 			}			
 			
-				//VENTAS NUEVAS
+//			VENTAS NUEVAS
 			int ultimaVenta = darNextSincWEB(idEmpresa,idCanal);		
-			List<Compras> compras2 =MSSQL.darComprasWeb(queryPedidos, depositosPickHT,ultimaVenta,idEmpresa,destinoPedidos,idCanal);
+			List<Compras> compras2 = MSSQL_API.darComprasWeb(queryPedidos, depositosPickHT,ultimaVenta,idEmpresa,destinoPedidos,idCanal);
 			
 			
 			compras.addAll(compras2);

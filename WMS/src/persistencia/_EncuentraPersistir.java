@@ -386,7 +386,7 @@ public class _EncuentraPersistir {
 		return true;
 	}
 	
-	public boolean persistirIdID(List<DataIDDescripcion> lista, String tabla, String columna1, String columna2, int idEmpresa) throws Exception 
+	public boolean persistirIdIdDescripcion(List<DataIDDescripcion> lista, String tabla, String columna1, String columna2, String columna3, int idEmpresa) throws Exception 
 	{
 		
 		System.out.println("Persistiendo "+ tabla);
@@ -394,7 +394,7 @@ public class _EncuentraPersistir {
 		PreparedStatement pstmt = null;
 		
 		StringBuilder values = new StringBuilder();
-		String insert = "INSERT ignore INTO "+tabla+" (`" + columna1 + "`, `" + columna2 + "` ,idEmpresa) VALUES ";
+		String insert = "INSERT ignore INTO "+tabla+" (`" + columna1 + "`, `" + columna2 + "`, `"+columna3+"`, idEmpresa) VALUES ";
 		List<String> inserts = new ArrayList<>();
 		int contador = 0;
 		boolean pri = true;
@@ -403,25 +403,25 @@ public class _EncuentraPersistir {
 			if(pri)
 			{
 				pri = false;
-				values.append (" ("+d.getId()+", '"+d.getIdB()+"',"+idEmpresa+")");
+				values.append (" ("+d.getId()+", "+d.getIdB()+", '"+d.getDescripcion()+"',"+idEmpresa+")");
 			}
 			else
 			{
-				values.append (",("+d.getId()+", '"+d.getIdB()+"',"+idEmpresa+")");
+				values.append (",("+d.getId()+", "+d.getIdB()+", '"+d.getDescripcion()+"',"+idEmpresa+")");
 			}
 			
 			contador++;
 			
 			if(contador == 2000)
 			{
-				inserts.add(insert+values.toString());
+				inserts.add(insert + values.toString());
 				pri=true;
 				values = new StringBuilder();
 				contador=0;
 			}
 		}
 		
-		inserts.add(insert+values.toString());
+		inserts.add(insert + values.toString());
 		
 		
 		boolean pude = false;
