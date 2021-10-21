@@ -49,7 +49,7 @@ public class GetPedidosForusVS
 		
 		List<Compras> compras = logica.sincroPedidosWebForusUY(idEmpresa, destinoPedidos, depositosPick, idCanal);
 	
-		System.out.println(compras.size());	
+		System.out.println("COMPRAS: " + compras.size());	
 			for (Compras c : compras) 
 			{
 				

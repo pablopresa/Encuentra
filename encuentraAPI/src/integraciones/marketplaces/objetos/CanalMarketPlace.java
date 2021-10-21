@@ -1,7 +1,7 @@
 package integraciones.marketplaces.objetos;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,8 +58,8 @@ public class CanalMarketPlace {
 		this.seller = seller;
 	}	
 	
-	public void guardarOrdenes(int idEmpresa, Call_WS_APIENCUENTRA wms, String token, Map<Integer, String> integraciones, String cambioEstado, 
-			int diasBusqueda, Hashtable<String, DataIDDescripcion> destinoPedidos, GetPedidosForusVS gp, List<DataIDDescripcion> depositosDestino, marketPlace mp ) {
+	public void guardarOrdenes(int idEmpresa, Call_WS_APIENCUENTRA wms, String token, String cambioEstado, 
+			int diasBusqueda, Map<String, DataIDDescripcion> destinoPedidos, GetPedidosForusVS gp, List<DataIDDescripcion> depositosDestino, marketPlace mp ) {
 
 		// 1 - le pedimos los pedidos a fenicio API (son datos complementarios)
 //	List<Ordenes> pedidosFenicio = f.getPedidosAPI(canal.getKey(), diasBusqueda);
@@ -71,7 +71,6 @@ public class CanalMarketPlace {
 		// debemos sincronizar y cuales no
 		Map<String, String> pedidosEncuentra = wms.PedidosID(token, diasBusqueda, "");
 		// 4 traemos los pedidos de la base de Visual de forus
-
 
 		// esta es la lista de pedidos buenos, los que vamos a meter en encuentra
 		List<EncuentraPedido> pedidos = new ArrayList<>();
@@ -124,7 +123,7 @@ public class CanalMarketPlace {
 
 		pedidos = pedidos2;
 
-		Hashtable<String, DataIDDescripcion> pedidosHT = new Hashtable<>();
+		Map<String, DataIDDescripcion> pedidosHT = new HashMap<>();
 		for (EncuentraPedido p : pedidos) {
 			// Ordenes ovf = f.OrdenVentaFenicio(p.getIdPedido(), f.getIdEmpresa(), 1);
 			try {
@@ -137,7 +136,6 @@ public class CanalMarketPlace {
 						found = true;
 						break;
 					}
-
 				}
 				if (!found) {
 
@@ -164,7 +162,6 @@ public class CanalMarketPlace {
 
 		for (EncuentraPedido p : pedidos) {
 			wms.updateDestinoPedido(token, p, p.getIdDepositoEnvio(), p.getMontoEnvio());
-
 		}
 
 		/*

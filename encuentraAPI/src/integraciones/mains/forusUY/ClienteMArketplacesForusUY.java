@@ -1,15 +1,12 @@
 package integraciones.mains.forusUY;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import beans.jsonEstadoMP;
 import beans.datatypes.DataIDDescripcion;
-import beans.encuentra.EncuentraPedido;
-import beans.encuentra.EncuentraPedidoArticulo;
 import integraciones.marketplaces.fenicioTrack.FenicioForusUY;
 import integraciones.marketplaces.forus.GetPedidosForusVS;
 import integraciones.marketplaces.objetos.CanalMarketPlace;
@@ -36,36 +33,36 @@ public class ClienteMArketplacesForusUY {
 		String cambioEstado = integraciones.get(3) != null ? integraciones.get(3) : "0";
 		int diasBusqueda = 6;
 
-		Hashtable<String, DataIDDescripcion> destinoPedidos = new Hashtable<>();
+		Map<String, DataIDDescripcion> destinoPedidos = new HashMap<>();
 		List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2);
 		GetPedidosForusVS gp = new GetPedidosForusVS();
 
-//		for (marketPlace mp : marketplaces) {
-//			if(mp.getIdMarketPlace()!=1) {
-//			for (Entry<Integer, CanalMarketPlace> canal : mp.getCanales().entrySet()) {
-				// 0 buscamos los destinos de los pedidos
-//				destinoPedidos = f.DestinoPedidos(canal.getKey(), diasBusqueda, destinoPedidos);
-//		TODO: sacar		
-//			}
-//			}
-//		}
+		for (marketPlace mp : marketplaces) {
+			if (mp.getIdMarketPlace() != 1) {
+				for (Entry<Integer, CanalMarketPlace> canal : mp.getCanales().entrySet()) {
+//				 0 buscamos los destinos de los pedidos
+					destinoPedidos = f.DestinoPedidos(canal.getKey(), diasBusqueda, destinoPedidos);
+				}
+			}
+		}
 
 		for (marketPlace mp : marketplaces) {
-			if(mp.getIdMarketPlace()!=1) {
-				
-			for (Entry<Integer, CanalMarketPlace> entry : mp.getCanales().entrySet()) {
+			if (mp.getIdMarketPlace() != 1) {
 
-				CanalMarketPlace canal = entry.getValue();
-				
-				try {
-					
-					canal.guardarOrdenes(v.getIdEmpresa(), wms, token, integraciones, cambioEstado, diasBusqueda, destinoPedidos, gp, depositosDestino, mp);
+				for (Entry<Integer, CanalMarketPlace> entry : mp.getCanales().entrySet()) {
 
-				} catch (Exception e) {
-					e.printStackTrace();
+					CanalMarketPlace canal = entry.getValue();
+
+					try {
+
+						canal.guardarOrdenes(v.getIdEmpresa(), wms, token, cambioEstado, diasBusqueda, destinoPedidos,
+								gp, depositosDestino, mp);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
 				}
-
-			}
 			} // for de canales
 		}
 

@@ -10,13 +10,10 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
-
-import beans.api.Utilidades;
-
+import java.util.Map.Entry;
 
 import beans.Fecha;
-
+import beans.api.Utilidades;
 import beans.api.pedidoFactura;
 import beans.datatypes.DTO_Articulo;
 import beans.datatypes.DataDescDescripcion;
@@ -30,7 +27,6 @@ import beans.encuentra.Compras;
 import beans.encuentra.DepositoMayorista;
 import beans.encuentra.Items;
 import beans.helper.PropertiesHelperAPI;
-
 import integraciones.erp.odoo.laIsla.StockArticulos;
 import logica.LogicaAPI;
 import logica.Util;
@@ -475,7 +471,7 @@ public class MSSQL_API
 	  		while (rs.next())
 	  		{   
 	  			
-	  			DepositoMayorista dep = new DepositoMayorista(rs.getString(1), rs.getString(2), rs.getString(3), "LOCAL");
+	  			DepositoMayorista dep = new DepositoMayorista(rs.getString(1), rs.getString(2), rs.getString(3), "100");
 	  			dep.setDepartamento(rs.getString(4));
 	  			dep.setCiudad(rs.getString(5));
 	  			retorno.add(dep);
@@ -514,7 +510,7 @@ public class MSSQL_API
 
 	
 	
-	public static List<Compras> darComprasWeb(String query,Map<String, String> depositosPickHT,int ultimaVenta, int idEmpresa, Map<String, DataIDDescripcion> destinoPedidos, int idCanal) 
+	public static List<Compras> darComprasWeb(String query, Map<String, String> depositosPickHT,int ultimaVenta, int idEmpresa, Map<String, DataIDDescripcion> destinoPedidos, int idCanal) 
 	{
 		LogicaAPI Logica = new LogicaAPI();
 		List<Compras> pedidos = new ArrayList<>();
@@ -524,23 +520,18 @@ public class MSSQL_API
 		List<Items> items;
 		int ultimoId=ultimaVenta;
 		
-		
-		
 		String consulta = query;
 		if(ultimaVenta!=0)
 		{
 			consulta += " > "+ultimaVenta;
 			
-			
 		}
-		
-		
 		
 		consulta+=" order by  DocV_NumeroDoc";
 		
-		 String connectionUrl = 
+		String connectionUrl = 
 		           "jdbc:sqlserver://179.27.145.162:2833;" +
-		           "databaseName=VsECommerce;";
+		           "databaseName=TEST_ECOMMERCE;";
 		        // Declare the JDBC objects.
 		        try {
 		        	
@@ -550,6 +541,7 @@ public class MSSQL_API
 		            			        
 			        Statement s = con.createStatement();
 			        ResultSet rs = s.executeQuery (consulta);
+					System.out.println(consulta);
 					
 					while (rs.next())
 					{
@@ -563,15 +555,16 @@ public class MSSQL_API
 							if(comentarioPick.contains(" PickUP: "))
 							{
 								
-								if(comentarioPick.contains("(Click and Collect)"))
+								if(comentarioPick.contains("(RETIRO EN SUCURSAL EXPRESS)"))
 								{
-									comentarioPick = comentarioPick.replace(" (Click and Collect)", "");
+									comentarioPick = comentarioPick.replace(" (RETIRO EN SUCURSAL EXPRESS)", "");
 									cNc = true;
 								}
 								arreglo = comentarioPick.split(" PickUP: ");
-								comentarioPick = arreglo[1].replace(" ", "");
 								arreglo = arreglo[0].split("NRO: ");
-								c.setIdVenta(arreglo[1].replace(" ", ""));
+								arreglo = arreglo[1].split(" ");
+								c.setIdVenta(arreglo[0]);
+//								c.setIdVenta(arreglo[1].replace(" ", ""));
 								c.setcNc(cNc);
 								//canal = arreglo[0].split("Compra web en ")[1].replace(" ", "");
 								try {
@@ -590,17 +583,30 @@ public class MSSQL_API
 								try
 								{
 									arreglo = rs.getString(10).split("NRO: ");
-									c.setIdVenta(arreglo[1].replace(" ",""));
+									arreglo = arreglo[1].split(" ");
+									c.setIdVenta(arreglo[0]);
 								}
 								catch (Exception e) {}
 								try
 								{
+									
+									for(Entry<String, DataIDDescripcion> entry : destinoPedidos.entrySet() ) {
+										System.out.println("ENTRADA: "+entry.getKey() + " - (" + entry.getValue().getId() + ", "+entry.getValue().getDescripcion()+")");
+									}
+									
+									System.out.println("IDVENTA: "+c.getIdVenta());
 									canal = destinoPedidos.get(c.getIdVenta()).getDescripcion();
+									System.out.println("CANAL: "+canal);
 								}
-								catch (Exception e) {canal="0";}
+								catch (Exception e) {
+									canal="0";
+								}
 								//canal = arreglo[0].split("Compra web en ")[1].replace(" ", "");
 							}
-							if(Integer.parseInt(canal)==idCanal)
+							
+							System.out.println("if("+Integer.parseInt(canal)+" == "+idCanal+")");
+							
+							if(Integer.parseInt(canal) == idCanal)
 							{
 								c.setIdCanal(canal);
 								cli = new  Cliente();	
@@ -630,7 +636,7 @@ public class MSSQL_API
 								cli.setLongitud(rs.getString(18));
 								cli.setCalle(utilidades.validarComillas(rs.getString(19))); //Cambio nuevo - Andres
 								String calle = cli.getCalle();
-								String[]direccion = calle.split(",");
+								String[] direccion = calle.split(",");
 								cli.setCalle(direccion[0]);
 								for(String d:direccion){
 									if(d.contains("nro. ")){
@@ -654,7 +660,6 @@ public class MSSQL_API
 													
 								System.out.println(" vta "+ultimoId);
 							}
-							
 							
 						} 
 						catch (Exception e) 
@@ -689,11 +694,11 @@ public class MSSQL_API
 	{
 		
 		Items i;
-		List<Items> items = new ArrayList<>(); ;
+		List<Items> items = new ArrayList<>();
 		
 		 String connectionUrl = 
 		           "jdbc:sqlserver://179.27.145.162:2833;" +
-		           "databaseName=VsHushPuppies;";
+		           "databaseName=TEST_ECOMMERCE;";
 		        // Declare the JDBC objects.
 		        try {
 		        	
@@ -702,11 +707,11 @@ public class MSSQL_API
 		            con = DriverManager.getConnection(connectionUrl,"ENCUENTRA",".Wm$2oo.$!");
 		          
 		            String query =	"SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; "
-		            		+ " SELECT a.idarticulo,a.\"Cantidad pendiente\",origen,NumeroDoc from [VsHushPuppies].[dbo].[encuentra_distribucion] a "
+		            		+ " SELECT a.idarticulo,a.\"Cantidad pendiente\",origen,NumeroDoc from [TEST_VsHushPuppies].[dbo].[TEST_encuentra_distribucion] a "
 		            		+ "where origen != 1200 and Comentario like CONCAT('Trans.Venta Dep. 1200 Doc. ','"
 							+serie+"','-','"+vta+"','%') "+
 		            		"UNION ALL "+
-							"SELECT a.idarticulo,a.\"Cantidad pendiente\",origen,NumeroDoc from [VsHushPuppies].[dbo].[encuentra_distribucion_terminada] a "
+							"SELECT a.idarticulo,a.\"Cantidad pendiente\",origen,NumeroDoc from [TEST_VsHushPuppies].[dbo].[TEST_encuentra_distribucion_terminada] a "
 							+ "where origen != 1200 and Comentario like CONCAT('Trans.Venta Dep. 1200 Doc. ','"
 							+serie+"','-','"+vta+"','%') ";		        
 			        Statement s = con.createStatement();
@@ -734,9 +739,6 @@ public class MSSQL_API
 			
 				return items;
 	}
-	
-	
-
 	
 	public static List<Remito> DarRemitosForus(String depo, String depoO, boolean TR, int idEmpresa) 
 	{

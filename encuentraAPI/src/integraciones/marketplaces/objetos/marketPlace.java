@@ -1,9 +1,11 @@
 package integraciones.marketplaces.objetos;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import beans.datatypes.DataIDDescripcion;
 import beans.encuentra.EncuentraPedido;
 import logica.LogicaAPI;
 
@@ -102,7 +104,12 @@ public class marketPlace implements marketPlaceInterface{
 	@Override
 	public List<EncuentraPedido> getPedidos(int canal, String status, int dias, Map<String, String> pedidosIn,
 			Map<String, Integer> depositosPickHT) {
-		// TODO Auto-generated method stub
+		return new ArrayList<>();
+	}
+
+	@Override
+	public Map<String, DataIDDescripcion> DestinoPedidos(int canal, int dias,
+			Map<String, DataIDDescripcion> retornable) {
 		return null;
 	}
 
