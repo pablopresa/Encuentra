@@ -37,7 +37,7 @@ public class ClientePPG
 			}
 		}
 
-	 	String[] nombresMetodos = {"familias","subfamilias"};
+	 	String[] nombresMetodos = {"categorias", "marcas", "productos", "familias","subfamilias"};
 	 	//String[] nombresMetodos = {"ordenes"};
 		
 		Call_WS_APIENCUENTRA wms = new Call_WS_APIENCUENTRA();

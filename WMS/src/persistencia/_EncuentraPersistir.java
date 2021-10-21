@@ -393,7 +393,6 @@ public class _EncuentraPersistir {
 		connection = getConnection();
 		PreparedStatement pstmt = null;
 		
-		String onDup ="";
 		StringBuilder values = new StringBuilder();
 		String insert = "INSERT ignore INTO "+tabla+" (`" + columna1 + "`, `" + columna2 + "`,`"+columna3+"`, idEmpresa) VALUES ";
 		List<String> inserts = new ArrayList<>();
@@ -401,7 +400,6 @@ public class _EncuentraPersistir {
 		boolean pri = true;
 		for (DataIDDescripcion d : lista) 
 		{
-			onDup= " on duplicate key update Descripcion = "+d.getDescripcion()+" ";
 			if(pri) {
 				pri = false;
 				values.append (" ("+d.getId()+", "+d.getIdB()+", '"+d.getDescripcion()+"', "+idEmpresa+")");
@@ -414,14 +412,14 @@ public class _EncuentraPersistir {
 			
 			if(contador == 2000)
 			{
-				inserts.add(insert+values.toString());
+				inserts.add(insert + values.toString());
 				pri=true;
 				values = new StringBuilder();
 				contador=0;
 			}
 		}
 		
-		inserts.add(insert + values.toString() + onDup);
+		inserts.add(insert + values.toString());
 		
 		boolean pude = false;
 		
@@ -429,9 +427,7 @@ public class _EncuentraPersistir {
 		{
 			for (String i : inserts) 
 			{
-				if(tabla.equals("art_genero")) {
-					System.out.println(i);
-				}
+				System.out.println(i);
 				pstmt = connection.prepareStatement(i);
 				pstmt.executeUpdate();
 			}
@@ -444,13 +440,12 @@ public class _EncuentraPersistir {
 		catch (Exception e)
 		{
 			pude = false;
+			e.printStackTrace();
 		}
 		
 		desconectar(null,pstmt,null, connection);
 		return true;
 	}
-	
-	
 	
 	public int persistirDarUltimo(String consulta, String tabla, String key, int idEmpresa) throws Exception 
 	{
