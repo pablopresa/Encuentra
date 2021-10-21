@@ -17,53 +17,28 @@ import integraciones.marketplaces.fenicio.Lineas;
 import integraciones.marketplaces.fenicio.Ordenes;
 import integraciones.marketplaces.fenicioTrack.FenicioBAS;
 import integraciones.marketplaces.objetos.CanalMarketPlace;
-import integraciones.wms.Call_WS_APIENCUENTRA;
 import logica.LogicaAPI;
 
 public class ClienteBASFenicioSecundario 
 {
- 
+
+	private static final String ENVIO_NORMAL ="800102000";
+	private static final String ENVIO_INTERIOR ="800103000";
+	private static final String ENVIO_OTRO ="800106000";
+	
 	public static void main(String[] args) 
 	{
-		FenicioBAS f = new FenicioBAS();
+		 FenicioBAS f = new FenicioBAS();
 				
 		 Map<Integer, CanalMarketPlace> canales = f.getCanales();
 		 List<CanalMarketPlace> canalesL = new ArrayList<> (canales.values());
 		 
-		 Call_WS_APIENCUENTRA wms = new Call_WS_APIENCUENTRA();
 		 LogicaAPI logica = new LogicaAPI();
 		 String token = logica.darToken(f.getIdEmpresa());
 		 
-		 Map<Integer, String> parametros = wms.darParametros(token, "");
-		 Map<Integer, String> integraciones = wms.darIntegraciones(token);
-		 
+//		 Agrego los pedidos pendientes de facturar
 		 List<Long> pedidosSinFacturar = new ArrayList<>();
 		 pedidosSinFacturar.add(Long.valueOf("271604"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271628"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271810"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271814"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271818"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271820"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271823"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271824"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271827"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271828"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271829"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271830"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271831"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271834"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271835"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271836"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271837"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271842"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271844"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271845"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271846"));		 
-		 pedidosSinFacturar.add(Long.valueOf("271847"));
-		 
-		 String cambioEstado = integraciones.get(3);
-		 
-		 int idDepoOrigen = Integer.parseInt(parametros.get(4));
 		 
 		 List<Cliente> clientes = new ArrayList<>();
 		 int diasBusqueda = 6;
@@ -75,27 +50,24 @@ public class ClienteBASFenicioSecundario
 			 
 			 Map<String, Ordenes> ordenesF = new HashMap<>();
 			 
-			 for (Ordenes o : pedidosFenicio) 
-			 {
+			 for (Ordenes o : pedidosFenicio) {
 				 ordenesF.put(o.getIdOrden(), o);
 			 }
 			 
-			 Map<String, String> pedidosEncuentra = wms.PedidosID(token, diasBusqueda, "");			 
-			 List<EncuentraPedido> pedidos = new ArrayList<>();		 
-			 
+//			Map<String, String> pedidosEncuentra = wms.PedidosID(token, diasBusqueda, "");			 
+			List<EncuentraPedido> pedidos = new ArrayList<>();		 
+			
 			int in = 0;
-			 for (EncuentraPedido p : pedidosALL) 
-			 {
+			 for (EncuentraPedido p : pedidosALL) {
 				 
 				 p.setTrackingNumber(p.getIdPedido()+"");
 				 
-				if(!pedidosEncuentra.containsKey(p.getIdPedido()+""))
-				 {
+//				Cuando agrega a la lista de pedidos para guardar las ordenes,
+//				agrego solo los pendientes de facturar 
+				if(pedidosSinFacturar.contains(p.getIdPedido())) {
 					 pedidos.add(p);
-					
-				 }
-				if(in==1)
-				{
+				}
+				if(in==1) {
 					break;
 				}
 			 }
@@ -106,7 +78,7 @@ public class ClienteBASFenicioSecundario
 	        		{
 	        			System.out.println("F");
 	        		}
-				 Ordenes ovf =  ordenesF.get(p.getIdPedido()+"");
+				 Ordenes ovf = ordenesF.get(p.getIdPedido()+"");
 				 if(ovf==null)
 				 {
 					 for (OrdenVentaLinea a : p.getOrden().getOrdenVentaLineas()) 
@@ -123,31 +95,26 @@ public class ClienteBASFenicioSecundario
 						linea++;
 						if(l.getSku().equals(""))
 						{
-							/*/
-							 * 800102000 -- "Envío Normal"
-							   800103000 -- Envío Interior
-							   800106000
-							 */
 							if(l.getNombre().equals("Envío Normal"))
 							{
-								l.setSku("800102000");
+								l.setSku(ENVIO_NORMAL);
 							}
 							else if(l.getNombre().equals("Envío Interior"))
 							{
-								l.setSku("800103000");
+								l.setSku(ENVIO_INTERIOR);
 							} 
 							else if (l.getNombre().equals("¡Recibí tu pedido en 24 horas!"))
 							{
-								l.setSku("800106000");
+								l.setSku(ENVIO_OTRO);
 							}
 							else if (l.getNombre().contains("Envío"))
 							{
-								l.setSku("800106000");
+								l.setSku(ENVIO_OTRO);
 							}
 							//si el nombre es peya hay que ponerle el SKU
 							else
 							{
-								l.setSku("800102000");
+								l.setSku(ENVIO_NORMAL);
 							}
 						}
 						
@@ -167,13 +134,6 @@ public class ClienteBASFenicioSecundario
 						{
 							for (Descuento d : l.getDescuentos()) 
 							{
-								/*
-								linea++;
-								OrdenVentaLinea lid = new OrdenVentaLinea(Double.parseDouble(d.getMonto())*-1, 1+"", d.getCodigo());
-								lid.setDescripcion(d.getNombre());
-								lid.setLinea(linea);
-								ovls.add(lid); 
-								 */
 								descuentoTotal +=  Double.parseDouble(d.getMonto());
 							}
 						}
@@ -211,12 +171,6 @@ public class ClienteBASFenicioSecundario
 				 int cantidadUnidades = 0;
 				for (EncuentraPedidoArticulo ar : p.getArticulosPedido()) 
 				{
-					//String articulo=ar.getArticulo().substring(1, ar.getArticulo().length());
-					ar.setOrigen(idDepoOrigen);
-					/*if(ar.getArticulo().startsWith("0"))
-					{
-						ar.setArticulo(articulo);
-					}*/
 					int cantRegalo = 0;
 					boolean found = false;
 					for (Lineas l : ovf.getLineas()) 
@@ -240,7 +194,6 @@ public class ClienteBASFenicioSecundario
 						EncuentraPedidoArticuloReq are = new EncuentraPedidoArticuloReq();
 						are.setArticulo(are.getArticulo());
 						are.setCantReq(ar.getCantidad());
-						are.setDeposito(idDepoOrigen);
 						cantidadUnidades+=ar.getCantidad();
 						p.getArticulosPedidoReq().add(are);
 						articulosPedido.add(ar);
@@ -265,12 +218,6 @@ public class ClienteBASFenicioSecundario
 				p.setCantidad(cantidadUnidades);
 				
 			 }
-			
-			 //cen.SaveCustomers(token, clientes);
-			 wms.SaveOrders(token, pedidos);
-			 wms.SaveOrdersArticulosReq(token, pedidos,canal.getId());
-			
-			 List<DataIDDescripcion> depositosDestino =wms.DarDatosPutOrders(token, 2);
 			 
 			 List<jsonEstadoMP> estadosMP = new ArrayList<>();
 			 
@@ -285,11 +232,6 @@ public class ClienteBASFenicioSecundario
 				 logica.saveImport1Customer(p.getCliente(),f.getIdEmpresa());
 				 p.getOrden().save(token, f.getIdEmpresa());
 				 
-				 if(cambioEstado != null && cambioEstado.equals("1")){
-					 jsonEstadoMP estado = new jsonEstadoMP(p.getIdPedido()+"",0,p.getIdPedido(),
-							 f.JSONUpdateState(p.getIdPedido(), p.getIdPedido()+"", "", 1),canal.getId(),f.getIdEmpresa());
-					 estadosMP.add(estado);
-				 }
 			 }
 			 
 			 if(!estadosMP.isEmpty()){
@@ -311,16 +253,6 @@ public class ClienteBASFenicioSecundario
 					 else
 					 {
 						 
-						 for (DataIDDescripcion d : depositosDestino) 
-						 {
-							if(d.getDescripcion().equals(p.getEmpresaEnvio()))
-							{
-								p.setShippingType(new DataIDDescripcion(1, ""));
-								p.setIdDepositoEnvio(d.getId());
-								found=true;
-								break;
-							}
-						 }
 					 }
 					 
 					 if(!found)
@@ -334,13 +266,10 @@ public class ClienteBASFenicioSecundario
 							 p.setIdDepositoEnvio(0);
 						 }
 					 }
-					 
-					 wms.updateDestinoPedido(token, p, p.getIdDepositoEnvio(), p.getMontoEnvio());
 				 }
 				 catch (Exception e) 
 				 {
 					 e.printStackTrace();
-					 wms.updateDestinoPedido(token, p, 0, p.getMontoEnvio());
 				 }
 			 }
 			 
@@ -349,17 +278,10 @@ public class ClienteBASFenicioSecundario
 			    try {
 					Thread.sleep(60000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			 f.buscarEtiquetas(pedidosFenicio, wms, token, canal.getId());
 			 
 			//CONSULTO ESTADO DE DESPACHADOS
-			 Map<String, String> pedidosDespachados = wms.PedidosID(token, 30, "4");
-			 List<DataIDDescripcion> entregados = f.tackPedidosDespachados(pedidosDespachados, canal.getId());
-			 if(!entregados.isEmpty()) {
-				 wms.updateOrdersStatus(token,entregados);
-			 }
 		}
 	}
 }
