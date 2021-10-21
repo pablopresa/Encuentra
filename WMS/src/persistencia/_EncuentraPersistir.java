@@ -386,28 +386,28 @@ public class _EncuentraPersistir {
 		return true;
 	}
 	
-	public boolean persistirIdID(List<DataIDDescripcion> lista, String tabla, String columna1, String columna2, int idEmpresa) throws Exception 
+	public boolean persistirIdIdDescripcion(List<DataIDDescripcion> lista, String tabla, String columna1, String columna2, String columna3, int idEmpresa) throws Exception 
 	{
 		
 		System.out.println("Persistiendo "+ tabla);
 		connection = getConnection();
 		PreparedStatement pstmt = null;
 		
+		String onDup ="";
 		StringBuilder values = new StringBuilder();
-		String insert = "INSERT ignore INTO "+tabla+" (`" + columna1 + "`, `" + columna2 + "` ,idEmpresa) VALUES ";
+		String insert = "INSERT ignore INTO "+tabla+" (`" + columna1 + "`, `" + columna2 + "`,`"+columna3+"`, idEmpresa) VALUES ";
 		List<String> inserts = new ArrayList<>();
 		int contador = 0;
 		boolean pri = true;
 		for (DataIDDescripcion d : lista) 
 		{
-			if(pri)
-			{
+			onDup= " on duplicate key update Descripcion = "+d.getDescripcion()+" ";
+			if(pri) {
 				pri = false;
-				values.append (" ("+d.getId()+", '"+d.getIdB()+"',"+idEmpresa+")");
+				values.append (" ("+d.getId()+", "+d.getIdB()+", '"+d.getDescripcion()+"', "+idEmpresa+")");
 			}
-			else
-			{
-				values.append (",("+d.getId()+", '"+d.getIdB()+"',"+idEmpresa+")");
+			else {
+				values.append (",("+d.getId()+", "+d.getIdB()+", '"+d.getDescripcion()+"', "+idEmpresa+")");
 			}
 			
 			contador++;
@@ -421,8 +421,7 @@ public class _EncuentraPersistir {
 			}
 		}
 		
-		inserts.add(insert+values.toString());
-		
+		inserts.add(insert + values.toString() + onDup);
 		
 		boolean pude = false;
 		
@@ -430,8 +429,7 @@ public class _EncuentraPersistir {
 		{
 			for (String i : inserts) 
 			{
-				if(tabla.equals("art_genero"))
-				{
+				if(tabla.equals("art_genero")) {
 					System.out.println(i);
 				}
 				pstmt = connection.prepareStatement(i);
