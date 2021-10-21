@@ -78,7 +78,6 @@ public class ClientePPG
 					break;
 					
 				case "subfamilias":
-//					cwa.putMaestros(token, listaSubFamilias, "art_subfamilia");
 					wms.putConexionSubfamilias(token, listaRelacionFamiliasSubFamilias, "art_familia_subfamilia", "IdFamilia", "IdSubfamilia", "Descripcion");
 					break;
 			

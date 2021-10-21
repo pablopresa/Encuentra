@@ -380,8 +380,6 @@ public class _EncuentraPersistir {
 			pude = false;
 		}
 		
-
-		
 		desconectar(null,pstmt,null, connection);
 		return true;
 	}
@@ -413,9 +411,9 @@ public class _EncuentraPersistir {
 			if(contador == 2000)
 			{
 				inserts.add(insert + values.toString());
-				pri=true;
+				pri = true;
 				values = new StringBuilder();
-				contador=0;
+				contador = 0;
 			}
 		}
 		

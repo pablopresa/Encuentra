@@ -52,11 +52,9 @@ public class Synchronizer
 				try {
 					datos = gson.fromJson(data, new TypeToken<List<DataIDDescripcion>>(){}.getType());
 					eper.persistirIdDesc(datos, tabla, true, idEmpresa);
-					//logica.persistirDatosMaestrosLaIsla(datos, "art_categoria", idEmpresa, true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
 			}
 		}
 		catch (Exception e) 
@@ -384,7 +382,6 @@ public class Synchronizer
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
 			}
 		}
 		catch (Exception e) 
