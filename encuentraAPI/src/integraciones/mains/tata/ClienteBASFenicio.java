@@ -246,7 +246,7 @@ public class ClienteBASFenicio
 			 wms.SaveOrders(token, pedidos);
 			 wms.SaveOrdersArticulosReq(token, pedidos,canal.getId());
 			
-			 List<DataIDDescripcion> depositosDestino =wms.DarDatosPutOrders(token, 2);
+			 List<DataIDDescripcion> depositosDestino =wms.DarDatosPutOrders(token, 2, null);
 			 
 			 List<jsonEstadoMP> estadosMP = new ArrayList<>();
 			 
@@ -328,7 +328,7 @@ public class ClienteBASFenicio
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			 f.buscarEtiquetas(pedidosFenicio, wms, token, canal.getId());
+			 f.sinEtiquetas(wms, token, canal.getId(), null);
 			 
 			//CONSULTO ESTADO DE DESPACHADOS
 			 Map<String, String> pedidosDespachados = wms.PedidosID(token, 30, "4");

@@ -1338,7 +1338,7 @@ public class _EncuentraConexion
 		try (Statement s = connection.createStatement();)
 		{
 			//connection = getConnection(); 
-			
+			//System.out.println(consulta);
 			ResultSet rs = s.executeQuery(consulta);
 			lista.add(new DataIDDescripcion(0,"Todos"));
 

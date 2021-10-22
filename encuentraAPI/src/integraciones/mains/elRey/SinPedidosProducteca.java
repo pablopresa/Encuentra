@@ -53,7 +53,7 @@ public class SinPedidosProducteca
 		Call_WS_APIENCUENTRA cen = new Call_WS_APIENCUENTRA();
 		System.out.println(token);
 		setOrdersCancelled(idEmpresa, token, cen, logica);
-		List<DataIDDescripcion> canalesFenicioALL = cen.DarDatosPutOrders(token,1);
+		List<DataIDDescripcion> canalesFenicioALL = cen.DarDatosPutOrders(token,1,null);
 		getCustomers(idEmpresa, cen, token);
 		getPedidos(idEmpresa, canalesFenicioALL,cen, token, logica);
 		

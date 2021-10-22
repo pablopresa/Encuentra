@@ -77,6 +77,12 @@
 			<attribute name="owner.project.facets" value="jst.web"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.jaxb_ri_2.2">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="../lib"/>
+			<attribute name="owner.project.facets" value="jpt.jaxb"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.jstl_1.2.2">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="WEB-INF/lib"/>
@@ -89,10 +95,10 @@
 			<attribute name="owner.project.facets" value="jst.jaxrs"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.jaxb_ri_2.2">
+	<classpathentry kind="con" path="com.genuitec.runtime.library/com.genuitec.jaxws_2.1">
 		<attributes>
-			<attribute name="org.eclipse.jst.component.dependency" value="../lib"/>
-			<attribute name="owner.project.facets" value="jpt.jaxb"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="WEB-INF/lib"/>
+			<attribute name="owner.project.facets" value="jst.jaxws"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>

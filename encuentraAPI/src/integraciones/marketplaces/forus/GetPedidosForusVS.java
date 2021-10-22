@@ -166,7 +166,7 @@ public class GetPedidosForusVS
 		List<EncuentraPedido> retorno = new ArrayList<>();
 		
 		List<DataEcommerce_canales_envio> envios = wms.darListaEcommerce_canales_envio(canal, token);
-		List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2);		
+		List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2, null);		
 	
 		List<EncuentraPedido> pedidosMarketplace = mp.getPedidos(canal,"",dias);
 		

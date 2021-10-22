@@ -51,6 +51,7 @@ import beans.helper.PropertiesHelper;
 import beans.helper.PropertiesHelperAPI;
 import integraciones.erp.visualStore.objetos.OrdenVenta;
 import integraciones.erp.visualStore.objetos.OrdenVentaLinea;
+import integraciones.marketplaces.fenicio.Orden;
 import integraciones.marketplaces.fenicio.Ordenes;
 import integraciones.marketplaces.fenicio.RspFenicioAPI;
 import integraciones.marketplaces.fenicio.RspFenicioAPIOrden;
@@ -463,7 +464,25 @@ public class Fenicio extends marketPlace{
 
 	
 }
+
+	public Orden getPedido(int canal, String idPedido) 
+	{	
+        List <Ordenes> pedidosALL = new ArrayList<>();
+        boolean pri = true;   	
+		  String urlBase = this.getCanales().get(canal).getHost();
+		  urlBase = urlBase.replace("/tracking/", "");
+	       String funcion = "/API_V1/ordenes/"+idPedido;
+	       
+	       String retorno = this.callPostOKHttp(urlBase+funcion, canal, null);
+	       
+	       System.out.println(retorno);
+	       Gson gson = new Gson();
+	       Orden orden =gson.fromJson(retorno,Orden.class);
+        
+	       return orden;
+
 	
+}
 	
 	
 	//GET ETIQUETAS
@@ -942,22 +961,15 @@ public class Fenicio extends marketPlace{
 		return retorno;
 	}
 	
-	public void buscarEtiquetas(List<Ordenes> pedidosFenicio, Call_WS_APIENCUENTRA cen, String token, int canal)
-	{
-		 List<DataIDDescripcion> pedidosSinE = cen.DarDatosPutOrders(token, 5);
-		 
-		 Map<String, String> pedidosSinEtiqueta = new HashMap<>();
-		 for (DataIDDescripcion ps : pedidosSinE) 
-		 {
-			pedidosSinEtiqueta.put(ps.getDescripcion(),ps.getDescripcion());
-		 }
-		 
-		 List<EncuentraPedido> pedidosUpEtiqueta = new ArrayList<>();
-		 
-		 for (Ordenes o : pedidosFenicio) 
+	@Override
+	public List<EncuentraPedido> buscarEtiquetas(List<DataIDDescripcion> pedidosSinE, Call_WS_APIENCUENTRA cen, String token, int canal, Map<String, Integer> depositosPickHT)
+	{		 
+		 List<EncuentraPedido> pedidosUpEtiqueta = new ArrayList<>();		 
+		 for (DataIDDescripcion p : pedidosSinE) 
 		 {
 			 try {
-				 if(pedidosSinEtiqueta.containsKey(o.getIdOrden()) && o.getEntrega()!=null && o.getEntrega().getEtiqueta()!=null &&!o.getEntrega().getEtiqueta().equals(""))
+				 Ordenes o = this.getPedido(canal, p.getDescripcion()).getOrden();
+				 if(o.getEntrega()!=null && o.getEntrega().getEtiqueta()!=null &&!o.getEntrega().getEtiqueta().equals(""))
 					{
 						System.out.println("BUSCANDO ETIQUETA");
 						EncuentraPedido eps = new EncuentraPedido();
@@ -977,6 +989,9 @@ public class Fenicio extends marketPlace{
 						else if (o.getEntrega().getEtiqueta().contains("soydelivery")) {
 							eps.setTrackingNumber("SD"+o.getEntrega().getCodigoTracking());
 						}
+						else if (o.getEntrega().getEtiqueta().contains("encargo")) {
+							eps.setTrackingNumber(o.getEntrega().getCodigoTracking().replace("-", "00")+"01");
+						}
 						else if (o.getEntrega().getCodigoTracking()!= null && o.getEntrega().getCodigoTracking().equals("Mercadoenvíos")) {
 							eps.setTrackingNumber(darTracking(o.getEntrega().getEtiqueta(),"UES"));
 						}
@@ -991,8 +1006,8 @@ public class Fenicio extends marketPlace{
 			}
 			
 		 }
+		 return pedidosUpEtiqueta;
 		 
-		 cen.updateLabels(pedidosUpEtiqueta,token);
 	}
 	
 }

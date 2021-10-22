@@ -223,7 +223,7 @@ public class ClienteLAISLAFenicio
 			 
 			 pedidos = pedidos2;
 			 
-			 List<DataIDDescripcion> depositosDestino =cen.DarDatosPutOrders(token, 2);
+			 List<DataIDDescripcion> depositosDestino =cen.DarDatosPutOrders(token, 2, null);
 			 
 			 Map<Integer, DataIDDescripcion> mailsDepositos = new HashMap<>();
 			 for(DataIDDescripcion d: depositosDestino) 
@@ -524,7 +524,7 @@ public class ClienteLAISLAFenicio
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-				 f.buscarEtiquetas(pedidosFenicio, cen, token, canal.getId());
+				 f.sinEtiquetas(cen, token, canal.getId(), null);
 				 
 				 //CONSULTO ESTADO DE DESPACHADOS
 				 Map<String, String> pedidosDespachados = cen.PedidosID(token, 30, "4");
@@ -542,7 +542,8 @@ public class ClienteLAISLAFenicio
 		 movsStock.add(new DataIDDescripcion(arp.getCantidad(), arp.getArticulo()));
 		 idDepositoEcommerce = 158;
 		 int idMS = logica.RegistrarMovimientoStock(arp.getOrigen(), idDepositoEcommerce, 0, movsStock, idEmpresa, idPedido, 0, 0, confirmarMovimiento);
-		 if(!confirmarMovimiento || (confirmarMovimiento && !central)) {
+		 //if(!confirmarMovimiento || (confirmarMovimiento && !central)) {
+		 if(!central) {
 			 ip.imprimirTicketMovStock(arp.getOrigen(), idDepositoEcommerce, 0, "Para Venta WEB "+idPedido, movsStock, idMS, arp.getOrigen());
 		 }
 		 

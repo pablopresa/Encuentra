@@ -37,7 +37,7 @@ public class ClienteMArketplacesForusUY {
 		int diasBusqueda = 6;
 
 		Hashtable<String, DataIDDescripcion> destinoPedidos = new Hashtable<>();
-		List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2);
+		List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2, null);
 		GetPedidosForusVS gp = new GetPedidosForusVS();
 
 //		for (marketPlace mp : marketplaces) {
