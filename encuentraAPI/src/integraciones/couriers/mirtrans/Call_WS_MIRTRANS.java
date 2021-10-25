@@ -123,6 +123,7 @@ public class Call_WS_MIRTRANS {
 			
 			if(salida.contains("Clave externa ya utilizada"))
 			{
+				
 				despacho = new despachoMIRTRANS();
 				despacho.setEtiqueta("Clave externa ya utilizada");
 				despacho.setCodigoBarra("0");
