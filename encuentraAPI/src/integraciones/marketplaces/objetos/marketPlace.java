@@ -7,6 +7,7 @@ import java.util.Map;
 
 import beans.datatypes.DataIDDescripcion;
 import beans.encuentra.EncuentraPedido;
+import integraciones.wms.Call_WS_APIENCUENTRA;
 import logica.LogicaAPI;
 
 public class marketPlace implements marketPlaceInterface{
@@ -112,8 +113,23 @@ public class marketPlace implements marketPlaceInterface{
 			Map<String, DataIDDescripcion> retornable) {
 		return null;
 	}
+	
+	@Override
+	public List<EncuentraPedido> buscarEtiquetas(List<DataIDDescripcion> pedidosSinE, Call_WS_APIENCUENTRA cen, String token, int canal, Map<String, Integer> depositosPickHT)
+	{
+		return null;
+	}
 
-
+	public void sinEtiquetas(Call_WS_APIENCUENTRA cen, String token, int canal, Map<String, Integer> depositosPickHT) {
+		List<DataIDDescripcion> pedidosSinE = cen.DarDatosPutOrders(token, 5, canal+"");
+		if (!pedidosSinE.isEmpty()) {
+			List<EncuentraPedido> pedidosUpEtiqueta = this.buscarEtiquetas(pedidosSinE, cen, token, canal, depositosPickHT);
+			if (!pedidosUpEtiqueta.isEmpty())
+				cen.updateLabels(pedidosUpEtiqueta,token);
+		}
+			
+		
+	}
 
 	
 	

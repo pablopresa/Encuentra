@@ -26,7 +26,7 @@ public class Result {
     private List<Payment> payments = null;
     private Shipping shipping;
     private Order_request order_request;
-    private Object pickup_id;
+    private Integer pickup_id;
     private Buyer buyer;
     private Seller seller;
     private Feedback feedback;
@@ -252,15 +252,15 @@ public class Result {
         return this;
     }
 
-    public Object getPickup_id() {
+    public Integer getPickup_id() {
         return pickup_id;
     }
 
-    public void setPickup_id(Object pickup_id) {
+    public void setPickup_id(Integer pickup_id) {
         this.pickup_id = pickup_id;
     }
 
-    public Result withPickup_id(Object pickup_id) {
+    public Result withPickup_id(Integer pickup_id) {
         this.pickup_id = pickup_id;
         return this;
     }

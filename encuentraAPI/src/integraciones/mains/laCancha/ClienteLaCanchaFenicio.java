@@ -119,7 +119,7 @@ public class ClienteLaCanchaFenicio {
 
 			pedidos = pedidos2;
 
-			List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2);
+			List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2, null);
 
 			Map<Integer, String> mailsDepositos = new HashMap<>();
 			for (DataIDDescripcion d : depositosDestino) {
@@ -382,7 +382,7 @@ public class ClienteLaCanchaFenicio {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			f.buscarEtiquetas(pedidosFenicio, wms, token, canal.getId());
+			f.sinEtiquetas(wms, token, canal.getId(), null);
 
 			// CONSULTO ESTADO DE DESPACHADOS
 			Map<String, String> pedidosDespachados = wms.PedidosID(token, 30, "4");

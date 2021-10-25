@@ -6,6 +6,7 @@ import java.util.Map;
 
 import beans.datatypes.DataIDDescripcion;
 import beans.encuentra.EncuentraPedido;
+import integraciones.wms.Call_WS_APIENCUENTRA;
 
 public interface marketPlaceInterface {
 	List<UpdateStateResponse> UpdateState(String json,int canal);

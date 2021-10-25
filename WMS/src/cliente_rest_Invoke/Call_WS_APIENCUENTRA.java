@@ -1411,7 +1411,7 @@ public void putColaCambioEstadoMarketPlace(List<jsonEstadoMP> lista, int idEmpre
 		
 	}
 	
-	public List<Remito> albaranesListosLaIsla(String idDeposito,String idDepositoO, boolean transito, int idEmpresa){
+	public List<Remito> albaranesListosLaIsla(String idDeposito,String idDepositoO, boolean transito, int idEmpresa, boolean ecommerce){
 			
 			List<Remito> remitos = new ArrayList<>();
 			String host = apiHost;
@@ -1425,7 +1425,7 @@ public void putColaCambioEstadoMarketPlace(List<jsonEstadoMP> lista, int idEmpre
 				String salida = "";			
 				
 				salida = callWSGET("http://"+host+"/encuentraAPI/Integraciones/ERPintegrations/albaranesListos?idDeposito="+idDeposito+"&idDepositoOrigen="
-				+idDepositoO+"&transito="+transito+"&token="+token_API,false);
+				+idDepositoO+"&transito="+transito+"&ecommerce="+ecommerce+"&token="+token_API,false);
 				remitos = gson.fromJson(salida, new TypeToken<List<Remito>>(){}.getType());
 			} catch (Exception e) 
 			{

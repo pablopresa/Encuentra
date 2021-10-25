@@ -49,7 +49,7 @@ public class _EncuentraSelDepoRecepTR extends Action
 		if(idDepoSel!=0)
 		{
 			Call_WS_APIENCUENTRA call = new Call_WS_APIENCUENTRA(); 
-			List<Remito> remitos =  call.albaranesListosLaIsla(idDepoSel+"",null,true, idEmpresa);
+			List<Remito> remitos =  call.albaranesListosLaIsla(idDepoSel+"",null,true, idEmpresa, false);
 			
 			List<DataIDDescDescripcion> depos = (List<DataIDDescDescripcion>) session.getAttribute("deposTran");
 			

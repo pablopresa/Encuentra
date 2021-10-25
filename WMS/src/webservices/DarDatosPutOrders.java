@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -33,6 +34,7 @@ public class DarDatosPutOrders
 	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Encoded
 	//public String createUser(@FormParam("name") String name) throws IOException
 	public String darTablas(String data, @QueryParam ("token") String a)
 	{	   
@@ -42,7 +44,9 @@ public class DarDatosPutOrders
 		Gson gson = new Gson();
 		String json = "";
 		
-		int idTabla = gson.fromJson(data, DataIDDescripcion.class).getId();
+		DataIDDescripcion dataid = gson.fromJson(data, DataIDDescripcion.class);
+		int idTabla = dataid.getId();
+		String descripcion=dataid.getDescripcion();
 		String padre = "{ \"idTabla\":"+idTabla+",\"datos\": ";
 		
 		Usuario u = l.loginEncuentraAPI2(a);
@@ -82,7 +86,8 @@ public class DarDatosPutOrders
 			}
 			case 5://pedidos sin factura
 			{
-				q = "SELECT 0,idPedido FROM ecommerce_pedido WHERE idEmpresa="+idEmpresa+" AND URLetiqueta='' AND stamptime>= DATE_ADD(CURDATE() ,INTERVAL -30 DAY)";
+				q = "SELECT 0,idPedido FROM ecommerce_pedido WHERE idEmpresa="+idEmpresa+" AND URLetiqueta='' AND stamptime>= DATE_ADD(CURDATE() ,INTERVAL -30 DAY) "
+						+ "and estadoencuentra in (1,2,25) and idCanalml ="+descripcion;
 				break;
 			}
 			default:

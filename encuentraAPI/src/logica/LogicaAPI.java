@@ -1145,7 +1145,7 @@ public class LogicaAPI
 			cone = _EncuentraConexionAPI2.getConnection();
 			
 			Call_WS_APIENCUENTRA cen = new Call_WS_APIENCUENTRA();
-			List<DataIDDescripcion>depositosPick = cen.DarDatosPutOrders(token,2);
+			List<DataIDDescripcion>depositosPick = cen.DarDatosPutOrders(token,2, null);
 			
 			Hashtable<String, String> depositosPickHT = new Hashtable<>();
 			for (DataIDDescripcion d : depositosPick) 
@@ -1168,7 +1168,7 @@ public class LogicaAPI
 		
 			
 			//VENTAS NUEVAS
-			int ultimaVenta = cen.DarDatosPutOrders(token,3).get(0).getId();		
+			int ultimaVenta = cen.DarDatosPutOrders(token,3, null).get(0).getId();		
 			List<Compras> compras2 =_EncuentraConexionAPI2.darComprasWeb(queryPedidos,idEmpresa);
 			
 			
@@ -2325,29 +2325,39 @@ public static ParametrosVisual darParametrosVS(int idEmpresa)
 	}
 }
 
-public static List<Remito> DarRemitosForus(String depo, String depoO, boolean TR, int idEmpresa) 
+public static List<Remito> DarRemitos(String depo, String depoO, boolean TR, int idEmpresa) 
 {
+	List<Remito> remitos = new ArrayList<Remito>();
 	@SuppressWarnings("unused") Connection cone;
 	try 
-	{
-		return MSSQL_API.DarRemitosForus(depo, depoO, TR, idEmpresa);		
+	{		
+		switch (idEmpresa) {
+		case 1:
+			remitos = MSSQL_API.DarRemitosStd(depo, depoO, TR, idEmpresa);
+			break;
+
+		case 2:
+			remitos = MSSQL_API.DarRemitosForus(depo, depoO, TR, idEmpresa);	
+			break;		
+		}
+		return remitos;
 	}
 	catch (Exception e)
 	{
-		return new ArrayList<>();
+		return remitos;
 	}
 }
 
-public static void RemitosForus(List<Remito> remitos, String idDeposito, int idEmpresa) {
+public static void RemitosForus(List<Remito> remitos, String idDeposito, int idEmpresa, boolean esEcommerce) {
 	try {
 		Call_WS_APIENCUENTRA wms = new Call_WS_APIENCUENTRA();
 		LogicaAPI l = new LogicaAPI();
 		String token = l.darToken(idEmpresa);
-		Map<Integer, String> parametros = wms.darParametros(token, "5");
+		/*Map<Integer, String> parametros = wms.darParametros(token, "5");
 		boolean esEcommerce = false;
 		try {
 			esEcommerce = idDeposito.equals(parametros.get(5));
-		} catch (Exception e) {}
+		} catch (Exception e) {}*/
 		String distrIn = "";
 		if(esEcommerce)
 		{
@@ -2373,9 +2383,6 @@ public static void RemitosForus(List<Remito> remitos, String idDeposito, int idE
 			
 			for (Remito r : remitos) 
 			{
-				if(r.getNumeroDoc()==14989) {
-					System.out.println("caso");
-				}
 				Long idPedido = (long)0;
 				try
 				{

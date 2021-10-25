@@ -89,6 +89,12 @@ public class _EncuentraConfirmarDistPick extends Action
 				Boolean clasificaPedido = util.darParametroEmpresaBool(idEmpresa, 49);
 				Long pedido = new Long("0");
 				
+				Hashtable<Integer,DataIDDescripcion> depositosWEB = (Hashtable<Integer, DataIDDescripcion>) session.getAttribute("canales_depositosWEB");
+				if(depositosWEB == null) {
+					depositosWEB = util.darDeposWEB(idEmpresa);
+					session.setAttribute("canales_depositosWEB", depositosWEB);
+				}
+				
 				Boolean paramVerificacion = (Boolean) session.getAttribute("paramVerificacion");
 				if(paramVerificacion==null){
 					paramVerificacion = util.darParametroEmpresaBool(idEmpresa, 52);
@@ -126,14 +132,16 @@ public class _EncuentraConfirmarDistPick extends Action
 					}
 				}
 				
-				int idDepoWEB = util.darParametroEmpresaINT(idEmpresa,5);
+				//int idDepoWEB = util.darParametroEmpresaINT(idEmpresa,5);
 				int cantidadLog = 0;
 				String msjEventos = "";
 				if (idPick!=0)
 				{
 					List<String> queries = new ArrayList<>();
 					String enCaja = "";
-					if(!posicion.equals(idDepoWEB+"")){
+					//if(!posicion.equals(idDepoWEB+"")){
+					int posicion_int = Integer.parseInt(posicion);
+					if(!depositosWEB.containsKey(posicion_int)) {
 						bulto b = null;
 						bultoContenido bc = null;
 						if(pickingsSel.isEsBulto() && pickingsSel.isEstaCerrado()) { 
@@ -153,7 +161,7 @@ public class _EncuentraConfirmarDistPick extends Action
 							Logica.encuentraMoverOjos(idDestino+"P",b.getIdBulto(),qty,uLog.getNumero(),idEmpresa);		//AGREGO BULTO A ZONA DE CLASIFICACION
 							Logica.IngresarMovimientoArticuloTipo("", idDestino+"P", b.getIdBulto(), qty,  uLog.getNumero(),"ADD",idEmpresa);	//REGISTRO LA UBICACION DEL BULTO
 							session.setAttribute("remitirBulto", b);
-							return clasificar(uLog, session, art, enCaja, pickings, idPick, idEmpresa, mapping,"cerrarBC" , idDepoWEB, posicion, util, qty,cajasAbiertas);
+							return clasificar(uLog, session, art, enCaja, pickings, idPick, idEmpresa, mapping,"cerrarBC" , depositosWEB, posicion_int, util, qty,cajasAbiertas);
 						}
 						
 						else if(cajasAbiertas.get(equipo+"-"+posicion)==null){
@@ -243,7 +251,8 @@ public class _EncuentraConfirmarDistPick extends Action
 						
 					}
 					
-					if(posicion.equals(idDepoWEB+"")){	
+					//if(posicion.equals(idDepoWEB+"")){	
+					if(depositosWEB.containsKey(posicion_int)) {
 						List<DataPicking> dp = new ArrayList<>();
 						if(pickingsSel.isEsBulto() && pickingsSel.isEstaCerrado()) {
 							dp = pickingsSel.getContenido();
@@ -262,7 +271,7 @@ public class _EncuentraConfirmarDistPick extends Action
 					
 					
 					Logica.getEper().persistirL(queries);
-					return clasificar(uLog, session, art, enCaja, pickings, idPick, idEmpresa, mapping, redirect, idDepoWEB, posicion, util, qty,cajasAbiertas);
+					return clasificar(uLog, session, art, enCaja, pickings, idPick, idEmpresa, mapping, redirect, depositosWEB, posicion_int, util, qty,cajasAbiertas);
 				}//---
 				else{
 					session.setAttribute("menError", "ESTE ARTICULO NO SE GUARDO EN LA CAJA, CIERRE SESSION E INTENTELO NUEVAMENTE");
@@ -289,7 +298,7 @@ public class _EncuentraConfirmarDistPick extends Action
 	}
 	
 	public ActionForward clasificar(Usuario uLog, HttpSession session, String art, String enCaja, List<DataPicking> pickings, int idPick, int idEmpresa, 
-			ActionMapping mapping, String redirect, int idDepoWEB, String posicion, Utilidades util, int qty, Hashtable<String, bulto> cajasAbiertas) {
+			ActionMapping mapping, String redirect, Hashtable<Integer,DataIDDescripcion> depositosWEB, int posicion_int, Utilidades util, int qty, Hashtable<String, bulto> cajasAbiertas) {
 		String retorno = "";
 		//LOGUEAMOS EVENTO
 		uLog.registrarEvento(idPick, qty,112,0,true, session.getId(), "Verificando articulo "+art+enCaja);
@@ -388,11 +397,12 @@ public class _EncuentraConfirmarDistPick extends Action
 			if(idPick>0){
 				try {
 					//CAMBIO ESTADO REPO SIEMPRE QUE NO SEA ECOMMERCE
-					if(!posicion.equals(idDepoWEB+"") && pickings.get(0).getRemision_bulto()==1){
+					//if(!posicion.equals(idDepoWEB+"") && pickings.get(0).getRemision_bulto()==1){
+					if(!depositosWEB.containsKey(posicion_int) && pickings.get(0).getRemision_bulto()==1) {
 						logica.UpdatePickingStatus(7, pickings.get(0).getIdPicking(),idEmpresa);
 					}				
 					//COMENTARIO LOG
-					uLog.registrarEventoHilo(session.getId(), "Se finalizo la verificacion del picking", pickings.get(0).getIdPicking(), 112);
+					uLog.registrarEventoHilo(session.getId(), "Se finalizo la verificacion del picking", idPick, 112);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -404,16 +414,19 @@ public class _EncuentraConfirmarDistPick extends Action
 				
 			}
 			
-			if(util.darParametroEmpresaBool(idEmpresa, 54))
-			{
-				int equipo = uLog.getEquipo_trabajo();
-				bulto bull = cajasAbiertas.get(equipo+"-"+posicion);
-				List<bulto> boxe = new ArrayList<>();
-				boxe.add(bull);
-				session.setAttribute("myboxes", boxe);
-				
-				return mapping.findForward("boxes");
+			if(!depositosWEB.containsKey(posicion_int)) {
+				if(util.darParametroEmpresaBool(idEmpresa, 54))
+				{
+					int equipo = uLog.getEquipo_trabajo();
+					bulto bull = cajasAbiertas.get(equipo+"-"+posicion_int);
+					List<bulto> boxe = new ArrayList<>();
+					boxe.add(bull);
+					session.setAttribute("myboxes", boxe);
+					
+					return mapping.findForward("boxes");
+				}
 			}
+			
 			
 			return mapping.findForward("fin");
 		}

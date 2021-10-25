@@ -48,9 +48,13 @@ public class _EncuentraDarRemitos extends Action
 		List<Remito> remitosIn = new ArrayList<>();
 		if(transitos==0)
 		{
+			Hashtable<Integer,DataIDDescripcion> depositosWEB = util.darDeposWEB(idEmpresa);
+			boolean esEcommerce = (depositosWEB.containsKey(Integer.parseInt(uLog.getDeposito()))) ? true : false;
+			
 			List<Remito> remitos = new ArrayList<>();
 			Call_WS_APIENCUENTRA call = new Call_WS_APIENCUENTRA();
-			remitos = call.albaranesListosLaIsla(uLog.getDeposito(),null,false, idEmpresa);
+			
+			remitos = call.albaranesListosLaIsla(uLog.getDeposito(),null,false, idEmpresa, esEcommerce);
 			
 			Hashtable<Integer, DataIDDescripcion> aliasDepositos = logica.darAliasDepositos(idEmpresa);
 			for(Remito r: remitos) {

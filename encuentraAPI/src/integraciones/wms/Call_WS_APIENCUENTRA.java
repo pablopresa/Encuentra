@@ -91,7 +91,7 @@ public class Call_WS_APIENCUENTRA
 		          StringBuilder strFileContents = new StringBuilder(); 
 		          while((bytesRead = bis.read(contents)) != -1) 
 		          { 
-		              strFileContents.append(new String(contents, 0, bytesRead));              
+		              strFileContents.append(new String(contents, 0, bytesRead, "UTF-8"));              
 		          }
 
 		          return strFileContents.toString();
@@ -310,7 +310,7 @@ public class Call_WS_APIENCUENTRA
 		
 	}
 	
-	public List<DataIDDescripcion> DarDatosPutOrders(String token, int idTabla)
+	public List<DataIDDescripcion> DarDatosPutOrders(String token, int idTabla, String descripcion)
 	{
 		try {
 			
@@ -320,7 +320,7 @@ public class Call_WS_APIENCUENTRA
 						
 			String json = "{ "+
 						"	   \"id\":"+idTabla+", "+
-						"	   \"descripcion\":\"\" "+
+						"	   \"descripcion\":\""+descripcion+"\" "+
 						"	}";
 			
 			String salida =  callWSPOST_ParamJSON(servicio, json);

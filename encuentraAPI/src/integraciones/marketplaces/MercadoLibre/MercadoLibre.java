@@ -48,6 +48,7 @@ import integraciones.marketplaces.MercadoLibre.entidades.Pickup;
 import integraciones.marketplaces.MercadoLibre.entidades.Result;
 import integraciones.marketplaces.MercadoLibre.entidades.Shipping;
 import integraciones.marketplaces.objetos.marketPlace;
+import integraciones.wms.Call_WS_APIENCUENTRA;
 import integraciones.marketplaces.MercadoLibre.entidades.TokenData;
 
 
@@ -103,6 +104,7 @@ public class MercadoLibre extends marketPlace{
 	}
 	
 	
+	
 	@Override
 	public List<EncuentraPedido> getPedidos(int canal, String status, int dias, Map<String, String> pedidosIn, Map<String, Integer> depositosPickHT) 
 	{
@@ -152,7 +154,7 @@ public class MercadoLibre extends marketPlace{
 					}				
 					
 					
-					if(pedidosIn.get(key)==null)
+					if(pedidosIn.get(key+"")==null)
 					{ //es un pedido nuevo		
 						
 						//seteo datos del cliente
@@ -212,6 +214,7 @@ public class MercadoLibre extends marketPlace{
 						p.setIdPedido(key);
 						p.setMl(1);
 						p.setPrecio(0.0);
+						p.setMontoEnvio(0.0);
 						
 						if(p.getIdPedido()<0){
 							System.out.println(key);
@@ -249,7 +252,8 @@ public class MercadoLibre extends marketPlace{
 						
 						if(costoEnvio>0.0)
 						{
-							ventaLineas.add(new OrdenVentaLinea(costoEnvio, "1", "0002000"));						
+							ventaLineas.add(new OrdenVentaLinea(costoEnvio, "1", "0002000"));		
+							p.setMontoEnvio(costoEnvio);
 						}
 						
 						p.setDescripcion("MELI: "+ pml.getBuyer().getFirst_name()+" "+pml.getBuyer().getLast_name());
@@ -354,7 +358,7 @@ public class MercadoLibre extends marketPlace{
 						{						
 							String idShipping = pml.getShipping().getId();
 							DataIDDescripcion pathEtiqueta = pdfEtiquetaML(String.valueOf(idShipping), access_token,pml.getId());
-							int num = depositosPickHT.get(pathEtiqueta.getDescripcionB());
+							int destino = depositosPickHT.get(pathEtiqueta.getDescripcionB());
 							
 							if(!pathEtiqueta.getDescripcionB().equals("")){
 								envio+=pathEtiqueta.getDescripcionB();
@@ -364,6 +368,7 @@ public class MercadoLibre extends marketPlace{
 							{	
 								p.setUrlEtiqueta(pathEtiqueta.getDescripcion());
 							}
+							p.setIdDepositoEnvio(destino);
 							p.setShippingType(new DataIDDescripcion(2,""));							
 							
 						}
@@ -379,7 +384,7 @@ public class MercadoLibre extends marketPlace{
 								int num = depositosPickHT.get(pi.getStore_info().getDescription());
 								String sucursalPick = String.format("%02d", num);
 								envio+="Pickup "+sucursalPick;
-								p.setSucursalPick(sucursalPick);
+								p.setIdDepositoEnvio(Integer.parseInt(sucursalPick));
 								String personaRetira = pi.getPickup_person().getFull_name();
 								p.setPersonaRetira(personaRetira);
 								p.setUrlEtiqueta("https://www.stadium.com.uy/public/ctm/"+sucursalPick+".pdf");
@@ -787,6 +792,86 @@ public class MercadoLibre extends marketPlace{
 		
 		this.callWSPOSTParam(jotason,URLbase+funcion);	
 		//this.sendPut(jotason,URLbase+funcion);
+	}
+	
+	@Override
+	public List<EncuentraPedido> buscarEtiquetas(List<DataIDDescripcion> pedidosSinE, Call_WS_APIENCUENTRA cen, String token, int canal, Map<String, Integer> depositosPickHT)
+	{
+		List<EncuentraPedido> pedidos = new ArrayList<EncuentraPedido>();
+		Gson gson = new Gson();
+		int est=0;
+		Long cantidadPasadas = new Long(1);
+		Fecha fecha = new Fecha(-30, 0, 0);		
+		Fecha fechaActual = new Fecha();		
+		String access_token = this.getToken(this.getCanales().get(canal).getUser(), this.getCanales().get(canal).getPass()); 
+		String seller = this.getCanales().get(canal).getSeller();			
+		int offset=0;
+		String URLbase = "https://api.mercadolibre.com";
+		for(DataIDDescripcion se : pedidosSinE) {
+			try
+			{								
+				String funcion = "/orders/search?order.status=paid&seller="+seller+"&order.date_created.from="+fecha.darFechaAnio_Mes_Dia()+
+						"T00:00:00.000-00:00&limit=50&offset="+offset+"&access_token="+access_token+"&q="+se.getDescripcion();
+				String retorno = this.callWSGET(URLbase, funcion);
+				//System.out.println(retorno);
+				MLPedidos pedidosML = gson.fromJson(retorno, MLPedidos.class);
+		        	        
+				for(Result pml: pedidosML.getResults()) {
+					EncuentraPedido p = new EncuentraPedido();
+					p.setIdPedido(Long.parseLong(se.getDescripcion()));
+					p.setTrackingNumber(se.getDescripcion());
+					String envio = "";
+					try
+					{									
+						String idShipping = pml.getShipping().getId();
+						DataIDDescripcion pathEtiqueta = pdfEtiquetaML(String.valueOf(idShipping), access_token,pml.getId());
+						int destino = depositosPickHT.get(pathEtiqueta.getDescripcionB());
+						
+						if(!pathEtiqueta.getDescripcionB().equals("")){
+							envio+=pathEtiqueta.getDescripcionB();
+						}
+														
+						if(!pathEtiqueta.getDescripcion().equals(""))
+						{	
+							p.setUrlEtiqueta(pathEtiqueta.getDescripcion());
+						}
+						p.setIdDepositoEnvio(destino);
+						p.setShippingType(new DataIDDescripcion(2,""));							
+						
+					}
+					catch (Exception e)
+					{								
+						try
+						{
+							funcion = "/pickups/"+pml.getPickup_id()+"?access_token="+access_token;
+							retorno = this.callWSGET(URLbase, funcion);
+							
+							Pickup pi = gson.fromJson(retorno,Pickup.class);
+							System.out.println(pi.getStore_info().getDescription()+"");
+							int num = depositosPickHT.get(pi.getStore_info().getDescription());
+							String sucursalPick = String.format("%02d", num);
+							envio+="Pickup "+sucursalPick;
+							p.setIdDepositoEnvio(Integer.parseInt(sucursalPick));
+							String personaRetira = pi.getPickup_person().getFull_name();
+							p.setPersonaRetira(personaRetira);
+							p.setUrlEtiqueta("https://www.stadium.com.uy/public/ctm/"+sucursalPick+".pdf");
+							
+							p.setShippingType(new DataIDDescripcion(1,""));		
+						}
+						catch (Exception e2)
+						{
+							System.out.println("error");
+						}
+					}
+					if(p.getUrlEtiqueta()!= null && !p.getUrlEtiqueta().equals(""))
+						pedidos.add(p);
+				}
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+				
+		return pedidos;
 	}
 	
 	

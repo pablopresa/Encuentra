@@ -537,7 +537,7 @@ public class ERPintegrations
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String albaranesListos(String data,@QueryParam ("idDeposito") String idDeposito, @QueryParam ("token") String token, @QueryParam ("idDepositoOrigen") String idDepositoO, 
-			@QueryParam ("transito") String transito) throws IOException
+			@QueryParam ("transito") String transito, @QueryParam ("ecommerce") String ecommerce) throws IOException
 	{		
 		String json = "";
 		Gson gson = new Gson();
@@ -553,25 +553,30 @@ public class ERPintegrations
 		else {
 			int idEmpresa = u.getIdEmpresa();
 			System.out.println(data);		
+			boolean tr = false;
+			boolean ec = false;
+			try {
+				ec = ecommerce.equalsIgnoreCase("true");
+			} catch (Exception e) {}
+			try {
+				tr = transito.equalsIgnoreCase("true");
+			} catch (Exception e) {}
 			
 			try {
 				
 				switch (idEmpresa) {
 				case 1:		//STADIUM
-					
-					break;
-					
+					remitos = LogicaAPI.DarRemitos(idDeposito, idDepositoO, tr, idEmpresa);
+					if(ec) {
+						
+					}
+					break;					
 					
 				case 2:		//FORUS
-					boolean tr = false;
-					try {
-						tr = transito.equalsIgnoreCase("true");
-					} catch (Exception e) {}
-					remitos = LogicaAPI.DarRemitosForus(idDeposito, idDepositoO, tr, idEmpresa);
-					LogicaAPI.RemitosForus(remitos, idDeposito, idEmpresa);
 					
-					break;	
-					
+					remitos = LogicaAPI.DarRemitos(idDeposito, idDepositoO, tr, idEmpresa);
+					LogicaAPI.RemitosForus(remitos, idDeposito, idEmpresa, ec);					
+					break;						
 					
 				case 4:		//EL REY DEL ENTRETENIMIENTO
 					
