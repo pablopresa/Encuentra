@@ -508,8 +508,6 @@ public class MSSQL_API
 		return retorno;
 	}
 
-	
-	
 	public static List<Compras> darComprasWeb(String query, Map<String, String> depositosPickHT,int ultimaVenta, int idEmpresa, Map<String, DataIDDescripcion> destinoPedidos, int idCanal) 
 	{
 		LogicaAPI Logica = new LogicaAPI();
@@ -742,8 +740,94 @@ public class MSSQL_API
 				return items;
 	}
 	
+	public static List<Remito> DarRemitosStd(String depo, String depoO, boolean TR, int idEmpresa) {
+		List<Remito> retorno = new ArrayList<>();
+		try {
+			String query="Select MS.IdDocumento, 0,Doc.Comentario,Doc.NumeroDoc, Doc.IdDepDestino, Doc.IdDeposito, Doc.Fecha, MS.cantidad, MS.IdArticulo, 0 " 
+					+"FROM MovStock MS INNER JOIN Documento Doc ON MS.IdDocumento = Doc.IdDocumento "
+					+"INNER JOIN MovStockEstado MSE ON MS.IdEstado = MSE.IdMovStockEstado "
+					+"INNER JOIN Deposito Dep ON Doc.IdDeposito = Dep.IdDeposito "
+					+"INNER JOIN Deposito DD ON Doc.IdDepDestino = DD.IdDeposito "
+					+"INNER JOIN Transaccion Tr ON Tr.IdTransaccion = Doc.IdTransaccion "
+					+"INNER JOIN PersonaEmpresa Pe ON Pe.IdPersonaEmpresa = Tr.IdUsuario "
+					+"INNER JOIN RazonDocumento Rd ON Doc.IdRazonDocumento=Rd.IdRazonDocumento "
+					+"Where ((Doc.IdDepDestino ="+depo+"  And Doc.IdTipoDocumento IN ('EMR','SMR','AJE','AJS','TRS','SMP','OEM','ORM')) "
+					+"Or (Doc.IdDeposito ="+depo+" And Doc.IdTipoDocumento IN ('TRE','EMC'))) "
+					+"And (Doc.IdTipoDocumento IN ('EMR','SMR','TRE','AJE','AJS','TRS','AJI','EMC','SMP','OEM','ORM')) "
+					+"And (  MS.IdEstado = 4 )  And Doc.IdListaEmpresa = 1 " 
+					+"Order by Doc.NumeroDoc";
+			
+			darConexion(idEmpresa);
+   	        
+	        Statement s = con.createStatement();
+	        ResultSet rs = s.executeQuery (query);
+			
+	        
+	        List<RemitoLinea> lineas = null;
+	        Remito remitoAnt = null;
+	        int idDocAnt = 0;
+	        boolean pri = true;
+	        Hashtable<String, String> entregas = null;
+	        int cantidadTotal = 0;
+	        
+			while (rs.next())
+			{
+				int idDocAct = rs.getInt(1);
+				Fecha fecha = new Fecha(rs.getString(7));
+				cantidadTotal += rs.getInt(8);
+				if(pri)
+				{
+					pri = false;
+					remitoAnt = new Remito(rs.getInt(2), rs.getInt(4), rs.getInt(5), rs.getInt(6), 0, rs.getString(3), fecha.darFechaDia_Mes_Anio_Barra());
+					lineas = new ArrayList<>();
+					lineas.add(new RemitoLinea(rs.getString(9), rs.getInt(8), rs.getString(2)));
+					entregas = new Hashtable<>();
+					entregas.put(rs.getString(2),rs.getString(2));
+					
+					
+					
+				}
+				else if(idDocAct==idDocAnt)
+				{
+					lineas.add(new RemitoLinea(rs.getString(9), rs.getInt(8), rs.getString(2)));
+					entregas.put(rs.getString(2),rs.getString(2));
+				}
+				else
+				{
+					cantidadTotal -= rs.getInt(8);
+					remitoAnt.setUnidades(cantidadTotal);
+					cantidadTotal = rs.getInt(8);
+					
+					remitoAnt.setLineas(lineas);
+					remitoAnt.setEntregasAfecta(new ArrayList<>(entregas.values()));
+					retorno.add(remitoAnt);
+					
+					remitoAnt = new Remito(rs.getInt(2), rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(10), rs.getString(3), fecha.darFechaDia_Mes_Anio_Barra());
+					lineas = new ArrayList<>();
+					lineas.add(new RemitoLinea(rs.getString(9), rs.getInt(8), rs.getString(2)));
+					entregas = new Hashtable<>();
+					entregas.put(rs.getString(2),rs.getString(2));
+					
+					
+				}
+				
+				idDocAnt=idDocAct;
+			}
+			closeFullConnection(con, rs, s);
+			
+			remitoAnt.setLineas(lineas);
+			remitoAnt.setEntregasAfecta(new ArrayList<>(entregas.values()));
+			retorno.add(remitoAnt);	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return retorno;
+	}
+	
+	
 	public static List<Remito> DarRemitosForus(String depo, String depoO, boolean TR, int idEmpresa) 
 	{
+		List<Remito> retorno = new ArrayList<>();
 		String qDepoOrigen = "";
 		String qTR = "";
 		if(depoO!=null && depoO.equals(""))
@@ -769,8 +853,7 @@ public class MSSQL_API
 		String q2 = "ORDER BY t0.IdDocumento;";
 			
 		System.out.println(q1+qDepoOrigen+qTR+q2);
-		String query = q1+qDepoOrigen+qTR+q2;
-		List<Remito> retorno = new ArrayList<>();		
+		String query = q1+qDepoOrigen+qTR+q2;				
 		        try {		        	
 		        	darConexion(idEmpresa);
 		           	        
@@ -786,9 +869,6 @@ public class MSSQL_API
 			        
 					while (rs.next())
 					{
-						if(rs.getInt(4)==14989) {
-							System.out.println("caso");
-						}
 						int idDocAct = rs.getInt(1);
 						Fecha fecha = new Fecha(rs.getString(7));
 						if(pri)
