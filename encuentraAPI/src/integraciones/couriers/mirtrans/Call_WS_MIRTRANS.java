@@ -110,7 +110,6 @@ public class Call_WS_MIRTRANS {
 					{
 						intentos=0;
 					}
-					
 				}
 				
 			}
