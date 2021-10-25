@@ -74,7 +74,10 @@ public class CanalMarketPlace {
 
 		// esta es la lista de pedidos buenos, los que vamos a meter en encuentra
 		List<EncuentraPedido> pedidos = new ArrayList<>();
+		Map<String, DataIDDescripcion> pedidosHT = new HashMap<>();
+
 		for (EncuentraPedido p : pedidosALL) {
+			
 			if (!pedidosEncuentra.containsKey(p.getIdPedido() + "")) {
 				p.setTrackingNumber(p.getIdPedido() + "");
 				List<EncuentraPedidoArticulo> removes = new ArrayList<>();
@@ -97,67 +100,74 @@ public class CanalMarketPlace {
 			}
 		}
 
-		List<DataIDDescripcion> listaOK = wms.SaveOrders(token, pedidos);
-
-		List<EncuentraPedido> pedidos2 = new ArrayList<>();
-		List<jsonEstadoMP> estadosMP = new ArrayList<>();
-
-		for (DataIDDescripcion pl : listaOK) {
+		if(!pedidos.isEmpty()) {
+			List<DataIDDescripcion> listaOK = wms.SaveOrders(token, pedidos);
+			
+			List<EncuentraPedido> pedidos2 = new ArrayList<>();
+			List<jsonEstadoMP> estadosMP = new ArrayList<>();
+			
+			for (DataIDDescripcion pl : listaOK) {
+				for (EncuentraPedido p : pedidos) {
+					if (((p.getIdPedido()) + "").equals(pl.getDescripcion())
+							&& pl.getDescripcionB().equals("OK")) {
+						pedidos2.add(p);
+						if (cambioEstado != null && cambioEstado.equals("1")) {
+							jsonEstadoMP estado = new jsonEstadoMP(p.getIdPedido() + "", 0, p.getIdPedido(),
+									mp.JSONUpdateState(p.getIdPedido(), p.getIdPedido() + "", "", 1),
+									this.id, idEmpresa);
+							estadosMP.add(estado);
+						}
+					}
+				}
+			}
+			
+			if (!estadosMP.isEmpty()) {
+				LogicaAPI.putColaEstadoMarketPlace(estadosMP);
+			}
+			
+			pedidos = pedidos2;
+			
+			
 			for (EncuentraPedido p : pedidos) {
-				if (((p.getIdPedido()) + "").equals(pl.getDescripcion())
-						&& pl.getDescripcionB().equals("OK")) {
-					pedidos2.add(p);
-					if (cambioEstado != null && cambioEstado.equals("1")) {
-						jsonEstadoMP estado = new jsonEstadoMP(p.getIdPedido() + "", 0, p.getIdPedido(),
-								mp.JSONUpdateState(p.getIdPedido(), p.getIdPedido() + "", "", 1),
-								this.id, idEmpresa);
-						estadosMP.add(estado);
+				// Ordenes ovf = f.OrdenVentaFenicio(p.getIdPedido(), f.getIdEmpresa(), 1);
+				try {
+					boolean found = false;
+					
+					for (DataIDDescripcion d : depositosDestino) {
+						if (d.getDescripcion().equals(p.getEmpresaEnvio())) {
+							p.setIdDepositoEnvio(d.getId());
+							p.setShippingType(new DataIDDescripcion(1, ""));
+							found = true;
+							break;
+						}
 					}
-				}
-			}
-		}
-
-		if (!estadosMP.isEmpty()) {
-			LogicaAPI.putColaEstadoMarketPlace(estadosMP);
-		}
-
-		pedidos = pedidos2;
-
-		Map<String, DataIDDescripcion> pedidosHT = new HashMap<>();
-		for (EncuentraPedido p : pedidos) {
-			// Ordenes ovf = f.OrdenVentaFenicio(p.getIdPedido(), f.getIdEmpresa(), 1);
-			try {
-				boolean found = false;
-
-				for (DataIDDescripcion d : depositosDestino) {
-					if (d.getDescripcion().equals(p.getEmpresaEnvio())) {
-						p.setIdDepositoEnvio(d.getId());
+					if (!found) {
+						
 						p.setShippingType(new DataIDDescripcion(1, ""));
-						found = true;
-						break;
+						System.out.println("No encontre " + p.getEmpresaEnvio());
+						p.setIdDepositoEnvio(0);
+						
 					}
-				}
-				if (!found) {
-
+				} catch (Exception e) {
 					p.setShippingType(new DataIDDescripcion(1, ""));
-					System.out.println("No encontre " + p.getEmpresaEnvio());
+					e.printStackTrace();
 					p.setIdDepositoEnvio(0);
-
 				}
-			} catch (Exception e) {
-				p.setShippingType(new DataIDDescripcion(1, ""));
-				e.printStackTrace();
-				p.setIdDepositoEnvio(0);
+				
+				
 			}
-
-			DataIDDescripcion pdid = new DataIDDescripcion(0, p.getIdPedido() + "");
-			pedidosHT.put(p.getIdFenicio() + "", pdid);
-
+			
+			System.out.println("");
+			wms.SaveOrdersArticulosReq(token, pedidos, this.id);
 		}
-
-		System.out.println("");
-		wms.SaveOrdersArticulosReq(token, pedidos, this.id);
-
+		
+		List<DataIDDescripcion> ordenesSinEtiqueta = wms.ordersNoLabel(token, ""+this.id);
+		
+		for (DataIDDescripcion orden : ordenesSinEtiqueta) {
+			DataIDDescripcion pdid = new DataIDDescripcion(0, orden.getDescripcion());
+			pedidosHT.put(orden.getDescripcionB(), pdid);
+		}
+		
 		pedidos = gp.setEtiquetas(pedidosHT, this.id, token, diasBusqueda, mp, wms);
 
 		for (EncuentraPedido p : pedidos) {

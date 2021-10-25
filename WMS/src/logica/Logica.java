@@ -10411,6 +10411,7 @@ public  List<DataDetallePedido> darListaDetallePedidosEcommerce(String idPedido,
 	{
 		cone = econ.getConnection();
 		String query = qry+qPedido+qFenicio+qArticulo+qEstado+qDestino+qFacturados+qFormaPago+qEtiqueta+qFechaI+qDepCero+qTienda+groupBy+limit;
+		System.out.println(query);
 		return econ.encuentraVerPedidos(query,idEmpresa,detalleCompleto);
 		
 		

@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 
 import beans.Fecha;
 import beans.datatypes.DataIDDescripcion;
+import beans.encuentra.Cliente;
 import beans.encuentra.EncuentraPedido;
 import beans.encuentra.EncuentraPedidoArticulo;
 import integraciones.marketplaces.fenicioTrack.ColectionUpdateState;
@@ -111,7 +112,6 @@ public class Vtex extends marketPlace {
 				  .build();
 		try {
 			Response response = client.newCall(request).execute();
-			
 			int bytesRead = 0;
 	        BufferedInputStream bis = new BufferedInputStream(response.body().byteStream());
 	        byte[] contents = new byte[1024];
@@ -121,7 +121,7 @@ public class Vtex extends marketPlace {
 	            strFileContents.append(new String(contents, 0, bytesRead));              
 	        }
 	        response.close();
-	        
+	        client.dispatcher().executorService().shutdown();
 	        return strFileContents.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -155,43 +155,70 @@ public class Vtex extends marketPlace {
 				
 				System.out.println("URL: " + url);
 				retorno = this.callHttpGet(url);
-				System.out.println("Retorno: " + retorno);
 				
+				System.out.println("Retorno: " + retorno);
 				VtexResponse order = gson.fromJson(retorno, VtexResponse.class);
 				
 				ClientProfileData cliente = order.getClientProfileData();
 
 				EncuentraPedido p = new EncuentraPedido();
 
-				String canalVentaWs = order.getShippingData().getLogisticsInfo().get(0).getDeliveryChannel();
+				String canalVentaWs = order.getShippingData().getAddress().getAddressType();
 				System.out.println("Canal de venta: " + canalVentaWs);
-				if(canalVentaWs.equals("delivery")) {
+				
+				if(canalVentaWs.equals("residential")) {
 					
 					DeliveryIds courier = order.getShippingData().getLogisticsInfo().get(0).getDeliveryIds().get(0);
 					System.out.println("Courier: " + courier.getCourierId() +" - " + courier.getCourierName());
-//					destino = new DataIDDescripcion(courier.getCourierId(), ""+canal);
 					p.setSucursalPick(courier.getWarehouseId());
 					p.setEmpresaEnvio(courier.getCourierName());
 					p.setEmpresaEnvioCod(courier.getCourierId());
 					p.setDestino(new DataIDDescripcion(0,""+canal));
+					p.setIdDepositoEnvio(0);
 				}
 				else {
-					String direccion =  order.getShippingData().getLogisticsInfo().get(0).getSlas().get(0).getPickupStoreInfo().getAddress().getAddressId();
+					
+					ShippingData datosEnvio = order.getShippingData();
+					String direccion =  datosEnvio.getAddress().getAddressId();
+					
 					System.out.println("Pickup: " + direccion);
 					int idDireccion = Integer.parseInt(direccion);
 					p.setSucursalPick(direccion);
 					p.setEmpresaEnvio(direccion);
 					p.setEmpresaEnvioCod(direccion);
 					p.setDestino(new DataIDDescripcion(idDireccion,""+canal));
+					p.setIdDepositoEnvio(idDireccion);
+					
+					Cliente clientePedido = new Cliente();
+					clientePedido.setNombre(cliente.getFirstName());
+					clientePedido.setApellido(cliente.getLastName());
+					clientePedido.setCalle(datosEnvio.getAddress().getStreet());
+					clientePedido.setCiudad(datosEnvio.getAddress().getCity());
+					clientePedido.setDepartamento(datosEnvio.getAddress().getState());
+					clientePedido.setDocumentoNro(cliente.getDocument());
+					clientePedido.setDocumentoTipo(cliente.getDocumentType());
+					clientePedido.setEmail(cliente.getEmail());
+					clientePedido.setIdPedido(order.getOrderId());
+					clientePedido.setLatitud(datosEnvio.getAddress().getGeoCoordinates().get(1));
+					clientePedido.setLocalidad(datosEnvio.getAddress().getNeighborhood());
+					clientePedido.setLongitud(datosEnvio.getAddress().getGeoCoordinates().get(0));
+					clientePedido.setNroApto("");
+					clientePedido.setNroPuerta(datosEnvio.getAddress().getNumber());
+					clientePedido.setObs(datosEnvio.getAddress().getComplement());
+					clientePedido.setRazonSocial(cliente.getCorporateName()!=null? cliente.getCorporateName() : "");
+					clientePedido.setRut("");
+					clientePedido.setTelefono(cliente.getPhone());
+					clientePedido.setCp(datosEnvio.getAddress().getPostalCode());
+					p.setCliente(clientePedido);
 				}
 				
-//						Si el deliverychannel = delivery tomo el destino de 
-//						tomo nombre y id de courier, si es pickup me tomo de pickupstoreinfo - address - addressid
-//						Si no es delivery le seteo el codigo de la sucursal en envio y enviocod
+	//			Si el deliverychannel = delivery tomo el destino de
+	//			tomo nombre y id de courier, si es pickup me tomo de pickupstoreinfo - address - addressid
+	//			Si no es delivery le seteo el codigo de la sucursal en envio y enviocod
 				
 				p.setIdFenicio(order.getOrderId());
                 p.setDescripcion(cliente.getFirstName()+" "+cliente.getLastName());
-                            
+                
                 p.setTicketNumber("");
                 p.setEstado("");
                 p.setUrlEtiqueta("");
@@ -209,6 +236,7 @@ public class Vtex extends marketPlace {
                 	articulos.add(articulo);
                 }
                 p.setArticulosPedido(articulos);
+                System.out.println(String.format("AGREGO PEDIDO: id: %s , destino: id: %s , descripcion: %s ", p.getIdPedido(), p.getDestino().getId(), p.getDestino().getDescripcion()));
                 pedidos.add(p);
 			}
 			

@@ -364,7 +364,6 @@ public class OrderFunctions
 	public List<DataIDDescripcion> ordersNoLabel(@QueryParam ("canal") String canal,@QueryParam ("token") String a) throws IOException
 	{	   
 		Logica l = new Logica();	
-		Gson gson = new Gson();
 		List<DataIDDescripcion> retorno = new ArrayList<>();
 		
 		try
@@ -384,6 +383,38 @@ public class OrderFunctions
 		
 		return retorno;
 	}
+	
+	@GET
+	@Path("/ordersNoLabelMarketplace")
+
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	//public String createUser(@FormParam("name") String name) throws IOException
+	public String ordersNoLabelMarkeplace(@QueryParam ("canal") String canal,@QueryParam ("token") String a) throws IOException
+	{	   
+		Logica l = new Logica();	
+		List<DataIDDescripcion> retorno = new ArrayList<>();
+		Gson gson = new Gson();
+		
+		try
+		{		
+			Usuario u = l.loginEncuentraAPI2(a);
+			int c = Integer.parseInt(canal);
+			
+			if(u!=null) {
+				int idEmpresa = u.getIdEmpresa();					
+				retorno = new ArrayList<>(l.darPedidosPorCanalFenicio(c, idEmpresa).values());				
+			}			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		return gson.toJson(retorno);
+	}
+	
 	
 	@GET
 	@Path("/ordersNotDispatched")

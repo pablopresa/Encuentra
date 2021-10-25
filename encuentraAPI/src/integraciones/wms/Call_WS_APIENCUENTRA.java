@@ -47,7 +47,6 @@ import beans.encuentra.DataArticuloEcommerceVerifR;
 import beans.encuentra.DataEcommerce_canales_envio;
 import beans.encuentra.DepositoMayorista;
 import beans.encuentra.EncuentraPedido;
-
 import beans.helper.PropertiesHelper;
 import logica.LogicaAPI;
 
@@ -1072,6 +1071,28 @@ public class Call_WS_APIENCUENTRA
 		}
 		return new ArrayList<>();
 	}
+	
+	public List<DataIDDescripcion> ordersNoLabel(String token, String idCanal)
+	{
+		try {
+
+			// String host = "encuentra.200.com.uy";
+
+			String servicio = "http://" + host + "/WMS/Integraciones/OrderFunctions/ordersNoLabelMarketplace?canal=" + idCanal
+					+ "&token=" + token;
+
+			Gson gson = new Gson();
+
+			String salida = callWSGET(servicio, false);
+
+			return gson.fromJson(salida, new TypeToken<List<DataIDDescripcion>>() {}.getType());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
+	
 	
 }
 

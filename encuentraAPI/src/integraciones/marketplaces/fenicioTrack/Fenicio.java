@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -179,7 +178,7 @@ public class Fenicio extends marketPlace{
 	
 	//GET PEDIDOS
 	@Override
-	public List<EncuentraPedido> getPedidos(int canal, String status, int dias, Map<String, String> pedidosIn, Map<String, Integer> depositosPickHT) 
+	public List<EncuentraPedido> getPedidos(int canal, String status, int dias) 
 	{					
 		int pag=1;
         int cantidadPasadas = 20;

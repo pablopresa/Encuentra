@@ -66,7 +66,10 @@ public class Call_WS_MIRTRANS {
 			data.setDescripcionB("2");
 			parametros.add(data);
 			data = new DataIDDescripcion(0,"destinatario");
-			data.setDescripcionB(c.getNombre()+" "+c.getApellido());
+			if(c!=null && c.getNombre()!=null && c.getApellido()!=null)
+				data.setDescripcionB(c.getNombre()+" "+c.getApellido());
+			else
+				data.setDescripcionB("");
 			parametros.add(data);
 			data = new DataIDDescripcion(0,"direccion");
 			data.setDescripcionB(c.getCalle()+" "+c.getNroPuerta());

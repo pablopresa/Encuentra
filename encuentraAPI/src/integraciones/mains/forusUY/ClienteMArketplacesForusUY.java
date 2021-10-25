@@ -31,7 +31,7 @@ public class ClienteMArketplacesForusUY {
 		String token = logica.darToken(v.getIdEmpresa());
 		Map<Integer, String> integraciones = wms.darIntegraciones(token);
 		String cambioEstado = integraciones.get(3) != null ? integraciones.get(3) : "0";
-		int diasBusqueda = 6;
+		int diasBusqueda = 14;
 
 		Map<String, DataIDDescripcion> destinoPedidos = new HashMap<>();
 		List<DataIDDescripcion> depositosDestino = wms.DarDatosPutOrders(token, 2);
@@ -41,31 +41,23 @@ public class ClienteMArketplacesForusUY {
 			if (mp.getIdMarketPlace() != 1) {
 				for (Entry<Integer, CanalMarketPlace> canal : mp.getCanales().entrySet()) {
 //				 0 buscamos los destinos de los pedidos
-					destinoPedidos = f.DestinoPedidos(canal.getKey(), diasBusqueda, destinoPedidos);
+					destinoPedidos = mp.DestinoPedidos(canal.getKey(), diasBusqueda, destinoPedidos);
 				}
 			}
 		}
 
 		for (marketPlace mp : marketplaces) {
 			if (mp.getIdMarketPlace() != 1) {
-
 				for (Entry<Integer, CanalMarketPlace> entry : mp.getCanales().entrySet()) {
-
 					CanalMarketPlace canal = entry.getValue();
-
 					try {
-
 						canal.guardarOrdenes(v.getIdEmpresa(), wms, token, cambioEstado, diasBusqueda, destinoPedidos,
 								gp, depositosDestino, mp);
-
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-
 				}
 			} // for de canales
 		}
-
 	}
-
 }

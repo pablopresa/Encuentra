@@ -177,8 +177,9 @@ public class GetPedidosForusVS
 				p.setIdPedido(Long.parseLong(pedidos.get(p.getIdFenicio()).getDescripcion()));
 				
 				Shipping shipp = new Shipping();
-				Cliente cli = new Cliente(p.getCliente());
-				shipp.setCliente(cli);
+				if(p.getCliente()!=null && p.getCliente().getNombre()!=null) {
+					Cliente cli = new Cliente(p.getCliente());
+					shipp.setCliente(cli);
 				/*Esto se cambio*/
 				Utilidades utilidades = new Utilidades();
 				shipp.getCliente().setApellido(utilidades.validarComillas(shipp.getCliente().getApellido()));
@@ -192,6 +193,7 @@ public class GetPedidosForusVS
 				shipp.getCliente().setObs(cli.getObs());
 				shipp.getCliente().setTelefono(cli.getTelefono());
 				shipp.getCliente().setEmail(cli.getEmail());
+				}
 				
 				DataDescDescripcion eti = null;
 				int destino = 0;
@@ -233,7 +235,6 @@ public class GetPedidosForusVS
 					System.out.println(p.getSucursalPick());
 					Utilidades u = new Utilidades();
 					int sucPick = u.tryParse(p.getSucursalPick());
-					
 					
 					DataArticuloEcommerceVerifR articuloR = new DataArticuloEcommerceVerifR(p.getIdPedido(), 0, p.getCantidad(), "", p.getDescripcion(), "", sucPick);
 				

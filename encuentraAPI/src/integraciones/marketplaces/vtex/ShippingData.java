@@ -3,7 +3,7 @@ import java.util.List;
 public class ShippingData
 {
     private String id;
-
+    private Address address;
 
     private List<LogisticsInfo> logisticsInfo;
 
@@ -35,6 +35,12 @@ public class ShippingData
     public List<SelectedAddresses> getSelectedAddresses(){
         return this.selectedAddresses;
     }
+	public Address getAddress() {
+		return address;
+	}
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 }
 
 

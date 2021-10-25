@@ -586,7 +586,9 @@ public class MSSQL_API
 									arreglo = arreglo[1].split(" ");
 									c.setIdVenta(arreglo[0]);
 								}
-								catch (Exception e) {}
+								catch (Exception e) {
+									e.printStackTrace();
+								}
 								try
 								{
 									
